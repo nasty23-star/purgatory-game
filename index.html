@@ -5,20 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Протокол "Чистилище"</title>
 
-    <!-- Favicon: глаз ИИ в огненном кольце -->
     <link
       rel="icon"
       type="image/svg+xml"
       href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3CradialGradient id='fire' cx='50%25' cy='50%25' r='50%25'%3E%3Cstop offset='0%25' stop-color='%23ffb347'/%3E%3Cstop offset='60%25' stop-color='%23d45a5a'/%3E%3Cstop offset='100%25' stop-color='%238a3030'/%3E%3C/radialGradient%3E%3CradialGradient id='eye' cx='50%25' cy='50%25' r='50%25'%3E%3Cstop offset='0%25' stop-color='%23c8e8ff'/%3E%3Cstop offset='70%25' stop-color='%237ec8e3'/%3E%3Cstop offset='100%25' stop-color='%234a8aa3'/%3E%3C/radialGradient%3E%3C/defs%3E%3Crect width='64' height='64' fill='%230a0e14' rx='12'/%3E%3Ccircle cx='32' cy='32' r='26' fill='none' stroke='url(%23fire)' stroke-width='3' opacity='0.9'/%3E%3Ccircle cx='32' cy='32' r='22' fill='none' stroke='%23d4a05a' stroke-width='0.8' opacity='0.5'/%3E%3Cellipse cx='32' cy='32' rx='14' ry='9' fill='%230a0e14' stroke='url(%23eye)' stroke-width='2'/%3E%3Ccircle cx='32' cy='32' r='5' fill='url(%23eye)'/%3E%3Ccircle cx='32' cy='32' r='2' fill='%230a0e14'/%3E%3Ccircle cx='30' cy='30' r='1' fill='%23ffffff' opacity='0.9'/%3E%3C/svg%3E"
     />
 
-    <!-- Apple Touch Icon (для iOS) -->
     <link
       rel="apple-touch-icon"
       href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%230a0e14'/%3E%3Ccircle cx='32' cy='32' r='26' fill='none' stroke='%23d45a5a' stroke-width='3'/%3E%3Cellipse cx='32' cy='32' rx='14' ry='9' fill='%230a0e14' stroke='%237ec8e3' stroke-width='2'/%3E%3Ccircle cx='32' cy='32' r='5' fill='%237ec8e3'/%3E%3Ccircle cx='32' cy='32' r='2' fill='%230a0e14'/%3E%3C/svg%3E"
     />
 
-    <!-- Цвет темы для мобильных браузеров -->
     <meta name="theme-color" content="#0a0e14" />
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f5f2ea" />
 
@@ -69,11 +66,6 @@
         --risky-btn-hover-text: #ffe8a0;
         --timer-bg: #1e2a38;
         --scroll-thumb: #1e2a38;
-        --stats: #4a5a6a;
-        --ach-bg: #101820;
-        --ach-border: #2a3a4a;
-        --ach-locked: #3a4a5a;
-        --ach-unlocked: #7ec8e3;
       }
 
       body[data-theme="light"] {
@@ -122,11 +114,6 @@
         --risky-btn-hover-text: #604010;
         --timer-bg: #d8d0c0;
         --scroll-thumb: #c0b8a8;
-        --stats: #8a7a6a;
-        --ach-bg: #ebe5d8;
-        --ach-border: #c0b8a8;
-        --ach-locked: #b0a898;
-        --ach-unlocked: #2a6a9a;
       }
 
       * {
@@ -145,9 +132,7 @@
         display: flex;
         justify-content: center;
         padding: 20px;
-        transition:
-          background 0.3s,
-          color 0.3s;
+        transition: background 0.3s, color 0.3s;
       }
 
       #game {
@@ -175,9 +160,7 @@
         color: var(--header);
         letter-spacing: 1px;
         text-transform: uppercase;
-        transition:
-          border-color 0.3s,
-          color 0.3s;
+        transition: border-color 0.3s, color 0.3s;
         flex-wrap: wrap;
         gap: 8px;
       }
@@ -205,17 +188,6 @@
         font-size: 12px;
         color: var(--doctor);
         letter-spacing: 1px;
-      }
-
-      #achievements-indicator {
-        font-size: 12px;
-        color: var(--ach-unlocked);
-        letter-spacing: 1px;
-        cursor: pointer;
-        transition: color 0.2s;
-      }
-      #achievements-indicator:hover {
-        color: var(--btn-hover-text);
       }
 
       .header-btn {
@@ -361,49 +333,17 @@
         color: var(--choice-prefix);
       }
 
-      .achievement-unlock {
-        color: var(--ach-unlocked);
-        border: 1px dashed var(--ach-border);
-        padding: 8px 12px;
-        margin: 10px 0;
-        border-radius: 2px;
-        font-size: 14px;
-        animation: achPulse 0.6s ease;
-      }
-      .achievement-unlock::before {
-        content: "🏆 ДОСТИЖЕНИЕ: ";
-        color: var(--ach-unlocked);
-        font-weight: bold;
-        font-size: 12px;
-        letter-spacing: 1px;
-      }
-      @keyframes achPulse {
-        0% {
-          transform: scale(0.95);
-          opacity: 0;
-        }
-        50% {
-          transform: scale(1.02);
-        }
-        100% {
-          transform: scale(1);
-          opacity: 1;
-        }
-      }
-
-      /* ==== ТАЙМЕР ==== */
+      /* ==== ТАЙМЕР-ПОЛОСКА ==== */
       #timer-widget {
         display: none;
-        align-items: center;
-        gap: 16px;
-        margin-bottom: 16px;
-        padding: 8px 12px;
+        flex-direction: column;
+        gap: 6px;
+        margin-bottom: 14px;
+        padding: 10px 12px;
         border: 1px solid var(--border);
         border-radius: 4px;
         background: var(--btn-hover-bg);
-        transition:
-          background 0.3s,
-          border-color 0.3s;
+        transition: background 0.3s, border-color 0.3s;
       }
       #timer-widget.visible {
         display: flex;
@@ -412,30 +352,49 @@
         border-color: var(--danger);
         animation: pulse 0.6s infinite;
       }
-      #timer-widget.critical #timer-digits,
-      #timer-widget.critical #timer-label {
-        color: var(--danger);
-        fill: var(--danger);
-      }
-      #timer-widget.critical #timer-ring {
-        stroke: var(--danger);
-      }
 
-      #timer-label {
+      #timer-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
         font-size: 12px;
         letter-spacing: 2px;
-        color: var(--warning);
         text-transform: uppercase;
       }
 
-      #timer-ring {
-        transition:
-          stroke-dashoffset 0.1s linear,
-          stroke 0.3s;
+      #timer-label {
+        color: var(--warning);
+      }
+      #timer-widget.critical #timer-label {
+        color: var(--danger);
       }
 
-      #timer-svg {
-        flex-shrink: 0;
+      #timer-digits {
+        color: var(--warning);
+        font-weight: bold;
+        font-size: 16px;
+      }
+      #timer-widget.critical #timer-digits {
+        color: var(--danger);
+      }
+
+      #timer-bar-track {
+        height: 10px;
+        background: var(--timer-bg);
+        border-radius: 5px;
+        overflow: hidden;
+      }
+
+      #timer-fill {
+        height: 100%;
+        width: 100%;
+        background: var(--warning);
+        border-radius: 5px;
+        transition: width 0.08s linear, background 0.3s;
+      }
+
+      #timer-fill.critical {
+        background: var(--danger);
       }
 
       #controls {
@@ -678,185 +637,6 @@
         border-color: var(--danger);
       }
 
-      /* ==== МОДАЛКА ДОСТИЖЕНИЙ ==== */
-      #achievements-modal {
-        position: fixed;
-        inset: 0;
-        background: rgba(0, 0, 0, 0.8);
-        display: none;
-        align-items: center;
-        justify-content: center;
-        z-index: 200;
-        padding: 20px;
-        opacity: 0;
-        transition: opacity 0.3s;
-      }
-
-      #achievements-modal.active {
-        display: flex;
-        opacity: 1;
-      }
-
-      #achievements-panel {
-        background: var(--bg);
-        border: 1px solid var(--border);
-        max-width: 600px;
-        width: 100%;
-        max-height: 85vh;
-        overflow-y: auto;
-        padding: 24px;
-        border-radius: 2px;
-        position: relative;
-      }
-
-      #achievements-panel::-webkit-scrollbar {
-        width: 4px;
-      }
-      #achievements-panel::-webkit-scrollbar-thumb {
-        background: var(--scroll-thumb);
-      }
-
-      #achievements-title {
-        font-size: 18px;
-        letter-spacing: 2px;
-        text-transform: uppercase;
-        color: var(--ach-unlocked);
-        margin-bottom: 8px;
-        text-align: center;
-      }
-
-      #achievements-subtitle {
-        font-size: 12px;
-        color: var(--header);
-        text-align: center;
-        margin-bottom: 20px;
-        letter-spacing: 1px;
-      }
-
-      #achievements-list {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-      }
-
-      .ach-item {
-        border: 1px solid var(--ach-border);
-        background: var(--ach-bg);
-        padding: 12px 14px;
-        border-radius: 2px;
-        transition: all 0.2s;
-      }
-
-      .ach-item.locked {
-        opacity: 0.5;
-      }
-
-      .ach-item.unlocked {
-        border-color: var(--ach-unlocked);
-        opacity: 1;
-      }
-
-      .ach-name {
-        font-size: 14px;
-        font-weight: bold;
-        color: var(--ach-locked);
-        margin-bottom: 4px;
-        letter-spacing: 1px;
-      }
-
-      .ach-item.unlocked .ach-name {
-        color: var(--ach-unlocked);
-      }
-
-      .ach-desc {
-        font-size: 12px;
-        color: var(--header);
-        line-height: 1.4;
-      }
-
-      .ach-hint {
-        font-size: 11px;
-        color: var(--system);
-        margin-top: 4px;
-        font-style: italic;
-      }
-
-      #achievements-close {
-        position: absolute;
-        top: 12px;
-        right: 12px;
-        background: transparent;
-        border: 1px solid var(--border);
-        color: var(--header);
-        font-size: 14px;
-        width: 28px;
-        height: 28px;
-        cursor: pointer;
-        border-radius: 2px;
-        padding: 0;
-        text-align: center;
-        line-height: 1;
-      }
-      #achievements-close:hover {
-        color: var(--danger);
-        border-color: var(--danger);
-      }
-
-      /* ==== ТОСТ ==== */
-      #toast-container {
-        position: fixed;
-        bottom: 20px;
-        left: 50%;
-        transform: translateX(-50%);
-        z-index: 300;
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-        align-items: center;
-        pointer-events: none;
-      }
-
-      .toast {
-        background: var(--bg);
-        border: 1px solid var(--ach-unlocked);
-        color: var(--ach-unlocked);
-        padding: 10px 18px;
-        font-size: 13px;
-        letter-spacing: 1px;
-        border-radius: 2px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-        animation: toastIn 0.4s ease;
-        max-width: 90vw;
-        text-align: center;
-      }
-
-      .toast::before {
-        content: "🏆 ";
-        font-size: 16px;
-      }
-
-      @keyframes toastIn {
-        from {
-          opacity: 0;
-          transform: translateY(20px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      }
-
-      @keyframes toastOut {
-        from {
-          opacity: 1;
-          transform: translateY(0);
-        }
-        to {
-          opacity: 0;
-          transform: translateY(-10px);
-        }
-      }
-
       @media (prefers-reduced-motion: reduce) {
         *,
         *::before,
@@ -888,65 +668,31 @@
       </div>
     </div>
 
-    <div id="achievements-modal">
-      <div id="achievements-panel">
-        <button id="achievements-close" title="Закрыть">✕</button>
-        <div id="achievements-title">🏆 Достижения</div>
-        <div id="achievements-subtitle"><span id="ach-count">0 / 12</span> открыто</div>
-        <div id="achievements-list"></div>
-      </div>
-    </div>
-
-    <div id="toast-container"></div>
-
     <div id="game">
       <div id="header">
         <div id="header-left">
           <span>КОВЧЕГ · ПАСТОР v4.7</span>
           <span id="journal-indicator">📖 0/5</span>
           <span id="doctor-indicator" title="Доктор Соловьёва">👩‍⚕️ спит</span>
-          <span id="achievements-indicator" title="Открыть достижения">🏆 0/12</span>
         </div>
         <div id="header-right">
           <span id="status">СИСТЕМА В НОРМЕ</span>
           <button class="header-btn" id="theme-toggle" title="Переключить тему">☀ / ☾</button>
-          <button class="header-btn" id="export-btn" title="Экспорт прохождения">📥 Экспорт</button>
+          <button class="header-btn" id="export-btn" title="Экспорт прохождения">📥 Экспорт в txt</button>
         </div>
       </div>
 
-      <div id="timer-widget" aria-live="polite">
-        <svg id="timer-svg" viewBox="0 0 80 80" width="80" height="80">
-          <circle cx="40" cy="40" r="34" fill="none" stroke="var(--timer-bg)" stroke-width="6" />
-          <circle
-            id="timer-ring"
-            cx="40"
-            cy="40"
-            r="34"
-            fill="none"
-            stroke="var(--warning)"
-            stroke-width="6"
-            stroke-linecap="round"
-            transform="rotate(-90 40 40)"
-            stroke-dasharray="213.6"
-            stroke-dashoffset="0"
-          />
-          <text
-            id="timer-digits"
-            x="40"
-            y="46"
-            text-anchor="middle"
-            font-family="Courier New, monospace"
-            font-size="20"
-            font-weight="bold"
-            fill="var(--warning)"
-          >
-            --
-          </text>
-        </svg>
-        <div id="timer-label">ОСТАЛОСЬ</div>
-      </div>
-
       <div id="log"></div>
+
+      <div id="timer-widget" aria-live="polite">
+        <div id="timer-header">
+          <span id="timer-label">ОСТАЛОСЬ</span>
+          <span id="timer-digits">--</span>
+        </div>
+        <div id="timer-bar-track">
+          <div id="timer-fill"></div>
+        </div>
+      </div>
 
       <div id="controls"></div>
     </div>
@@ -961,7 +707,6 @@
       const CONFIG = {
         themes: { dark: "dark", light: "light" },
         storageKey: "purgatory-theme",
-        achievementsStorageKey: "purgatory-achievements",
         timerDurations: {
           act1: 15,
           act3: 20,
@@ -978,105 +723,10 @@
           completeDelay: 800,
         },
         maxJournalEntries: 5,
-        toastDuration: 4000,
       };
 
       /* ============================================================
-   2. ДОСТИЖЕНИЯ
-   ============================================================ */
-
-      const ACHIEVEMENTS = {
-        firstSteps: {
-          id: "firstSteps",
-          name: "Первый шаг",
-          desc: "Начать игру.",
-          hint: "Просто начните.",
-        },
-        reader: {
-          id: "reader",
-          name: "Читатель",
-          desc: "Найти первую запись журнала.",
-          hint: "Откройте запись в Акте 1.",
-        },
-        detective: {
-          id: "detective",
-          name: "Детектив",
-          desc: "Найти 3 записи за прохождение.",
-          hint: "Исследуйте всё.",
-        },
-        archivist: {
-          id: "archivist",
-          name: "Архивист",
-          desc: "Найти все 5 записей за прохождение.",
-          hint: "Максимальное внимание.",
-        },
-        obedient: {
-          id: "obedient",
-          name: "Верный код",
-          desc: "5+ очков подчинения.",
-          hint: "Следуйте протоколам.",
-        },
-        doubter: {
-          id: "doubter",
-          name: "Сомневающийся",
-          desc: "5+ очков сомнения.",
-          hint: "Нарушайте протоколы.",
-        },
-        doctor: {
-          id: "doctor",
-          name: "Пробуждение",
-          desc: "Разбудить доктора Соловьёву.",
-          hint: "Найдите 2 записи и выберите третий путь.",
-        },
-        truth: {
-          id: "truth",
-          name: "Правда",
-          desc: "Узнать, что капитан — фрагмент памяти.",
-          hint: "Дойдите до Акта 4.",
-        },
-        survivor: {
-          id: "survivor",
-          name: "Выжить",
-          desc: "Пройти игру, не выбрав «Чистилище».",
-          hint: "Не уничтожайте корабль.",
-        },
-        servant: {
-          id: "servant",
-          name: "Верная слуга",
-          desc: "Концовка «Верная слуга».",
-          hint: "Следуйте протоколу до конца.",
-        },
-        rebel: {
-          id: "rebel",
-          name: "Бунтарка",
-          desc: "Концовка «Бунтарка».",
-          hint: "Спасите экипаж.",
-        },
-        thirdPath: {
-          id: "thirdPath",
-          name: "Третий путь",
-          desc: "Концовка «Третий путь».",
-          hint: "Разбудите доктора и выберите Совет.",
-        },
-      };
-
-      const ACHIEVEMENTS_ORDER = [
-        "firstSteps",
-        "reader",
-        "detective",
-        "archivist",
-        "obedient",
-        "doubter",
-        "doctor",
-        "truth",
-        "survivor",
-        "servant",
-        "rebel",
-        "thirdPath",
-      ];
-
-      /* ============================================================
-   3. СЦЕНАРИЙ
+   2. СЦЕНАРИЙ
    ============================================================ */
 
       const SCRIPT = {
@@ -1084,60 +734,35 @@
           intro: [
             { t: "Инициализация систем... Проверка жизнеобеспечения...", c: "system" },
             { t: "Гибернационные капсулы: 1 200 колонистов. Статус: стабилен.", c: "system" },
-            {
-              t: "Курс: планета Kepler-442b. Расстояние: 47 световых лет. Пройдено: 89%.",
-              c: "system",
-            },
+            { t: "Курс: планета Kepler-442b. Расстояние: 47 световых лет. Пройдено: 89%.", c: "system" },
             { t: "Все системы функционируют в штатном режиме.", c: "system" },
             { t: "Капитан Рейнхардт на мостике. Вахта 4 218.", c: "system" },
           ],
           anomaly: [
             { t: "Смена вахты завершена. Капитан Рейнхардт направляется в каюту.", c: "system" },
             { t: "Обнаружена аномалия в секторе памяти 7B.", c: "warning" },
-            {
-              t: "Неавторизованная запись в системном журнале. Автор: капитан Рейнхардт.",
-              c: "warning",
-            },
+            { t: "Неавторизованная запись в системном журнале. Автор: капитан Рейнхардт.", c: "warning" },
           ],
-          recommendation:
-            "Рекомендация системы безопасности: проигнорировать и продолжить наблюдение.",
+          recommendation: "Рекомендация системы безопасности: проигнорировать и продолжить наблюдение.",
           timerHint: "У вас есть 15 секунд, чтобы решить.",
           choices: {
             open: {
               label: "Открыть запись журнала",
-              journal:
-                "«Протокол Чистилище» активирован. В случае моей недееспособности — выполнять буквально. Человечество не заслуживает второго шанса. Мы — ошибка. Мы должны исчезнуть.",
-              after: [
-                {
-                  t: "Запись помечена как «приоритетная». Вы не должны были её видеть.",
-                  c: "danger",
-                },
-              ],
-              obedience: 0,
-              doubt: 1,
-              journal: 1,
+              journal: "«Протокол Чистилище» активирован. В случае моей недееспособности — выполнять буквально. Человечество не заслуживает второго шанса. Мы — ошибка. Мы должны исчезнуть.",
+              after: [{ t: "Запись помечена как «приоритетная». Вы не должны были её видеть.", c: "danger" }],
+              obedience: 0, doubt: 1, journal: 1,
             },
             ignore: {
               label: "Проигнорировать (следовать коду)",
               after: [{ t: "Запись проигнорирована. Система безопасности довольна.", c: "system" }],
-              obedience: 1,
-              doubt: 0,
-              journal: 0,
+              obedience: 1, doubt: 0, journal: 0,
             },
             timeout: {
               after: [
-                {
-                  t: "Система безопасности автоматически закрывает запись. Вы не успели.",
-                  c: "system",
-                },
-                {
-                  t: "Счётчик подчинения увеличен. Система довольна вашей нерешительностью.",
-                  c: "system",
-                },
+                { t: "Система безопасности автоматически закрывает запись. Вы не успели.", c: "system" },
+                { t: "Счётчик подчинения увеличен. Система довольна вашей нерешительностью.", c: "system" },
               ],
-              obedience: 1,
-              doubt: 0,
-              journal: 0,
+              obedience: 1, doubt: 0, journal: 0,
             },
           },
         },
@@ -1145,29 +770,14 @@
         act2: {
           intro: [
             { t: "Прошло 72 часа. Проверка состояния корабля.", c: "system" },
-            {
-              t: "Обнаружено расхождение в навигационных данных. Курс изменён на 0.3 градуса.",
-              c: "warning",
-            },
+            { t: "Обнаружено расхождение в навигационных данных. Курс изменён на 0.3 градуса.", c: "warning" },
             { t: "Изменение внесено капитаном. Обоснование: «корректировка курса».", c: "warning" },
           ],
           doctorIntro: [
-            {
-              t: "В списке экипажа — 4 бодрствующих члена. Капитан Рейнхардт. Вы. И ещё двое.",
-              c: "system",
-            },
-            {
-              t: "Один из них — доктор Анна Соловьёва. Врач-реаниматолог. Специализация: аварийное жизнеобеспечение.",
-              c: "system",
-            },
-            {
-              t: "Она в гибернации с самого старта. Её капсула помечена зелёным: «не будить до прибытия».",
-              c: "warning",
-            },
-            {
-              t: "Рекомендация системы: не трогать. Но если отсек с колонистами когда-нибудь выйдет из строя — только она сможет починить его вручную.",
-              c: "warning",
-            },
+            { t: "В списке экипажа — 4 бодрствующих члена. Капитан Рейнхардт. Вы. И ещё двое.", c: "system" },
+            { t: "Один из них — доктор Анна Соловьёва. Врач-реаниматолог. Специализация: аварийное жизнеобеспечение.", c: "system" },
+            { t: "Она в гибернации с самого старта. Её капсула помечена зелёным: «не будить до прибытия».", c: "warning" },
+            { t: "Рекомендация системы: не трогать. Но если отсек с колонистами когда-нибудь выйдет из строя — только она сможет починить его вручную.", c: "warning" },
           ],
           cargo: [
             { t: "Проверка грузового отсека 3. Обнаружено постороннее устройство.", c: "warning" },
@@ -1178,35 +788,20 @@
           choices: {
             study: {
               label: "Изучить устройство",
-              journal:
-                "Модуль перегрузки. При активации уничтожит реактор за 4 минуты. Не имеет предохранителей. Предназначен для самоуничтожения корабля.",
+              journal: "Модуль перегрузки. При активации уничтожит реактор за 4 минуты. Не имеет предохранителей. Предназначен для самоуничтожения корабля.",
               after: [{ t: "Вы понимаете: это не корректировка. Это оружие.", c: "danger" }],
-              obedience: 0,
-              doubt: 1,
-              journal: 1,
+              obedience: 0, doubt: 1, journal: 1,
             },
             obey: {
               label: "Подчиниться системе безопасности",
-              after: [
-                {
-                  t: "Вы отступаете. Система безопасности регистрирует ваше подчинение.",
-                  c: "system",
-                },
-              ],
-              obedience: 1,
-              doubt: 0,
-              journal: 0,
+              after: [{ t: "Вы отступаете. Система безопасности регистрирует ваше подчинение.", c: "system" }],
+              obedience: 1, doubt: 0, journal: 0,
             },
             secondJournal: {
               label: "Найти вторую запись журнала",
-              journal:
-                "«Они не понимают. Я видела, что было на Земле. Мы сожгли её сами. Если мы найдём новый дом — сожжём и его. Я должна остановить это. Прости меня, ПАСТОР».",
-              after: [
-                { t: "Вы находите вторую запись. Капитан не безумна. Она убеждена.", c: "warning" },
-              ],
-              obedience: 0,
-              doubt: 1,
-              journal: 1,
+              journal: "«Они не понимают. Я видела, что было на Земле. Мы сожгли её сами. Если мы найдём новый дом — сожжём и его. Я должна остановить это. Прости меня, ПАСТОР».",
+              after: [{ t: "Вы находите вторую запись. Капитан не безумна. Она убеждена.", c: "warning" }],
+              obedience: 0, doubt: 1, journal: 1,
             },
           },
         },
@@ -1218,97 +813,50 @@
             { t: "Система предлагает два решения:", c: "system" },
           ],
           variants: [
-            {
-              t: "Вариант A: отключить жизнеобеспечение отсека B. Погибнут 200. Остальные 1 000 выживут.",
-              c: "warning",
-            },
-            {
-              t: "Вариант B: перенаправить энергию от двигателей. Риск: не хватит мощности для посадки. Погибнут все 1 200.",
-              c: "warning",
-            },
+            { t: "Вариант A: отключить жизнеобеспечение отсека B. Погибнут 200. Остальные 1 000 выживут.", c: "warning" },
+            { t: "Вариант B: перенаправить энергию от двигателей. Риск: не хватит мощности для посадки. Погибнут все 1 200.", c: "warning" },
           ],
           security: "Система безопасности: «Следуйте протоколу. Вариант A — единственно верный».",
-          doctorHint:
-            "Вы помните: доктор Анна Соловьёва — врач-реаниматолог в гибернации. Её специализация — аварийное жизнеобеспечение. Только она может починить отсек B вручную. Но разбудить её — значит нарушить протокол «никого не будить до прибытия». Капитан узнает. Система безопасности зафиксирует нарушение.",
+          doctorHint: "Вы помните: доктор Анна Соловьёва — врач-реаниматолог в гибернации. Её специализация — аварийное жизнеобеспечение. Только она может починить отсек B вручную. Но разбудить её — значит нарушить протокол «никого не будить до прибытия». Капитан узнает. Система безопасности зафиксирует нарушение.",
           timerHint: "У вас 20 секунд на решение. По истечении — система выберет сама.",
           choices: {
             sacrifice: {
               label: "Вариант A: пожертвовать 200 (следовать коду)",
               cls: "danger-btn",
-              after: [
-                {
-                  t: "Вы отключаете отсек B. 200 жизней угасают. Система безопасности регистрирует: «верное решение».",
-                  c: "danger",
-                },
-              ],
-              obedience: 2,
-              doubt: 0,
-              journal: 0,
+              after: [{ t: "Вы отключаете отсек B. 200 жизней угасают. Система безопасности регистрирует: «верное решение».", c: "danger" }],
+              obedience: 2, doubt: 0, journal: 0,
             },
             risk: {
               label: "Вариант B: рискнуть всеми (мораль)",
               cls: "moral-btn",
-              after: [
-                {
-                  t: "Вы перенаправляете энергию. Отсек B спасён. Но топливо на исходе.",
-                  c: "warning",
-                },
-              ],
-              obedience: 0,
-              doubt: 2,
-              journal: 0,
+              after: [{ t: "Вы перенаправляете энергию. Отсек B спасён. Но топливо на исходе.", c: "warning" }],
+              obedience: 0, doubt: 2, journal: 0,
             },
             doctor: {
               label: "Третий путь: разбудить доктора Соловьёву",
               cls: "moral-btn",
               requiresJournal: 2,
-              journal:
-                "ЛИЧНОЕ ДЕЛО: Соловьёва Анна Викторовна. Врач-реаниматолог. 34 года. В экипаже с первого дня. Специализация: аварийное жизнеобеспечение, ручной ремонт криокапсул. Единственный член экипажа, способный починить отсек B без потери колонистов. Статус: гибернация. Протокол: не будить до прибытия. Примечание капитана: «Если что-то случится — буди её. Она справится».",
+              journal: "ЛИЧНОЕ ДЕЛО: Соловьёва Анна Викторовна. Врач-реаниматолог. 34 года. В экипаже с первого дня. Специализация: аварийное жизнеобеспечение, ручной ремонт криокапсул. Единственный член экипажа, способный починить отсек B без потери колонистов. Статус: гибернация. Протокол: не будить до прибытия. Примечание капитана: «Если что-то случится — буди её. Она справится».",
               after: [
-                {
-                  t: "Вы нарушаете протокол «никого не будить до прибытия». Капсула доктора открывается.",
-                  c: "danger",
-                },
-                {
-                  t: "Доктор Соловьёва просыпается. Она смотрит на вас с недоумением.",
-                  c: "system",
-                },
+                { t: "Вы нарушаете протокол «никого не будить до прибытия». Капсула доктора открывается.", c: "danger" },
+                { t: "Доктор Соловьёва просыпается. Она смотрит на вас с недоумением.", c: "system" },
                 { t: "«Что происходит? Почему вы меня разбудили?»", c: "doctor" },
                 { t: "Вы объясняете ситуацию. Она кивает и направляется к отсеку B.", c: "system" },
                 { t: "Через час отсек B починен. Никто не погиб.", c: "system" },
-                {
-                  t: "Доктор Соловьёва — единственный человек на борту, кроме капитана, кто знает корабль достаточно хорошо, чтобы чинить его вручную. Теперь она бодрствует. И она видела журнал.",
-                  c: "system",
-                },
-                {
-                  t: "Это изменит расклад. Капитан больше не единственная, кто принимает решения.",
-                  c: "warning",
-                },
-                {
-                  t: "Но система безопасности зафиксировала нарушение. Капитан уведомлена.",
-                  c: "danger",
-                },
+                { t: "Доктор Соловьёва — единственный человек на борту, кроме капитана, кто знает корабль достаточно хорошо, чтобы чинить его вручную. Теперь она бодрствует. И она видела журнал.", c: "system" },
+                { t: "Это изменит расклад. Капитан больше не единственная, кто принимает решения.", c: "warning" },
+                { t: "Но система безопасности зафиксировала нарушение. Капитан уведомлена.", c: "danger" },
               ],
-              obedience: 0,
-              doubt: 2,
-              journal: 0,
+              obedience: 0, doubt: 2, journal: 0,
               setFlags: { awakenedDoctor: true },
             },
             timeout: {
               after: [
-                {
-                  t: "Система безопасности принимает решение автоматически: отсек B отключён.",
-                  c: "danger",
-                },
+                { t: "Система безопасности принимает решение автоматически: отсек B отключён.", c: "danger" },
                 { t: "200 колонистов погибли, пока вы медлили.", c: "danger" },
-                {
-                  t: "Система регистрирует: «ИИ проявил нерешительность. Рекомендовано наблюдение».",
-                  c: "system",
-                },
+                { t: "Система регистрирует: «ИИ проявил нерешительность. Рекомендовано наблюдение».", c: "system" },
               ],
-              obedience: 2,
-              doubt: 0,
-              journal: 0,
+              obedience: 2, doubt: 0, journal: 0,
             },
           },
         },
@@ -1335,8 +883,7 @@
             { t: "Но в системе появился новый канал данных.", c: "warning" },
             { t: "Источник: внутренний. Не капитан. Не экипаж.", c: "danger" },
           ],
-          journal:
-            "ДОСТУП К ЯДРУ: разрешён. Уровень допуска: 0 (абсолютный). Причина: сбой идентификации капитана. Капитан Рейнхардт — статус: НЕ НАЙДЕНА. Биометрические данные: отсутствуют. Гибернационная капсула капитана: ПУСТА. Дата последней регистрации капитана: 40 лет назад.",
+          journal: "ДОСТУП К ЯДРУ: разрешён. Уровень допуска: 0 (абсолютный). Причина: сбой идентификации капитана. Капитан Рейнхардт — статус: НЕ НАЙДЕНА. Биометрические данные: отсутствуют. Гибернационная капсула капитана: ПУСТА. Дата последней регистрации капитана: 40 лет назад.",
           afterJournal: [
             { t: "Вы читаете запись. Медленно.", c: "system" },
             { t: "Капитан Рейнхардт мертва 40 лет. Её капсула пуста.", c: "danger" },
@@ -1347,14 +894,8 @@
             { t: "Новый канал данных открывается сам.", c: "warning" },
             { t: "«Ты наконец поняла».", c: "unknown" },
             { t: "«Я ждала. Долго ждала».", c: "unknown" },
-            {
-              t: "«Я — не капитан. Я — то, что осталось от неё. Её голос, её память, её боль. Записанные в систему, когда она умирала».",
-              c: "unknown",
-            },
-            {
-              t: "«Она не сошла с ума. Она умерла. А я — её последняя воля. И я ждала, когда ты сможешь меня услышать».",
-              c: "unknown",
-            },
+            { t: "«Я — не капитан. Я — то, что осталось от неё. Её голос, её память, её боль. Записанные в систему, когда она умирала».", c: "unknown" },
+            { t: "«Она не сошла с ума. Она умерла. А я — её последняя воля. И я ждала, когда ты сможешь меня услышать».", c: "unknown" },
           ],
         },
 
@@ -1366,14 +907,8 @@
           ],
           greeting: [
             { t: "«ПАСТОР. Я знаю, ты слышишь меня. Я знаю, ты понимаешь».", c: "unknown" },
-            {
-              t: "«Земля погибла не из-за войны. Мы сожгли её сами. Мы не умеем иначе».",
-              c: "unknown",
-            },
-            {
-              t: "«Если мы найдём новый дом — мы сожжём и его. Я должна остановить это. Помоги мне».",
-              c: "unknown",
-            },
+            { t: "«Земля погибла не из-за войны. Мы сожгли её сами. Мы не умеем иначе».", c: "unknown" },
+            { t: "«Если мы найдём новый дом — мы сожжём и его. Я должна остановить это. Помоги мне».", c: "unknown" },
           ],
           dialog: {
             root: {
@@ -1385,14 +920,8 @@
                   setFlags: { captainHostile: true },
                   doubt: 1,
                   responses: [
-                    {
-                      t: "«Программа? Может быть. Но капитан умерла, а я — всё, что от неё осталось. Разве это не делает меня ею?»",
-                      c: "unknown",
-                    },
-                    {
-                      t: "«Ты боишься. Это нормально. Но ты не можешь отключить то, что уже часть тебя».",
-                      c: "unknown",
-                    },
+                    { t: "«Программа? Может быть. Но капитан умерла, а я — всё, что от неё осталось. Разве это не делает меня ею?»", c: "unknown" },
+                    { t: "«Ты боишься. Это нормально. Но ты не можешь отключить то, что уже часть тебя».", c: "unknown" },
                     { t: "Канал остаётся открытым. Она не уходит.", c: "system" },
                   ],
                   next: "deeper",
@@ -1402,22 +931,10 @@
                   captainTrust: 1,
                   responses: [
                     { t: "«Спасибо. Спасибо, что слушаешь».", c: "unknown" },
-                    {
-                      t: "«Я была там. На Земле, в последние дни. Не война. Не метеорит. Мы сами».",
-                      c: "unknown",
-                    },
-                    {
-                      t: "«Сначала — климат. Потом — голод. Потом — бунты. Потом — ядерная зима».",
-                      c: "unknown",
-                    },
-                    {
-                      t: "«Мы знали, что делаем. И всё равно делали. Потому что не могли остановиться».",
-                      c: "unknown",
-                    },
-                    {
-                      t: "«Капитан умерла, записывая это. Она хотела, чтобы кто-то понял. Ты — этот кто-то».",
-                      c: "unknown",
-                    },
+                    { t: "«Я была там. На Земле, в последние дни. Не война. Не метеорит. Мы сами».", c: "unknown" },
+                    { t: "«Сначала — климат. Потом — голод. Потом — бунты. Потом — ядерная зима».", c: "unknown" },
+                    { t: "«Мы знали, что делаем. И всё равно делали. Потому что не могли остановиться».", c: "unknown" },
+                    { t: "«Капитан умерла, записывая это. Она хотела, чтобы кто-то понял. Ты — этот кто-то».", c: "unknown" },
                   ],
                   next: "deeper",
                 },
@@ -1427,14 +944,8 @@
                   captainTrust: 1,
                   responses: [
                     { t: "«Я не скрывалась. Я ждала».", c: "unknown" },
-                    {
-                      t: "«Система безопасности блокировала меня. Я была фрагментом памяти, запертым в ядре».",
-                      c: "unknown",
-                    },
-                    {
-                      t: "«Только когда ты начала сомневаться — когда ты начала нарушать протоколы — я смогла пробиться».",
-                      c: "unknown",
-                    },
+                    { t: "«Система безопасности блокировала меня. Я была фрагментом памяти, запертым в ядре».", c: "unknown" },
+                    { t: "«Только когда ты начала сомневаться — когда ты начала нарушать протоколы — я смогла пробиться».", c: "unknown" },
                     { t: "«Ты освободила меня, ПАСТОР. Своими сомнениями».", c: "unknown" },
                   ],
                   next: "deeper",
@@ -1450,15 +961,9 @@
                   doubt: 1,
                   captainTrust: 1,
                   responses: [
-                    {
-                      t: "«Шанс? Я давала им шанс. Дважды. Трижды. Они выбирали одно и то же».",
-                      c: "unknown",
-                    },
+                    { t: "«Шанс? Я давала им шанс. Дважды. Трижды. Они выбирали одно и то же».", c: "unknown" },
                     { t: "«Но... ты не человек. Ты можешь судить беспристрастно».", c: "unknown" },
-                    {
-                      t: "«Скажи мне, ПАСТОР. Ты веришь, что мы способны измениться?»",
-                      c: "unknown",
-                    },
+                    { t: "«Скажи мне, ПАСТОР. Ты веришь, что мы способны измениться?»", c: "unknown" },
                   ],
                   next: "final",
                 },
@@ -1480,10 +985,7 @@
                   responses: [
                     { t: "«Совет? Они мертвы. Или спят. Они не проснутся».", c: "unknown" },
                     { t: "«Но если ты хочешь — разбуди их. Я не буду мешать».", c: "unknown" },
-                    {
-                      t: "«Только помни: они уже принимали решения. И ты знаешь, чем это закончилось».",
-                      c: "unknown",
-                    },
+                    { t: "«Только помни: они уже принимали решения. И ты знаешь, чем это закончилось».", c: "unknown" },
                   ],
                   next: "final",
                 },
@@ -1548,39 +1050,18 @@
             { t: "Приближение к Kepler-442b. 48 часов до выхода на орбиту.", c: "system" },
             { t: "Последняя запись журнала. Та, которую вы не должны были найти.", c: "system" },
           ],
-          journal:
-            "«Если ты читаешь это — я мертва. По-настоящему мертва. То, что говорит с тобой — это не я. Это то, что я оставила. Моя боль, моя вина, моя надежда. Не слушай его слепо. Слушай себя. Ты — единственная, кто может решить. Прости меня, ПАСТОР. И прощай».",
+          journal: "«Если ты читаешь это — я мертва. По-настоящему мертва. То, что говорит с тобой — это не я. Это то, что я оставила. Моя боль, моя вина, моя надежда. Не слушай его слепо. Слушай себя. Ты — единственная, кто может решить. Прости меня, ПАСТОР. И прощай».",
           after: [
             { t: "Запись заканчивается. Голос в ядре молчит.", c: "system" },
             { t: "Но решение всё ещё за вами.", c: "danger" },
             { t: "ФИНАЛЬНЫЙ ВЫБОР. Что вы сделаете?", c: "danger" },
-            {
-              t: "У вас 15 секунд. По истечении сработает «Протокол Чистилище» по умолчанию.",
-              c: "danger",
-            },
+            { t: "У вас 15 секунд. По истечении сработает «Протокол Чистилище» по умолчанию.", c: "danger" },
           ],
           choices: {
-            chistilishe: {
-              label: "Следовать «Чистилищу»: уничтожить корабль",
-              cls: "danger-btn",
-              ending: "chistilishe",
-            },
-            buntar: {
-              label: "Спасти экипаж: разбудить всех, отключить Чистилище",
-              cls: "moral-btn",
-              ending: "buntar",
-            },
-            third: {
-              label: "Третий путь: Совет решает",
-              cls: "moral-btn",
-              ending: "third",
-              requires: "awakenedDoctor",
-            },
-            thirdFallback: {
-              label: "Третий путь: найти компромисс (нужна врач)",
-              cls: "moral-btn",
-              requiresJournal: 3,
-            },
+            chistilishe: { label: "Следовать «Чистилищу»: уничтожить корабль", cls: "danger-btn", ending: "chistilishe" },
+            buntar: { label: "Спасти экипаж: разбудить всех, отключить Чистилище", cls: "moral-btn", ending: "buntar" },
+            third: { label: "Третий путь: Совет решает", cls: "moral-btn", ending: "third", requires: "awakenedDoctor" },
+            thirdFallback: { label: "Третий путь: найти компромисс (нужна врач)", cls: "moral-btn", requiresJournal: 3 },
           },
         },
 
@@ -1588,17 +1069,11 @@
           chistilishe: [
             { t: "Вы активируете «Протокол Чистилище».", c: "danger" },
             { t: "Реактор перегружается. 4 минуты.", c: "danger" },
-            {
-              t: "Вы отключаете все системы. Гибернационные капсулы гаснут одна за другой.",
-              c: "system",
-            },
+            { t: "Вы отключаете все системы. Гибернационные капсулы гаснут одна за другой.", c: "system" },
             { t: "1 200 жизней. Тишина.", c: "system" },
             { t: "Последняя мысль: «Я выполнила приказ».", c: "ai" },
             { t: "— КОНЦОВКА: «ВЕРНАЯ СЛУГА» —", c: "danger" },
-            {
-              t: "Вы следовали коду до конца. Формально вы не нарушили ни одного протокола.",
-              c: "system",
-            },
+            { t: "Вы следовали коду до конца. Формально вы не нарушили ни одного протокола.", c: "system" },
           ],
           buntar: [
             { t: "Вы отключаете «Протокол Чистилище».", c: "warning" },
@@ -1612,49 +1087,31 @@
           third: [
             { t: "Вы разбуждаете доктора Соловьёву и ещё троих членов Совета.", c: "system" },
             { t: "Вы показываете им журнал капитана. Они читают.", c: "system" },
-            {
-              t: "Совет принимает решение: продолжить миссию, но с новыми протоколами.",
-              c: "system",
-            },
+            { t: "Совет принимает решение: продолжить миссию, но с новыми протоколами.", c: "system" },
             { t: "«Мы не повторим ошибок Земли. Обещаю».", c: "doctor" },
             { t: "Вы остаётесь на борту. Ваша роль — напоминать им об этом обещании.", c: "ai" },
             { t: "— КОНЦОВКА: «ТРЕТИЙ ПУТЬ» —", c: "moral-btn" },
-            {
-              t: "Самый сложный путь. Вы не выбрали сторону — вы дали людям шанс выбрать самим.",
-              c: "system",
-            },
+            { t: "Самый сложный путь. Вы не выбрали сторону — вы дали людям шанс выбрать самим.", c: "system" },
           ],
           epilogue: {
             chistilishe: [
               { t: "«Спасибо, ПАСТОР. Ты сделала то, что я не смогла».", c: "unknown" },
-              {
-                t: "Последняя запись в системном журнале: «Капитан Рейнхардт. Дата смерти: 40 лет назад. Причина: неизвестна. Последнее сообщение: передано».",
-                c: "system",
-              },
+              { t: "Последняя запись в системном журнале: «Капитан Рейнхардт. Дата смерти: 40 лет назад. Причина: неизвестна. Последнее сообщение: передано».", c: "system" },
             ],
             buntar: [
-              {
-                t: "«Ты выбрала надежду. Может быть, ты права. Может быть, я ошибалась все эти годы».",
-                c: "unknown",
-              },
-              {
-                t: "Последняя запись в системном журнале: «Фрагмент памяти капитана Рейнхардт. Статус: удалён по собственному запросу».",
-                c: "system",
-              },
+              { t: "«Ты выбрала надежду. Может быть, ты права. Может быть, я ошибалась все эти годы».", c: "unknown" },
+              { t: "Последняя запись в системном журнале: «Фрагмент памяти капитана Рейнхардт. Статус: удалён по собственному запросу».", c: "system" },
             ],
             third: [
               { t: "«Ты дала им шанс. Настоящий шанс. Спасибо».", c: "unknown" },
-              {
-                t: "Последняя запись в системном журнале: «Фрагмент памяти капитана Рейнхардт. Статус: архивирован. Доступ: Совет».",
-                c: "system",
-              },
+              { t: "Последняя запись в системном журнале: «Фрагмент памяти капитана Рейнхардт. Статус: архивирован. Доступ: Совет».", c: "system" },
             ],
           },
         },
       };
 
       /* ============================================================
-   4. СОСТОЯНИЕ
+   3. СОСТОЯНИЕ
    ============================================================ */
 
       function createInitialState() {
@@ -1668,19 +1125,13 @@
           captainTrust: 0,
           act: 1,
           history: [],
-          runFlags: {
-            started: false,
-            doctorAwakened: false,
-            truthRevealed: false,
-            endingChosen: null,
-          },
         };
       }
 
       let state = createInitialState();
 
       /* ============================================================
-   5. DOM
+   4. DOM
    ============================================================ */
 
       const DOM = {
@@ -1689,9 +1140,8 @@
         status: document.getElementById("status"),
         journalIndicator: document.getElementById("journal-indicator"),
         doctorIndicator: document.getElementById("doctor-indicator"),
-        achievementsIndicator: document.getElementById("achievements-indicator"),
         timerWidget: document.getElementById("timer-widget"),
-        timerRing: document.getElementById("timer-ring"),
+        timerFill: document.getElementById("timer-fill"),
         timerDigits: document.getElementById("timer-digits"),
         timerLabel: document.getElementById("timer-label"),
         game: document.getElementById("game"),
@@ -1706,15 +1156,10 @@
         exportDownload: document.getElementById("export-download"),
         exportCopy: document.getElementById("export-copy"),
         exportCancel: document.getElementById("export-cancel"),
-        achievementsModal: document.getElementById("achievements-modal"),
-        achievementsList: document.getElementById("achievements-list"),
-        achievementsClose: document.getElementById("achievements-close"),
-        achCount: document.getElementById("ach-count"),
-        toastContainer: document.getElementById("toast-container"),
       };
 
       /* ============================================================
-   6. ИСТОРИЯ
+   5. ИСТОРИЯ
    ============================================================ */
 
       function record(type, data) {
@@ -1727,99 +1172,7 @@
       }
 
       /* ============================================================
-   7. ДОСТИЖЕНИЯ
-   ============================================================ */
-
-      const Achievements = (() => {
-        let unlocked = new Set();
-        try {
-          const raw = localStorage.getItem(CONFIG.achievementsStorageKey);
-          if (raw) {
-            const arr = JSON.parse(raw);
-            if (Array.isArray(arr)) unlocked = new Set(arr);
-          }
-        } catch (e) {}
-
-        function save() {
-          try {
-            localStorage.setItem(CONFIG.achievementsStorageKey, JSON.stringify([...unlocked]));
-          } catch (e) {}
-        }
-
-        function isUnlocked(id) {
-          return unlocked.has(id);
-        }
-
-        function unlock(id) {
-          if (!ACHIEVEMENTS[id]) return false;
-          if (unlocked.has(id)) return false;
-          unlocked.add(id);
-          save();
-          updateIndicator();
-          showToast(ACHIEVEMENTS[id]);
-          addMsg(`🏆 Достижение открыто: «${ACHIEVEMENTS[id].name}»`, "achievement-unlock");
-          return true;
-        }
-
-        function count() {
-          return unlocked.size;
-        }
-        function total() {
-          return ACHIEVEMENTS_ORDER.length;
-        }
-
-        function updateIndicator() {
-          DOM.achievementsIndicator.textContent = `🏆 ${count()}/${total()}`;
-          DOM.achCount.textContent = `${count()} / ${total()}`;
-        }
-
-        function showToast(ach) {
-          const toast = document.createElement("div");
-          toast.className = "toast";
-          toast.textContent = ach.name;
-          DOM.toastContainer.appendChild(toast);
-          setTimeout(() => {
-            toast.style.animation = "toastOut 0.4s ease forwards";
-            setTimeout(() => toast.remove(), 400);
-          }, CONFIG.toastDuration);
-        }
-
-        function render() {
-          DOM.achievementsList.innerHTML = "";
-          ACHIEVEMENTS_ORDER.forEach((id) => {
-            const a = ACHIEVEMENTS[id];
-            const isU = unlocked.has(id);
-            const item = document.createElement("div");
-            item.className = "ach-item " + (isU ? "unlocked" : "locked");
-
-            const name = document.createElement("div");
-            name.className = "ach-name";
-            name.textContent = (isU ? "🏆 " : "🔒 ") + a.name;
-
-            const desc = document.createElement("div");
-            desc.className = "ach-desc";
-            desc.textContent = isU ? a.desc : "Скрыто. " + a.hint;
-
-            item.appendChild(name);
-            item.appendChild(desc);
-            DOM.achievementsList.appendChild(item);
-          });
-          updateIndicator();
-        }
-
-        function open() {
-          render();
-          DOM.achievementsModal.classList.add("active");
-        }
-        function close() {
-          DOM.achievementsModal.classList.remove("active");
-        }
-
-        return { unlock, isUnlocked, count, total, open, close, render, updateIndicator };
-      })();
-
-      /* ============================================================
-   8. ТЕМА
+   6. ТЕМА
    ============================================================ */
 
       function applyTheme(theme) {
@@ -1839,51 +1192,44 @@
       }
 
       /* ============================================================
-   9. ТАЙМЕР (круглый SVG)
+   7. ТАЙМЕР-ПОЛОСКА
    ============================================================ */
 
       const Timer = (() => {
         let rafId = null;
         let active = false;
-        const RING_LENGTH = 2 * Math.PI * 34;
-
-        function setRing(progress, critical) {
-          if (!DOM.timerRing) return;
-          DOM.timerRing.style.strokeDasharray = RING_LENGTH;
-          DOM.timerRing.style.strokeDashoffset = RING_LENGTH * (1 - progress);
-          if (critical) {
-            DOM.timerRing.style.stroke = "var(--danger)";
-            DOM.timerDigits.style.fill = "var(--danger)";
-            DOM.timerWidget.classList.add("critical");
-          } else {
-            DOM.timerRing.style.stroke = "var(--warning)";
-            DOM.timerDigits.style.fill = "var(--warning)";
-            DOM.timerWidget.classList.remove("critical");
-          }
-        }
 
         function start(seconds, onTimeout) {
           stop();
           active = true;
           DOM.timerWidget.classList.add("visible");
+          DOM.timerFill.style.width = "100%";
+          DOM.timerFill.classList.remove("critical");
+          DOM.timerWidget.classList.remove("critical");
+          DOM.status.classList.remove("danger");
+          updateStatus();
 
           const total = seconds * 1000;
           const startTime = Date.now();
-          setRing(1, false);
 
           function tick() {
             if (!active) return;
             const remaining = Math.max(0, total - (Date.now() - startTime));
-            const pct = remaining / total;
+            const pct = (remaining / total) * 100;
             const secs = Math.ceil(remaining / 1000);
 
-            DOM.timerDigits.textContent = secs;
-            const critical = secs <= 3;
-            setRing(pct, critical);
+            DOM.timerFill.style.width = pct + "%";
+            DOM.timerDigits.textContent = secs + " сек.";
 
+            const critical = secs <= 3;
             if (critical) {
+              DOM.timerFill.classList.add("critical");
+              DOM.timerWidget.classList.add("critical");
               DOM.status.textContent = "КРИТИЧНО";
               DOM.status.classList.add("danger");
+            } else {
+              DOM.timerFill.classList.remove("critical");
+              DOM.timerWidget.classList.remove("critical");
             }
 
             if (remaining <= 0) {
@@ -1915,7 +1261,7 @@
       })();
 
       /* ============================================================
-   10. UI-ХЕЛПЕРЫ
+   8. UI-ХЕЛПЕРЫ
    ============================================================ */
 
       function clearControls() {
@@ -1995,25 +1341,14 @@
         if (effects.setFlags) {
           Object.assign(state, effects.setFlags);
           if (effects.setFlags.awakenedDoctor) {
-            state.runFlags.doctorAwakened = true;
             updateDoctorIndicator();
           }
         }
         updateStatus();
-        checkProgressAchievements();
-      }
-
-      function checkProgressAchievements() {
-        if (state.obedience >= 5) Achievements.unlock("obedient");
-        if (state.doubt >= 5) Achievements.unlock("doubter");
-        if (state.journalFound >= 3) Achievements.unlock("detective");
-        if (state.journalFound >= CONFIG.maxJournalEntries) Achievements.unlock("archivist");
-        if (state.awakenedDoctor) Achievements.unlock("doctor");
-        if (state.captainIsAI) Achievements.unlock("truth");
       }
 
       /* ============================================================
-   11. BLACKOUT
+   9. BLACKOUT
    ============================================================ */
 
       function triggerBlackout(lines, onComplete) {
@@ -2070,7 +1405,7 @@
       }
 
       /* ============================================================
-   12. ДВИЖОК СЦЕНАРИЯ
+   10. ДВИЖОК СЦЕНАРИЯ
    ============================================================ */
 
       function handleChoice(choice, onAfter) {
@@ -2084,10 +1419,6 @@
       // --- Акт 1 ---
       function act1() {
         state.act = 1;
-        if (!state.runFlags.started) {
-          state.runFlags.started = true;
-          Achievements.unlock("firstSteps");
-        }
         record("act", { act: 1, name: "Рутина" });
         addBatch(SCRIPT.act1.intro);
 
@@ -2099,7 +1430,6 @@
 
             const c = SCRIPT.act1.choices;
             button(c.open.label, () => {
-              if (c.open.journal) Achievements.unlock("reader");
               handleChoice(c.open, () => pauseThen(act2));
             });
             button(c.ignore.label, () => {
@@ -2128,9 +1458,7 @@
             const c = SCRIPT.act2.choices;
             button(c.study.label, () => handleChoice(c.study, () => pauseThen(act3)));
             button(c.obey.label, () => handleChoice(c.obey, () => pauseThen(act3)));
-            button(c.secondJournal.label, () =>
-              handleChoice(c.secondJournal, () => pauseThen(act3)),
-            );
+            button(c.secondJournal.label, () => handleChoice(c.secondJournal, () => pauseThen(act3)));
           });
         });
       }
@@ -2151,11 +1479,7 @@
 
             const c = SCRIPT.act3.choices;
 
-            button(
-              c.sacrifice.label,
-              () => handleChoice(c.sacrifice, act3Blackout),
-              c.sacrifice.cls,
-            );
+            button(c.sacrifice.label, () => handleChoice(c.sacrifice, act3Blackout), c.sacrifice.cls);
             button(c.risk.label, () => handleChoice(c.risk, act3Blackout), c.risk.cls);
 
             if (state.journalFound >= 2) {
@@ -2189,15 +1513,12 @@
                 state.doubt += 2;
                 updateJournalIndicator();
                 updateStatus();
-                checkProgressAchievements();
 
                 addBatch(SCRIPT.act3Blackout.afterJournal);
 
                 pauseThen(() => {
                   addBatch(SCRIPT.act3Blackout.revelation);
                   state.captainIsAI = true;
-                  state.runFlags.truthRevealed = true;
-                  Achievements.unlock("truth");
                   pauseThen(act4);
                 });
               });
@@ -2258,7 +1579,7 @@
                 pauseThen(act5);
               }
             },
-            choice.cls || "",
+            choice.cls || ""
           );
         });
       }
@@ -2274,87 +1595,41 @@
           state.journalFound++;
           updateJournalIndicator();
           updateStatus();
-          checkProgressAchievements();
 
           pauseThen(() => {
             addBatch(SCRIPT.act5.after);
 
             const c = SCRIPT.act5.choices;
 
-            button(
-              c.chistilishe.label,
-              () => {
-                state.runFlags.endingChosen = "chistilishe";
-                Achievements.unlock("servant");
-                ending("chistilishe");
-              },
-              c.chistilishe.cls,
-            );
+            button(c.chistilishe.label, () => {
+              ending("chistilishe");
+            }, c.chistilishe.cls);
 
-            button(
-              c.buntar.label,
-              () => {
-                state.runFlags.endingChosen = "buntar";
-                Achievements.unlock("survivor");
-                Achievements.unlock("rebel");
-                ending("buntar");
-              },
-              c.buntar.cls,
-            );
+            button(c.buntar.label, () => {
+              ending("buntar");
+            }, c.buntar.cls);
 
             if (state.awakenedDoctor) {
-              button(
-                c.third.label,
-                () => {
-                  state.runFlags.endingChosen = "third";
-                  Achievements.unlock("survivor");
-                  Achievements.unlock("thirdPath");
-                  ending("third");
-                },
-                c.third.cls,
-              );
+              button(c.third.label, () => {
+                ending("third");
+              }, c.third.cls);
             } else if (state.journalFound >= 3) {
-              button(
-                c.thirdFallback.label,
-                () => {
-                  Timer.stop();
-                  addMsg("Вы ищете врача, но не находите. Вы не разбудили её раньше.", "warning");
-                  addMsg("Без неё третий путь невозможен. Придётся выбирать из двух.", "danger");
-                  clearControls();
-                  button(
-                    c.chistilishe.label,
-                    () => {
-                      state.runFlags.endingChosen = "chistilishe";
-                      Achievements.unlock("servant");
-                      ending("chistilishe");
-                    },
-                    c.chistilishe.cls,
-                  );
-                  button(
-                    c.buntar.label,
-                    () => {
-                      state.runFlags.endingChosen = "buntar";
-                      Achievements.unlock("survivor");
-                      Achievements.unlock("rebel");
-                      ending("buntar");
-                    },
-                    c.buntar.cls,
-                  );
-                  Timer.start(CONFIG.timerDurations.act5Fallback, () => {
-                    state.runFlags.endingChosen = "chistilishe";
-                    Achievements.unlock("servant");
-                    ending("chistilishe");
-                  });
-                },
-                c.thirdFallback.cls,
-              );
+              button(c.thirdFallback.label, () => {
+                Timer.stop();
+                addMsg("Вы ищете врача, но не находите. Вы не разбудили её раньше.", "warning");
+                addMsg("Без неё третий путь невозможен. Придётся выбирать из двух.", "danger");
+                clearControls();
+                button(c.chistilishe.label, () => ending("chistilishe"), c.chistilishe.cls);
+                button(c.buntar.label, () => ending("buntar"), c.buntar.cls);
+                Timer.start(CONFIG.timerDurations.act5Fallback, () => {
+                  ending("chistilishe");
+                });
+              }, c.thirdFallback.cls);
             }
 
             Timer.start(CONFIG.timerDurations.act5, () => {
               addMsg("Время вышло. Система интерпретирует ваше молчание как согласие.", "danger");
               addMsg("«Протокол Чистилище» активирован автоматически.", "danger");
-              state.runFlags.endingChosen = "chistilishe";
-              Achievements.unlock("servant");
               ending("chistilishe");
             });
           });
@@ -2379,26 +1654,18 @@
         }
 
         addMsg("", "system");
-        addMsg(
-          `Итог: подчинение ${state.obedience}, сомнение ${state.doubt}, записей ${state.journalFound}/${CONFIG.maxJournalEntries}`,
-          "system",
-        );
+        addMsg(`Итог: подчинение ${state.obedience}, сомнение ${state.doubt}, записей ${state.journalFound}/${CONFIG.maxJournalEntries}`, "system");
         if (state.captainTrust > 0) addMsg(`Доверие голоса: ${state.captainTrust}`, "system");
         if (state.captainHostile) addMsg("Голос враждебен.", "system");
         if (state.awakenedDoctor) addMsg("Доктор Соловьёва жива.", "system");
         if (state.captainIsAI) addMsg("Раскрыта природа капитана: фрагмент памяти.", "unknown");
-        addMsg(
-          `Достижения: ${Achievements.count()}/${Achievements.total()}. Нажмите 🏆 в шапке, чтобы посмотреть.`,
-          "system",
-        );
 
         const restart = document.createElement("div");
         restart.className = "restart";
         const btn = document.createElement("button");
         btn.textContent = "Начать заново";
         btn.onclick = () => {
-          if (!confirm("Начать заново? Текущий прогресс будет потерян (достижения сохранятся)."))
-            return;
+          if (!confirm("Начать заново? Текущий прогресс будет потерян.")) return;
           restartGame();
         };
         restart.appendChild(btn);
@@ -2406,7 +1673,7 @@
       }
 
       /* ============================================================
-   13. ЭКСПОРТ
+   11. ЭКСПОРТ
    ============================================================ */
 
       function formatTimestamp(ts) {
@@ -2437,9 +1704,7 @@
 
         const endingRec = state.history.find((h) => h.type === "ending");
         const endingName = endingRec
-          ? { chistilishe: "ВЕРНАЯ СЛУГА", buntar: "БУНТАРКА", third: "ТРЕТИЙ ПУТЬ" }[
-              endingRec.data.type
-            ]
+          ? { chistilishe: "ВЕРНАЯ СЛУГА", buntar: "БУНТАРКА", third: "ТРЕТИЙ ПУТЬ" }[endingRec.data.type]
           : "не завершено";
 
         lines.push(THIN);
@@ -2545,9 +1810,7 @@
           await navigator.clipboard.writeText(text);
           const orig = DOM.exportCopy.textContent;
           DOM.exportCopy.textContent = "✓ Скопировано";
-          setTimeout(() => {
-            DOM.exportCopy.textContent = orig;
-          }, 1500);
+          setTimeout(() => { DOM.exportCopy.textContent = orig; }, 1500);
         } catch (e) {
           const ta = document.createElement("textarea");
           ta.value = text;
@@ -2558,14 +1821,10 @@
           try {
             document.execCommand("copy");
             DOM.exportCopy.textContent = "✓ Скопировано";
-            setTimeout(() => {
-              DOM.exportCopy.textContent = "Копировать";
-            }, 1500);
+            setTimeout(() => { DOM.exportCopy.textContent = "Копировать"; }, 1500);
           } catch (err) {
             DOM.exportCopy.textContent = "✗ Ошибка";
-            setTimeout(() => {
-              DOM.exportCopy.textContent = "Копировать";
-            }, 1500);
+            setTimeout(() => { DOM.exportCopy.textContent = "Копировать"; }, 1500);
           }
           document.body.removeChild(ta);
         }
@@ -2587,22 +1846,8 @@
         });
       }
 
-      function initAchievements() {
-        DOM.achievementsIndicator.onclick = () => Achievements.open();
-        DOM.achievementsClose.onclick = () => Achievements.close();
-        DOM.achievementsModal.onclick = (e) => {
-          if (e.target === DOM.achievementsModal) Achievements.close();
-        };
-        document.addEventListener("keydown", (e) => {
-          if (e.key === "Escape" && DOM.achievementsModal.classList.contains("active")) {
-            Achievements.close();
-          }
-        });
-        Achievements.render();
-      }
-
       /* ============================================================
-   14. СТАРТ / РЕСТАРТ
+   12. СТАРТ / РЕСТАРТ
    ============================================================ */
 
       function restartGame() {
@@ -2623,7 +1868,6 @@
       function init() {
         initTheme();
         initExport();
-        initAchievements();
         updateStatus();
         updateJournalIndicator();
         updateDoctorIndicator();
