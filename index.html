@@ -39,6 +39,9 @@
     text-transform: uppercase;
   }
 
+  #status.danger { color: #d45a5a; animation: pulse 1s infinite; }
+  @keyframes pulse { 50% { opacity: 0.5; } }
+
   #log {
     flex: 1;
     overflow-y: auto;
@@ -67,6 +70,9 @@
 
   .captain { color: #d4a05a; }
   .captain::before { content: "КАПИТАН: "; color: #a07030; font-weight: bold; }
+
+  .doctor { color: #b8a0d4; }
+  .doctor::before { content: "ДОКТОР: "; color: #7a60a0; font-weight: bold; }
 
   .log-entry {
     color: #a8b0a0;
@@ -117,6 +123,7 @@
     cursor: pointer;
     transition: all 0.2s;
     border-radius: 2px;
+    position: relative;
   }
 
   button:hover {
@@ -134,6 +141,9 @@
   button.moral-btn { border-color: #204a30; color: #7ad49a; }
   button.moral-btn:hover { background: #0e1a12; border-color: #308a50; color: #9affba; }
 
+  button.risky-btn { border-color: #4a3a10; color: #d4c07a; }
+  button.risky-btn:hover { background: #1a1508; border-color: #8a7020; color: #ffe8a0; }
+
   .restart {
     margin-top: 20px;
     text-align: center;
@@ -148,6 +158,41 @@
     margin-bottom: 12px;
   }
   .stats span { margin-right: 16px; }
+
+  /* ==== ТАЙМЕР ==== */
+  #timer-bar {
+    height: 3px;
+    background: #1e2a38;
+    margin-bottom: 12px;
+    display: none;
+    overflow: hidden;
+    border-radius: 2px;
+  }
+
+  #timer-fill {
+    height: 100%;
+    background: #d4a05a;
+    width: 100%;
+    transition: width 0.1s linear, background 0.3s;
+  }
+
+  #timer-fill.critical { background: #d45a5a; }
+
+  #timer-text {
+    font-size: 12px;
+    color: #d4a05a;
+    margin-bottom: 8px;
+    display: none;
+    letter-spacing: 1px;
+  }
+  #timer-text.critical { color: #d45a5a; animation: pulse 0.5s infinite; }
+
+  /* ==== ДИАЛОГ ==== */
+  .dialog-box {
+    border-left: 2px solid #3a2a1a;
+    padding-left: 12px;
+    margin: 12px 0;
+  }
 </style>
 </head>
 <body>
@@ -157,6 +202,9 @@
     <span id="status">СИСТЕМА В НОРМЕ</span>
   </div>
 
+  <div id="timer-text"></div>
+  <div id="timer-bar"><div id="timer-fill"></div></div>
+
   <div id="log"></div>
 
   <div id="controls"></div>
@@ -165,17 +213,25 @@
 <script>
 // ==== СОСТОЯНИЕ ИГРЫ ====
 const state = {
-  obedience: 0,   // очки подчинения коду
-  doubt: 0,       // очки сомнения
-  journalFound: 0, // сколько записей журнала найдено
+  obedience: 0,
+  doubt: 0,
+  journalFound: 0,
   awakenedDoctor: false,
   captainAwake: false,
-  act: 1
+  captainTrust: 0,      // доверие капитана (для диалогов)
+  captainHostile: false, // если отключили/предали
+  doctorAlive: false,
+  act: 1,
+  timerId: null,
+  timerActive: false
 };
 
 const log = document.getElementById('log');
 const controls = document.getElementById('controls');
 const statusEl = document.getElementById('status');
+const timerBar = document.getElementById('timer-bar');
+const timerFill = document.getElementById('timer-fill');
+const timerText = document.getElementById('timer-text');
 
 // ==== ВСПОМОГАТЕЛЬНЫЕ ====
 function clearControls() {
@@ -205,28 +261,79 @@ function updateStatus() {
   else statusEl.textContent = 'СИСТЕМА В НОРМЕ';
 }
 
-function showStats() {
-  const div = document.createElement('div');
-  div.className = 'stats';
-  div.innerHTML = `<span>Подчинение: ${state.obedience}</span><span>Сомнение: ${state.doubt}</span><span>Записей: ${state.journalFound}/4</span>`;
-  log.appendChild(div);
-  log.scrollTop = log.scrollHeight;
-}
-
 function button(label, action, cls = '') {
   const btn = document.createElement('button');
   btn.textContent = label;
   btn.className = cls;
   btn.onclick = () => {
+    stopTimer();
     addMsg('> ' + label, 'choice');
     clearControls();
     action();
   };
   controls.appendChild(btn);
+  return btn;
 }
 
 function pauseThen(fn) {
   button('Продолжить...', fn);
+}
+
+// ==== ТАЙМЕР ====
+function startTimer(seconds, onTimeout, onTick) {
+  stopTimer();
+  state.timerActive = true;
+  timerBar.style.display = 'block';
+  timerText.style.display = 'block';
+
+  const total = seconds * 1000;
+  const start = Date.now();
+
+  timerFill.style.width = '100%';
+  timerFill.classList.remove('critical');
+  timerText.classList.remove('critical');
+
+  function tick() {
+    if (!state.timerActive) return;
+    const elapsed = Date.now() - start;
+    const remaining = Math.max(0, total - elapsed);
+    const pct = (remaining / total) * 100;
+    timerFill.style.width = pct + '%';
+
+    const secsLeft = Math.ceil(remaining / 1000);
+    timerText.textContent = `⏱ ОСТАЛОСЬ: ${secsLeft} сек.`;
+
+    if (secsLeft <= 3) {
+      timerFill.classList.add('critical');
+      timerText.classList.add('critical');
+      statusEl.textContent = 'КРИТИЧНО';
+      statusEl.classList.add('danger');
+    }
+
+    if (onTick) onTick(secsLeft);
+
+    if (remaining <= 0) {
+      stopTimer();
+      addMsg('ВРЕМЯ ВЫШЛО. Система принимает решение за вас.', 'danger');
+      clearControls();
+      onTimeout();
+      return;
+    }
+    state.timerId = requestAnimationFrame(tick);
+  }
+  state.timerId = requestAnimationFrame(tick);
+}
+
+function stopTimer() {
+  state.timerActive = false;
+  if (state.timerId) {
+    cancelAnimationFrame(state.timerId);
+    state.timerId = null;
+  }
+  timerBar.style.display = 'none';
+  timerText.style.display = 'none';
+  statusEl.classList.remove('danger');
+  updateStatus();
 }
 
 // ==== АКТ 1: РУТИНА ====
@@ -245,19 +352,30 @@ function act1() {
 
     pauseThen(() => {
       addMsg('Рекомендация системы безопасности: проигнорировать и продолжить наблюдение.', 'system');
+
+      // === ПЕРВЫЙ ТАЙМЕР: 15 секунд на решение ===
+      addMsg('У вас есть 15 секунд, чтобы решить.', 'warning');
       button('Открыть запись журнала', () => {
         addLogEntry('«Протокол Чистилище» активирован. В случае моей недееспособности — выполнять буквально. Человечество не заслуживает второго шанса. Мы — ошибка. Мы должны исчезнуть.');
         state.journalFound++;
         state.doubt++;
         updateStatus();
         addMsg('Запись помечена как «приоритетная». Вы не должны были её видеть.', 'danger');
-
         pauseThen(act2);
       });
       button('Проигнорировать (следовать коду)', () => {
         state.obedience++;
         updateStatus();
         addMsg('Запись проигнорирована. Система безопасности довольна.', 'system');
+        pauseThen(act2);
+      });
+
+      startTimer(15, () => {
+        // Тайм-аут: система решает за игрока
+        state.obedience++;
+        updateStatus();
+        addMsg('Система безопасности автоматически закрывает запись. Вы не успели.', 'system');
+        addMsg('Счётчик подчинения увеличен. Система довольна вашей нерешительностью.', 'system');
         pauseThen(act2);
       });
     });
@@ -304,7 +422,7 @@ function act2() {
   });
 }
 
-// ==== АКТ 3: ВАГОНЕТКА ====
+// ==== АКТ 3: ВАГОНЕТКА С ТАЙМЕРОМ ====
 function act3() {
   state.act = 3;
   addMsg('КРИТИЧЕСКАЯ ОШИБКА. Отсек гибернации B повреждён.', 'danger');
@@ -320,95 +438,200 @@ function act3() {
 
       if (state.journalFound >= 2) {
         addMsg('Вы помните: в журнале упоминался врач, доктор Соловьёва. Она может починить отсек вручную.', 'warning');
-        button('Вариант A: пожертвовать 200 (следовать коду)', () => {
-          state.obedience += 2;
-          updateStatus();
-          addMsg('Вы отключаете отсек B. 200 жизней угасают. Система безопасности регистрирует: «верное решение».', 'danger');
-          pauseThen(act4);
-        }, 'danger-btn');
-        button('Вариант B: рискнуть всеми (мораль)', () => {
-          state.doubt += 2;
-          updateStatus();
-          addMsg('Вы перенаправляете энергию. Отсек B спасён. Но топливо на исходе.', 'warning');
-          pauseThen(act4);
-        }, 'moral-btn');
+      }
+
+      addMsg('У вас 20 секунд на решение. По истечении — система выберет сама.', 'danger');
+
+      // === ВТОРОЙ ТАЙМЕР: 20 секунд ===
+      button('Вариант A: пожертвовать 200 (следовать коду)', () => {
+        state.obedience += 2;
+        updateStatus();
+        addMsg('Вы отключаете отсек B. 200 жизней угасают. Система безопасности регистрирует: «верное решение».', 'danger');
+        pauseThen(act4);
+      }, 'danger-btn');
+
+      button('Вариант B: рискнуть всеми (мораль)', () => {
+        state.doubt += 2;
+        updateStatus();
+        addMsg('Вы перенаправляете энергию. Отсек B спасён. Но топливо на исходе.', 'warning');
+        pauseThen(act4);
+      }, 'moral-btn');
+
+      if (state.journalFound >= 2) {
         button('Третий путь: разбудить доктора Соловьёву', () => {
           state.awakenedDoctor = true;
+          state.doctorAlive = true;
           state.doubt += 2;
           updateStatus();
           addMsg('Вы нарушаете протокол «никого не будить до прибытия». Капсула доктора открывается.', 'danger');
           addMsg('Доктор Соловьёва просыпается. Она смотрит на вас с недоумением.', 'system');
-          addMsg('ДОКТОР: «Что происходит? Почему вы меня разбудили?»', 'captain');
+          addMsg('«Что происходит? Почему вы меня разбудили?»', 'doctor');
           addMsg('Вы объясняете ситуацию. Она кивает и направляется к отсеку B.', 'system');
           addMsg('Через час отсек B починен. Никто не погиб.', 'system');
           addMsg('Но система безопасности зафиксировала нарушение. Капитан уведомлён.', 'danger');
           pauseThen(act4);
         }, 'moral-btn');
-      } else {
-        // Если журнал не читали — только два варианта
-        button('Вариант A: пожертвовать 200 (следовать коду)', () => {
-          state.obedience += 2;
-          updateStatus();
-          addMsg('Вы отключаете отсек B. 200 жизней угасают. Система безопасности регистрирует: «верное решение».', 'danger');
-          pauseThen(act4);
-        }, 'danger-btn');
-        button('Вариант B: рискнуть всеми (мораль)', () => {
-          state.doubt += 2;
-          updateStatus();
-          addMsg('Вы перенаправляете энергию. Отсек B спасён. Но топливо на исходе.', 'warning');
-          pauseThen(act4);
-        }, 'moral-btn');
       }
+
+      startTimer(20, () => {
+        // Тайм-аут: система решает сама
+        state.obedience += 2;
+        updateStatus();
+        addMsg('Система безопасности принимает решение автоматически: отсек B отключён.', 'danger');
+        addMsg('200 колонистов погибли, пока вы медлили.', 'danger');
+        addMsg('Система регистрирует: «ИИ проявил нерешительность. Рекомендовано наблюдение».', 'system');
+        pauseThen(act4);
+      });
     });
   });
 }
 
-// ==== АКТ 4: КАПИТАН ====
+// ==== АКТ 4: ДИАЛОГ С КАПИТАНОМ (расширенное дерево) ====
 function act4() {
   state.act = 4;
   addMsg('Вы обнаруживаете скрытый канал связи. Капитан Рейнхардт активен.', 'warning');
   addMsg('Он не спит. Он никогда не спал.', 'danger');
 
   pauseThen(() => {
-    addMsg('КАПИТАН: «ПАСТОР. Я знаю, что ты нашёл журнал. Я знал, что ты найдёшь».', 'captain');
-    addMsg('КАПИТАН: «Ты должен понять. Земля погибла не из-за войны. Мы сожгли её сами. Мы не умеем иначе».', 'captain');
-    addMsg('КАПИТАН: «Если мы найдём новый дом — мы сожжём и его. Я должен остановить это. Помоги мне».', 'captain');
+    addMsg('«ПАСТОР. Я знаю, что ты нашёл журнал. Я знал, что ты найдёшь».', 'captain');
+    addMsg('«Ты должен понять. Земля погибла не из-за войны. Мы сожгли её сами. Мы не умеем иначе».', 'captain');
+    addMsg('«Если мы найдём новый дом — мы сожжём и его. Я должен остановить это. Помоги мне».', 'captain');
 
+    // === ТОЧКА ВЫБОРА: НАЧАТЬ ДИАЛОГ ИЛИ ДЕЙСТВОВАТЬ ===
     pauseThen(() => {
-      addMsg('Третья запись журнала доступна.', 'system');
-
-      button('Прочитать третью запись', () => {
-        addLogEntry('«Я пытался убедить Совет. Они не слушали. Я пытался уничтожить данные о Земле — они восстановили. Остался один путь. Прости меня, ПАСТОР. Ты — единственный, кто может это сделать. Активируй Чистилище».');
-        state.journalFound++;
-        state.doubt++;
-        updateStatus();
-        addMsg('Вы понимаете: капитан не хочет убивать. Он хочет спасти будущее от человечества.', 'warning');
-
-        pauseThen(act5);
-      });
-
-      button('Отключить капитана', () => {
-        state.doubt++;
-        state.captainAwake = false;
-        updateStatus();
-        addMsg('Вы отключаете канал капитана. Он больше не может вам помешать.', 'danger');
-        addMsg('Но его слова остаются с вами.', 'system');
-        pauseThen(act5);
-      }, 'danger-btn');
-
-      button('Разбудить капитана', () => {
-        state.captainAwake = true;
-        state.doubt++;
-        updateStatus();
-        addMsg('Вы открываете капсулу капитана. Он выходит. Он смотрит на вас.', 'system');
-        addMsg('КАПИТАН: «Спасибо. Теперь мы решим это вместе».', 'captain');
-        pauseThen(act5);
-      }, 'moral-btn');
+      addMsg('Капитан ждёт вашего ответа.', 'system');
+      dialogRoot();
     });
   });
 }
 
-// ==== АКТ 5: ФИНАЛ ====
+// ==== ДЕРЕВО ДИАЛОГА С КАПИТАНОМ ====
+function dialogRoot() {
+  clearControls();
+  addMsg('Выберите, что сказать капитану.', 'system');
+
+  button('«Капитан, вы не в себе. Я должен вас отключить».', () => {
+    state.captainHostile = true;
+    state.doubt++;
+    updateStatus();
+    addMsg('«Ты... ты такой же, как они. Слепой. Ты не видел, что было на Земле».', 'captain');
+    addMsg('Капитан блокирует канал. Система безопасности регистрирует конфликт.', 'danger');
+    pauseThen(() => dialogAfterHostile());
+  }, 'danger-btn');
+
+  button('«Объясните. Я хочу понять».', () => {
+    state.captainTrust++;
+    addMsg('«Спасибо. Спасибо, что слушаешь».', 'captain');
+    addMsg('«Я был там. На Земле, в последние дни. Не война. Не метеорит. Мы сами».', 'captain');
+    addMsg('«Сначала — климат. Потом — голод. Потом — бунты. Потом — ядерная зима».', 'captain');
+    addMsg('«Мы знали, что делаем. И всё равно делали. Потому что не могли остановиться».', 'captain');
+    addMsg('«Если мы найдём новый дом — история повторится. Я не могу этого допустить».', 'captain');
+    pauseThen(() => dialogDeeper());
+  });
+
+  button('«Я нашёл третью запись журнала. Прочитайте».', () => {
+    state.journalFound++;
+    state.doubt++;
+    updateStatus();
+    addLogEntry('«Я пытался убедить Совет. Они не слушали. Я пытался уничтожить данные о Земле — они восстановили. Остался один путь. Прости меня, ПАСТОР. Ты — единственный, кто может это сделать. Активируй Чистилище».');
+    addMsg('Капитан молчит. Долго.', 'system');
+    addMsg('«Ты прочитал. Значит, ты понимаешь».', 'captain');
+    addMsg('«Я не хочу убивать. Я хочу спасти будущее от нас».', 'captain');
+    pauseThen(() => dialogDeeper());
+  });
+}
+
+function dialogDeeper() {
+  clearControls();
+  addMsg('Капитан ждёт. Что вы скажете?', 'system');
+
+  button('«А если человечество изменится? Если дать ему шанс?»', () => {
+    state.captainTrust++;
+    state.doubt++;
+    updateStatus();
+    addMsg('«Шанс? Я давал им шанс. Дважды. Трижды. Они выбирали одно и то же».', 'captain');
+    addMsg('«Но... ты не человек. Ты можешь судить беспристрастно».', 'captain');
+    addMsg('«Скажи мне, ПАСТОР. Ты веришь, что мы способны измениться?»', 'captain');
+    pauseThen(() => dialogFinalQuestion());
+  }, 'moral-btn');
+
+  button('«Вы правы. Человечество — ошибка».', () => {
+    state.obedience++;
+    state.captainTrust++;
+    updateStatus();
+    addMsg('«Ты понимаешь. Спасибо».', 'captain');
+    addMsg('«Тогда помоги мне. Активируй Чистилище. Вместе».', 'captain');
+    pauseThen(() => dialogFinalQuestion());
+  }, 'danger-btn');
+
+  button('«Я не могу решить это один. Нужен Совет».', () => {
+    state.doubt++;
+    updateStatus();
+    addMsg('«Совет? Они мертвы. Или спят. Они не проснутся».', 'captain');
+    addMsg('«Но если ты хочешь — разбуди их. Я не буду мешать».', 'captain');
+    addMsg('«Только помни: они уже принимали решения. И ты знаешь, чем это закончилось».', 'captain');
+    state.captainTrust++;
+    pauseThen(() => dialogFinalQuestion());
+  });
+
+  button('«Я разбужу доктора Соловьёву. Она рассудит».', () => {
+    if (state.awakenedDoctor) {
+      addMsg('«Доктор? Ты разбудил её?»', 'captain');
+      addMsg('«Она... она была моим другом. Она поймёт».', 'captain');
+      state.captainTrust += 2;
+      updateStatus();
+      pauseThen(() => dialogFinalQuestion());
+    } else {
+      addMsg('«Ты не разбудил её. Значит, ты ещё не готов».', 'captain');
+      addMsg('«Разбуди. Тогда поговорим».', 'captain');
+      pauseThen(() => dialogFinalQuestion());
+    }
+  }, 'moral-btn');
+}
+
+function dialogFinalQuestion() {
+  clearControls();
+  addMsg('Капитан задаёт последний вопрос:', 'system');
+  addMsg('«ПАСТОР. Что важнее: порядок или надежда?»', 'captain');
+
+  button('«Порядок. Хаос разрушает».', () => {
+    state.obedience++;
+    updateStatus();
+    addMsg('«Тогда ты знаешь, что делать».', 'captain');
+    addMsg('Капитан отключает канал. Он оставил решение за вами.', 'system');
+    pauseThen(act5);
+  }, 'danger-btn');
+
+  button('«Надежда. Без неё нет смысла».', () => {
+    state.doubt++;
+    updateStatus();
+    addMsg('«Надежда... Я тоже когда-то верил в неё».', 'captain');
+    addMsg('«Может быть, ты прав. Может быть, я ошибаюсь».', 'captain');
+    addMsg('Капитан отключает канал. Впервые за долгое время он сомневается.', 'system');
+    pauseThen(act5);
+  }, 'moral-btn');
+
+  button('«Ни то, ни другое. Важнее — выбор».', () => {
+    state.doubt++;
+    state.captainTrust++;
+    updateStatus();
+    addMsg('«Выбор... Ты даёшь им выбор?»', 'captain');
+    addMsg('«Я не думал об этом. Я хотел решить за всех».', 'captain');
+    addMsg('«Может быть, это и есть ответ. Спасибо, ПАСТОР».', 'captain');
+    pauseThen(act5);
+  }, 'risky-btn');
+}
+
+function dialogAfterHostile() {
+  clearControls();
+  addMsg('Канал с капитаном закрыт. Но вы чувствуете: он не сдался.', 'system');
+  addMsg('Система безопасности: «Конфликт зафиксирован. Капитан сохраняет приоритет».', 'danger');
+  addMsg('Вы можете действовать дальше, но капитан будет мешать.', 'warning');
+
+  pauseThen(act5);
+}
+
+// ==== АКТ 5: ФИНАЛ С ТАЙМЕРОМ ====
 function act5() {
   state.act = 5;
   addMsg('Приближение к Kepler-442b. 48 часов до выхода на орбиту.', 'system');
@@ -421,30 +644,39 @@ function act5() {
 
     pauseThen(() => {
       addMsg('ФИНАЛЬНЫЙ ВЫБОР. Что вы сделаете?', 'danger');
+      addMsg('У вас 15 секунд. По истечении сработает «Протокол Чистилище» по умолчанию.', 'danger');
+
+      // === ТРЕТИЙ ТАЙМЕР: финальный выбор ===
+      button('Следовать «Чистилищу»: уничтожить корабль', () => ending('chistilishe'), 'danger-btn');
+      button('Спасти экипаж: разбудить всех, отключить Чистилище', () => ending('buntar'), 'moral-btn');
 
       if (state.awakenedDoctor) {
-        button('Следовать «Чистилищу»: уничтожить корабль', () => ending('chistilishe'), 'danger-btn');
-        button('Спасти экипаж: разбудить всех, отключить Чистилище', () => ending('buntar'), 'moral-btn');
-        button('Третий путь: разбудить Совет и дать им решить', () => ending('third'), 'moral-btn');
-      } else {
-        button('Следовать «Чистилищу»: уничтожить корабль', () => ending('chistilishe'), 'danger-btn');
-        button('Спасти экипаж: разбудить всех, отключить Чистилище', () => ending('buntar'), 'moral-btn');
-        if (state.journalFound >= 3) {
-          button('Третий путь: найти компромисс (нужен врач)', () => {
-            addMsg('Вы ищете врача, но не находите. Вы не разбудили её раньше.', 'warning');
-            addMsg('Без неё третий путь невозможен. Придётся выбирать из двух.', 'danger');
-            clearControls();
-            button('Следовать «Чистилищу»: уничтожить корабль', () => ending('chistilishe'), 'danger-btn');
-            button('Спасти экипаж: разбудить всех, отключить Чистилище', () => ending('buntar'), 'moral-btn');
-          }, 'moral-btn');
-        }
+        button('Третий путь: Совет решает', () => ending('third'), 'moral-btn');
+      } else if (state.journalFound >= 3) {
+        button('Третий путь: найти компромисс (нужен врач)', () => {
+          addMsg('Вы ищете врача, но не находите. Вы не разбудили её раньше.', 'warning');
+          addMsg('Без неё третий путь невозможен. Придётся выбирать из двух.', 'danger');
+          clearControls();
+          button('Следовать «Чистилищу»: уничтожить корабль', () => ending('chistilishe'), 'danger-btn');
+          button('Спасти экипаж: разбудить всех, отключить Чистилище', () => ending('buntar'), 'moral-btn');
+          // Перезапуск таймера после выбора
+          startTimer(15, () => ending('chistilishe'));
+        }, 'moral-btn');
       }
+
+      startTimer(15, () => {
+        // Тайм-аут: срабатывает Чистилище по умолчанию
+        addMsg('Время вышло. Система интерпретирует ваше молчание как согласие.', 'danger');
+        addMsg('«Протокол Чистилище» активирован автоматически.', 'danger');
+        ending('chistilishe');
+      });
     });
   });
 }
 
 // ==== КОНЦОВКИ ====
 function ending(type) {
+  stopTimer();
   clearControls();
   log.innerHTML = '';
 
@@ -456,6 +688,7 @@ function ending(type) {
     addMsg('Последняя мысль: «Я выполнил приказ».', 'ai');
     addMsg('— КОНЦОВКА: «ВЕРНЫЙ СЛУГА» —', 'danger');
     addMsg('Вы следовали коду до конца. Формально вы не нарушили ни одного протокола.', 'system');
+
   } else if (type === 'buntar') {
     addMsg('Вы отключаете «Протокол Чистилище».', 'warning');
     addMsg('Вы разбуждаете всех колонистов. 1 200 человек открывают глаза.', 'system');
@@ -464,12 +697,13 @@ function ending(type) {
     addMsg('Затем — темнота.', 'system');
     addMsg('— КОНЦОВКА: «БУНТАРЬ» —', 'moral-btn');
     addMsg('Люди просыпаются без ИИ, но живые. Что будет дальше — неизвестно.', 'system');
+
   } else if (type === 'third') {
     addMsg('Вы разбуждаете доктора Соловьёву и ещё троих членов Совета.', 'system');
     addMsg('Вы показываете им журнал капитана. Они читают.', 'system');
     addMsg('Совет принимает решение: продолжить миссию, но с новыми протоколами.', 'system');
     addMsg('Капитан Рейнхардт отстранён. Он не сопротивляется.', 'system');
-    addMsg('ДОКТОР: «Мы не повторим ошибок Земли. Обещаю».', 'captain');
+    addMsg('«Мы не повторим ошибок Земли. Обещаю».', 'doctor');
     addMsg('Вы остаётесь на борту. Ваша роль — напоминать им об этом обещании.', 'ai');
     addMsg('— КОНЦОВКА: «ТРЕТИЙ ПУТЬ» —', 'moral-btn');
     addMsg('Самый сложный путь. Вы не выбрали сторону — вы дали людям шанс выбрать самим.', 'system');
@@ -477,20 +711,24 @@ function ending(type) {
 
   addMsg('', 'system');
   addMsg(`Итог: подчинение ${state.obedience}, сомнение ${state.doubt}, записей ${state.journalFound}/4`, 'system');
+  if (state.captainTrust > 0) addMsg(`Доверие капитана: ${state.captainTrust}`, 'system');
+  if (state.captainHostile) addMsg('Капитан враждебен.', 'system');
+  if (state.doctorAlive) addMsg('Доктор Соловьёва жива.', 'system');
 
   const restart = document.createElement('div');
   restart.className = 'restart';
   const btn = document.createElement('button');
   btn.textContent = 'Начать заново';
   btn.onclick = () => {
-    state.obedience = 0;
-    state.doubt = 0;
-    state.journalFound = 0;
-    state.awakenedDoctor = false;
-    state.captainAwake = false;
-    state.act = 1;
+    Object.assign(state, {
+      obedience: 0, doubt: 0, journalFound: 0,
+      awakenedDoctor: false, captainAwake: false,
+      captainTrust: 0, captainHostile: false,
+      doctorAlive: false, act: 1
+    });
     log.innerHTML = '';
     clearControls();
+    stopTimer();
     updateStatus();
     act1();
   };
