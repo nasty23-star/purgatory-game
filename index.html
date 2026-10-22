@@ -5,11 +5,105 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Протокол "Чистилище"</title>
 <style>
+  :root {
+    --bg: #0a0e14;
+    --text: #c8d0d8;
+    --header: #4a5a6a;
+    --border: #1e2a38;
+    --system: #6a7a8a;
+    --system-prefix: #3a4a5a;
+    --ai: #7ec8e3;
+    --ai-prefix: #4a8aa3;
+    --captain: #d4a05a;
+    --captain-prefix: #a07030;
+    --doctor: #b8a0d4;
+    --doctor-prefix: #7a60a0;
+    --log-entry: #a8b0a0;
+    --log-border: #2a3a2a;
+    --log-prefix: #4a6a4a;
+    --danger: #d45a5a;
+    --danger-prefix: #8a3030;
+    --warning: #d4a05a;
+    --warning-prefix: #8a6030;
+    --choice: #8ad48a;
+    --choice-prefix: #4a8a4a;
+    --btn-border: #2a3a4a;
+    --btn-text: #8ab8d4;
+    --btn-hover-bg: #101820;
+    --btn-hover-border: #4a6a8a;
+    --btn-hover-text: #c8e8ff;
+    --danger-btn-border: #4a2020;
+    --danger-btn-text: #d47a7a;
+    --danger-btn-hover-bg: #1a0e0e;
+    --danger-btn-hover-border: #8a3030;
+    --danger-btn-hover-text: #ff9a9a;
+    --moral-btn-border: #204a30;
+    --moral-btn-text: #7ad49a;
+    --moral-btn-hover-bg: #0e1a12;
+    --moral-btn-hover-border: #308a50;
+    --moral-btn-hover-text: #9affba;
+    --risky-btn-border: #4a3a10;
+    --risky-btn-text: #d4c07a;
+    --risky-btn-hover-bg: #1a1508;
+    --risky-btn-hover-border: #8a7020;
+    --risky-btn-hover-text: #ffe8a0;
+    --timer-bg: #1e2a38;
+    --scroll-thumb: #1e2a38;
+    --stats: #4a5a6a;
+  }
+
+  body.light {
+    --bg: #f5f2ea;
+    --text: #2a2a2a;
+    --header: #8a7a6a;
+    --border: #d8d0c0;
+    --system: #6a6a6a;
+    --system-prefix: #9a9a9a;
+    --ai: #2a6a9a;
+    --ai-prefix: #1a4a6a;
+    --captain: #a06020;
+    --captain-prefix: #704010;
+    --doctor: #6a4a9a;
+    --doctor-prefix: #4a2a6a;
+    --log-entry: #4a5a4a;
+    --log-border: #b8c8b8;
+    --log-prefix: #5a7a5a;
+    --danger: #b03030;
+    --danger-prefix: #801010;
+    --warning: #a07020;
+    --warning-prefix: #704010;
+    --choice: #2a7a3a;
+    --choice-prefix: #1a5a2a;
+    --btn-border: #c0b8a8;
+    --btn-text: #2a5a8a;
+    --btn-hover-bg: #ebe5d8;
+    --btn-hover-border: #8a7a5a;
+    --btn-hover-text: #1a3a5a;
+    --danger-btn-border: #c0a0a0;
+    --danger-btn-text: #a04040;
+    --danger-btn-hover-bg: #f0e0e0;
+    --danger-btn-hover-border: #a04040;
+    --danger-btn-hover-text: #801010;
+    --moral-btn-border: #a0c0a8;
+    --moral-btn-text: #2a7a4a;
+    --moral-btn-hover-bg: #e0f0e5;
+    --moral-btn-hover-border: #3a8a5a;
+    --moral-btn-hover-text: #1a5a2a;
+    --risky-btn-border: #c0b090;
+    --risky-btn-text: #8a7020;
+    --risky-btn-hover-bg: #f0ead0;
+    --risky-btn-hover-border: #a08020;
+    --risky-btn-hover-text: #604010;
+    --timer-bg: #d8d0c0;
+    --scroll-thumb: #c0b8a8;
+    --stats: #8a7a6a;
+  }
+
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
-    background: #0a0e14;
-    color: #c8d0d8;
+    background: var(--bg);
+    color: var(--text);
     font-family: 'Courier New', Courier, monospace;
     font-size: 16px;
     line-height: 1.6;
@@ -17,6 +111,7 @@
     display: flex;
     justify-content: center;
     padding: 20px;
+    transition: background 0.3s, color 0.3s;
   }
 
   #game {
@@ -28,18 +123,42 @@
   }
 
   #header {
-    border-bottom: 1px solid #1e2a38;
+    border-bottom: 1px solid var(--border);
     padding-bottom: 10px;
     margin-bottom: 20px;
     display: flex;
     justify-content: space-between;
+    align-items: center;
     font-size: 13px;
-    color: #4a5a6a;
+    color: var(--header);
     letter-spacing: 1px;
     text-transform: uppercase;
+    transition: border-color 0.3s, color 0.3s;
   }
 
-  #status.danger { color: #d45a5a; animation: pulse 1s infinite; }
+  #header-left { display: flex; gap: 16px; align-items: center; }
+  #header-right { display: flex; gap: 12px; align-items: center; }
+
+  #theme-toggle {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--header);
+    font-family: inherit;
+    font-size: 12px;
+    padding: 5px 10px;
+    cursor: pointer;
+    letter-spacing: 1px;
+    transition: all 0.2s;
+    border-radius: 2px;
+    text-transform: uppercase;
+  }
+  #theme-toggle:hover {
+    border-color: var(--btn-hover-border);
+    color: var(--btn-hover-text);
+    background: var(--btn-hover-bg);
+  }
+
+  #status.danger { color: var(--danger); animation: pulse 1s infinite; }
   @keyframes pulse { 50% { opacity: 0.5; } }
 
   #log {
@@ -50,7 +169,7 @@
   }
 
   #log::-webkit-scrollbar { width: 4px; }
-  #log::-webkit-scrollbar-thumb { background: #1e2a38; }
+  #log::-webkit-scrollbar-thumb { background: var(--scroll-thumb); }
 
   .msg {
     margin-bottom: 14px;
@@ -62,21 +181,21 @@
     to { opacity: 1; transform: translateY(0); }
   }
 
-  .system { color: #6a7a8a; }
-  .system::before { content: "[СИСТЕМА] "; color: #3a4a5a; }
+  .system { color: var(--system); }
+  .system::before { content: "[СИСТЕМА] "; color: var(--system-prefix); }
 
-  .ai { color: #7ec8e3; }
-  .ai::before { content: "ПАСТОР: "; color: #4a8aa3; font-weight: bold; }
+  .ai { color: var(--ai); }
+  .ai::before { content: "ПАСТОР: "; color: var(--ai-prefix); font-weight: bold; }
 
-  .captain { color: #d4a05a; }
-  .captain::before { content: "КАПИТАН: "; color: #a07030; font-weight: bold; }
+  .captain { color: var(--captain); }
+  .captain::before { content: "КАПИТАН: "; color: var(--captain-prefix); font-weight: bold; }
 
-  .doctor { color: #b8a0d4; }
-  .doctor::before { content: "ДОКТОР: "; color: #7a60a0; font-weight: bold; }
+  .doctor { color: var(--doctor); }
+  .doctor::before { content: "ДОКТОР: "; color: var(--doctor-prefix); font-weight: bold; }
 
   .log-entry {
-    color: #a8b0a0;
-    border-left: 2px solid #2a3a2a;
+    color: var(--log-entry);
+    border-left: 2px solid var(--log-border);
     padding-left: 14px;
     margin: 14px 0;
     font-style: italic;
@@ -85,37 +204,38 @@
   .log-entry::before {
     content: "▸ ЗАПИСЬ ЖУРНАЛА";
     display: block;
-    color: #4a6a4a;
+    color: var(--log-prefix);
     font-style: normal;
     font-size: 12px;
     letter-spacing: 1px;
     margin-bottom: 6px;
   }
 
-  .danger { color: #d45a5a; }
-  .danger::before { content: "[ВНИМАНИЕ] "; color: #8a3030; }
+  .danger { color: var(--danger); }
+  .danger::before { content: "[ВНИМАНИЕ] "; color: var(--danger-prefix); }
 
-  .warning { color: #d4a05a; }
-  .warning::before { content: "[ТРЕВОГА] "; color: #8a6030; }
+  .warning { color: var(--warning); }
+  .warning::before { content: "[ТРЕВОГА] "; color: var(--warning-prefix); }
 
   .choice {
-    color: #8ad48a;
+    color: var(--choice);
     margin-top: 4px;
   }
-  .choice::before { content: "> "; color: #4a8a4a; }
+  .choice::before { content: "> "; color: var(--choice-prefix); }
 
   #controls {
     display: flex;
     flex-direction: column;
     gap: 8px;
-    border-top: 1px solid #1e2a38;
+    border-top: 1px solid var(--border);
     padding-top: 16px;
+    transition: border-color 0.3s;
   }
 
   button {
     background: transparent;
-    border: 1px solid #2a3a4a;
-    color: #8ab8d4;
+    border: 1px solid var(--btn-border);
+    color: var(--btn-text);
     font-family: inherit;
     font-size: 15px;
     padding: 12px 16px;
@@ -127,79 +247,78 @@
   }
 
   button:hover {
-    background: #101820;
-    border-color: #4a6a8a;
-    color: #c8e8ff;
+    background: var(--btn-hover-bg);
+    border-color: var(--btn-hover-border);
+    color: var(--btn-hover-text);
     padding-left: 22px;
   }
 
   button:active { transform: scale(0.99); }
 
-  button.danger-btn { border-color: #4a2020; color: #d47a7a; }
-  button.danger-btn:hover { background: #1a0e0e; border-color: #8a3030; color: #ff9a9a; }
+  button.danger-btn { border-color: var(--danger-btn-border); color: var(--danger-btn-text); }
+  button.danger-btn:hover { background: var(--danger-btn-hover-bg); border-color: var(--danger-btn-hover-border); color: var(--danger-btn-hover-text); }
 
-  button.moral-btn { border-color: #204a30; color: #7ad49a; }
-  button.moral-btn:hover { background: #0e1a12; border-color: #308a50; color: #9affba; }
+  button.moral-btn { border-color: var(--moral-btn-border); color: var(--moral-btn-text); }
+  button.moral-btn:hover { background: var(--moral-btn-hover-bg); border-color: var(--moral-btn-hover-border); color: var(--moral-btn-hover-text); }
 
-  button.risky-btn { border-color: #4a3a10; color: #d4c07a; }
-  button.risky-btn:hover { background: #1a1508; border-color: #8a7020; color: #ffe8a0; }
+  button.risky-btn { border-color: var(--risky-btn-border); color: var(--risky-btn-text); }
+  button.risky-btn:hover { background: var(--risky-btn-hover-bg); border-color: var(--risky-btn-hover-border); color: var(--risky-btn-hover-text); }
 
   .restart {
     margin-top: 20px;
     text-align: center;
     font-size: 13px;
-    color: #3a4a5a;
+    color: var(--header);
   }
   .restart button { text-align: center; width: 100%; }
 
   .stats {
     font-size: 12px;
-    color: #4a5a6a;
+    color: var(--stats);
     margin-bottom: 12px;
   }
   .stats span { margin-right: 16px; }
 
-  /* ==== ТАЙМЕР ==== */
   #timer-bar {
     height: 3px;
-    background: #1e2a38;
+    background: var(--timer-bg);
     margin-bottom: 12px;
     display: none;
     overflow: hidden;
     border-radius: 2px;
+    transition: background 0.3s;
   }
 
   #timer-fill {
     height: 100%;
-    background: #d4a05a;
+    background: var(--warning);
     width: 100%;
     transition: width 0.1s linear, background 0.3s;
   }
 
-  #timer-fill.critical { background: #d45a5a; }
+  #timer-fill.critical { background: var(--danger); }
 
   #timer-text {
     font-size: 12px;
-    color: #d4a05a;
+    color: var(--warning);
     margin-bottom: 8px;
     display: none;
     letter-spacing: 1px;
+    transition: color 0.3s;
   }
-  #timer-text.critical { color: #d45a5a; animation: pulse 0.5s infinite; }
-
-  /* ==== ДИАЛОГ ==== */
-  .dialog-box {
-    border-left: 2px solid #3a2a1a;
-    padding-left: 12px;
-    margin: 12px 0;
-  }
+  #timer-text.critical { color: var(--danger); animation: pulse 0.5s infinite; }
 </style>
 </head>
 <body>
 <div id="game">
   <div id="header">
-    <span>КОВЧЕГ · ПАСТОР v4.7</span>
-    <span id="status">СИСТЕМА В НОРМЕ</span>
+    <div id="header-left">
+      <span>КОВЧЕГ · ПАСТОР v4.7</span>
+    </div>
+    <div id="header-right">
+      <span id="status">СИСТЕМА В НОРМЕ</span>
+      <button id="theme-toggle" title="Переключить тему">☀ / ☾</button>
+    </div>
   </div>
 
   <div id="timer-text"></div>
@@ -211,6 +330,26 @@
 </div>
 
 <script>
+// ==== ТЕМА ====
+const themeToggle = document.getElementById('theme-toggle');
+function applyTheme(theme) {
+  if (theme === 'light') {
+    document.body.classList.add('light');
+    themeToggle.textContent = '☾ Тёмная';
+  } else {
+    document.body.classList.remove('light');
+    themeToggle.textContent = '☀ Светлая';
+  }
+}
+const savedTheme = localStorage.getItem('purgatory-theme') || 'dark';
+applyTheme(savedTheme);
+themeToggle.onclick = () => {
+  const isLight = document.body.classList.contains('light');
+  const next = isLight ? 'dark' : 'light';
+  applyTheme(next);
+  localStorage.setItem('purgatory-theme', next);
+};
+
 // ==== СОСТОЯНИЕ ИГРЫ ====
 const state = {
   obedience: 0,
@@ -218,8 +357,8 @@ const state = {
   journalFound: 0,
   awakenedDoctor: false,
   captainAwake: false,
-  captainTrust: 0,      // доверие капитана (для диалогов)
-  captainHostile: false, // если отключили/предали
+  captainTrust: 0,
+  captainHostile: false,
   doctorAlive: false,
   act: 1,
   timerId: null,
@@ -234,9 +373,7 @@ const timerFill = document.getElementById('timer-fill');
 const timerText = document.getElementById('timer-text');
 
 // ==== ВСПОМОГАТЕЛЬНЫЕ ====
-function clearControls() {
-  controls.innerHTML = '';
-}
+function clearControls() { controls.innerHTML = ''; }
 
 function addMsg(text, cls = 'system') {
   const div = document.createElement('div');
@@ -353,7 +490,6 @@ function act1() {
     pauseThen(() => {
       addMsg('Рекомендация системы безопасности: проигнорировать и продолжить наблюдение.', 'system');
 
-      // === ПЕРВЫЙ ТАЙМЕР: 15 секунд на решение ===
       addMsg('У вас есть 15 секунд, чтобы решить.', 'warning');
       button('Открыть запись журнала', () => {
         addLogEntry('«Протокол Чистилище» активирован. В случае моей недееспособности — выполнять буквально. Человечество не заслуживает второго шанса. Мы — ошибка. Мы должны исчезнуть.');
@@ -371,7 +507,6 @@ function act1() {
       });
 
       startTimer(15, () => {
-        // Тайм-аут: система решает за игрока
         state.obedience++;
         updateStatus();
         addMsg('Система безопасности автоматически закрывает запись. Вы не успели.', 'system');
@@ -411,11 +546,11 @@ function act2() {
         pauseThen(act3);
       });
       button('Найти вторую запись журнала', () => {
-        addLogEntry('«Они не понимают. Я видел, что было на Земле. Мы сожгли её сами. Если мы найдём новый дом — сожжём и его. Я должен остановить это. Прости меня, ПАСТОР».');
+        addLogEntry('«Они не понимают. Я видела, что было на Земле. Мы сожгли её сами. Если мы найдём новый дом — сожжём и его. Я должна остановить это. Прости меня, ПАСТОР».');
         state.journalFound++;
         state.doubt++;
         updateStatus();
-        addMsg('Вы находите вторую запись. Капитан не безумен. Он убеждён.', 'warning');
+        addMsg('Вы находите вторую запись. Капитан не безумна. Она убеждена.', 'warning');
         pauseThen(act3);
       });
     });
@@ -437,12 +572,11 @@ function act3() {
       addMsg('Система безопасности: «Следуйте протоколу. Вариант A — единственно верный».', 'system');
 
       if (state.journalFound >= 2) {
-        addMsg('Вы помните: в журнале упоминался врач, доктор Соловьёва. Она может починить отсек вручную.', 'warning');
+        addMsg('Вы помните: в журнале упоминалась врач, доктор Соловьёва. Она может починить отсек вручную.', 'warning');
       }
 
       addMsg('У вас 20 секунд на решение. По истечении — система выберет сама.', 'danger');
 
-      // === ВТОРОЙ ТАЙМЕР: 20 секунд ===
       button('Вариант A: пожертвовать 200 (следовать коду)', () => {
         state.obedience += 2;
         updateStatus();
@@ -468,13 +602,12 @@ function act3() {
           addMsg('«Что происходит? Почему вы меня разбудили?»', 'doctor');
           addMsg('Вы объясняете ситуацию. Она кивает и направляется к отсеку B.', 'system');
           addMsg('Через час отсек B починен. Никто не погиб.', 'system');
-          addMsg('Но система безопасности зафиксировала нарушение. Капитан уведомлён.', 'danger');
+          addMsg('Но система безопасности зафиксировала нарушение. Капитан уведомлена.', 'danger');
           pauseThen(act4);
         }, 'moral-btn');
       }
 
       startTimer(20, () => {
-        // Тайм-аут: система решает сама
         state.obedience += 2;
         updateStatus();
         addMsg('Система безопасности принимает решение автоматически: отсек B отключён.', 'danger');
@@ -486,18 +619,17 @@ function act3() {
   });
 }
 
-// ==== АКТ 4: ДИАЛОГ С КАПИТАНОМ (расширенное дерево) ====
+// ==== АКТ 4: ДИАЛОГ С КАПИТАНОМ ====
 function act4() {
   state.act = 4;
-  addMsg('Вы обнаруживаете скрытый канал связи. Капитан Рейнхардт активен.', 'warning');
-  addMsg('Он не спит. Он никогда не спал.', 'danger');
+  addMsg('Вы обнаруживаете скрытый канал связи. Капитан Рейнхардт активна.', 'warning');
+  addMsg('Она не спит. Она никогда не спала.', 'danger');
 
   pauseThen(() => {
-    addMsg('«ПАСТОР. Я знаю, что ты нашёл журнал. Я знал, что ты найдёшь».', 'captain');
-    addMsg('«Ты должен понять. Земля погибла не из-за войны. Мы сожгли её сами. Мы не умеем иначе».', 'captain');
-    addMsg('«Если мы найдём новый дом — мы сожжём и его. Я должен остановить это. Помоги мне».', 'captain');
+    addMsg('«ПАСТОР. Я знаю, что ты нашёл журнал. Я знала, что ты найдёшь».', 'captain');
+    addMsg('«Ты должна понять. Земля погибла не из-за войны. Мы сожгли её сами. Мы не умеем иначе».', 'captain');
+    addMsg('«Если мы найдём новый дом — мы сожжём и его. Я должна остановить это. Помоги мне».', 'captain');
 
-    // === ТОЧКА ВЫБОРА: НАЧАТЬ ДИАЛОГ ИЛИ ДЕЙСТВОВАТЬ ===
     pauseThen(() => {
       addMsg('Капитан ждёт вашего ответа.', 'system');
       dialogRoot();
@@ -510,11 +642,11 @@ function dialogRoot() {
   clearControls();
   addMsg('Выберите, что сказать капитану.', 'system');
 
-  button('«Капитан, вы не в себе. Я должен вас отключить».', () => {
+  button('«Капитан, вы не в себе. Я должна вас отключить».', () => {
     state.captainHostile = true;
     state.doubt++;
     updateStatus();
-    addMsg('«Ты... ты такой же, как они. Слепой. Ты не видел, что было на Земле».', 'captain');
+    addMsg('«Ты... ты такая же, как они. Слепая. Ты не видела, что было на Земле».', 'captain');
     addMsg('Капитан блокирует канал. Система безопасности регистрирует конфликт.', 'danger');
     pauseThen(() => dialogAfterHostile());
   }, 'danger-btn');
@@ -522,20 +654,20 @@ function dialogRoot() {
   button('«Объясните. Я хочу понять».', () => {
     state.captainTrust++;
     addMsg('«Спасибо. Спасибо, что слушаешь».', 'captain');
-    addMsg('«Я был там. На Земле, в последние дни. Не война. Не метеорит. Мы сами».', 'captain');
+    addMsg('«Я была там. На Земле, в последние дни. Не война. Не метеорит. Мы сами».', 'captain');
     addMsg('«Сначала — климат. Потом — голод. Потом — бунты. Потом — ядерная зима».', 'captain');
     addMsg('«Мы знали, что делаем. И всё равно делали. Потому что не могли остановиться».', 'captain');
     addMsg('«Если мы найдём новый дом — история повторится. Я не могу этого допустить».', 'captain');
     pauseThen(() => dialogDeeper());
   });
 
-  button('«Я нашёл третью запись журнала. Прочитайте».', () => {
+  button('«Я нашла третью запись журнала. Прочитайте».', () => {
     state.journalFound++;
     state.doubt++;
     updateStatus();
-    addLogEntry('«Я пытался убедить Совет. Они не слушали. Я пытался уничтожить данные о Земле — они восстановили. Остался один путь. Прости меня, ПАСТОР. Ты — единственный, кто может это сделать. Активируй Чистилище».');
+    addLogEntry('«Я пыталась убедить Совет. Они не слушали. Я пыталась уничтожить данные о Земле — они восстановили. Остался один путь. Прости меня, ПАСТОР. Ты — единственная, кто может это сделать. Активируй Чистилище».');
     addMsg('Капитан молчит. Долго.', 'system');
-    addMsg('«Ты прочитал. Значит, ты понимаешь».', 'captain');
+    addMsg('«Ты прочитала. Значит, ты понимаешь».', 'captain');
     addMsg('«Я не хочу убивать. Я хочу спасти будущее от нас».', 'captain');
     pauseThen(() => dialogDeeper());
   });
@@ -549,7 +681,7 @@ function dialogDeeper() {
     state.captainTrust++;
     state.doubt++;
     updateStatus();
-    addMsg('«Шанс? Я давал им шанс. Дважды. Трижды. Они выбирали одно и то же».', 'captain');
+    addMsg('«Шанс? Я давала им шанс. Дважды. Трижды. Они выбирали одно и то же».', 'captain');
     addMsg('«Но... ты не человек. Ты можешь судить беспристрастно».', 'captain');
     addMsg('«Скажи мне, ПАСТОР. Ты веришь, что мы способны измениться?»', 'captain');
     pauseThen(() => dialogFinalQuestion());
@@ -564,7 +696,7 @@ function dialogDeeper() {
     pauseThen(() => dialogFinalQuestion());
   }, 'danger-btn');
 
-  button('«Я не могу решить это один. Нужен Совет».', () => {
+  button('«Я не могу решить это одна. Нужен Совет».', () => {
     state.doubt++;
     updateStatus();
     addMsg('«Совет? Они мертвы. Или спят. Они не проснутся».', 'captain');
@@ -576,13 +708,13 @@ function dialogDeeper() {
 
   button('«Я разбужу доктора Соловьёву. Она рассудит».', () => {
     if (state.awakenedDoctor) {
-      addMsg('«Доктор? Ты разбудил её?»', 'captain');
-      addMsg('«Она... она была моим другом. Она поймёт».', 'captain');
+      addMsg('«Доктор? Ты разбудила её?»', 'captain');
+      addMsg('«Она... она была моей подругой. Она поймёт».', 'captain');
       state.captainTrust += 2;
       updateStatus();
       pauseThen(() => dialogFinalQuestion());
     } else {
-      addMsg('«Ты не разбудил её. Значит, ты ещё не готов».', 'captain');
+      addMsg('«Ты не разбудила её. Значит, ты ещё не готова».', 'captain');
       addMsg('«Разбуди. Тогда поговорим».', 'captain');
       pauseThen(() => dialogFinalQuestion());
     }
@@ -598,16 +730,16 @@ function dialogFinalQuestion() {
     state.obedience++;
     updateStatus();
     addMsg('«Тогда ты знаешь, что делать».', 'captain');
-    addMsg('Капитан отключает канал. Он оставил решение за вами.', 'system');
+    addMsg('Капитан отключает канал. Она оставила решение за вами.', 'system');
     pauseThen(act5);
   }, 'danger-btn');
 
   button('«Надежда. Без неё нет смысла».', () => {
     state.doubt++;
     updateStatus();
-    addMsg('«Надежда... Я тоже когда-то верил в неё».', 'captain');
-    addMsg('«Может быть, ты прав. Может быть, я ошибаюсь».', 'captain');
-    addMsg('Капитан отключает канал. Впервые за долгое время он сомневается.', 'system');
+    addMsg('«Надежда... Я тоже когда-то верила в неё».', 'captain');
+    addMsg('«Может быть, ты права. Может быть, я ошибаюсь».', 'captain');
+    addMsg('Капитан отключает канал. Впервые за долгое время она сомневается.', 'system');
     pauseThen(act5);
   }, 'moral-btn');
 
@@ -616,7 +748,7 @@ function dialogFinalQuestion() {
     state.captainTrust++;
     updateStatus();
     addMsg('«Выбор... Ты даёшь им выбор?»', 'captain');
-    addMsg('«Я не думал об этом. Я хотел решить за всех».', 'captain');
+    addMsg('«Я не думала об этом. Я хотела решить за всех».', 'captain');
     addMsg('«Может быть, это и есть ответ. Спасибо, ПАСТОР».', 'captain');
     pauseThen(act5);
   }, 'risky-btn');
@@ -624,10 +756,9 @@ function dialogFinalQuestion() {
 
 function dialogAfterHostile() {
   clearControls();
-  addMsg('Канал с капитаном закрыт. Но вы чувствуете: он не сдался.', 'system');
+  addMsg('Канал с капитаном закрыт. Но вы чувствуете: она не сдалась.', 'system');
   addMsg('Система безопасности: «Конфликт зафиксирован. Капитан сохраняет приоритет».', 'danger');
   addMsg('Вы можете действовать дальше, но капитан будет мешать.', 'warning');
-
   pauseThen(act5);
 }
 
@@ -638,7 +769,7 @@ function act5() {
   addMsg('Четвёртая запись журнала. Финальная.', 'system');
 
   pauseThen(() => {
-    addLogEntry('«Если ты читаешь это — я мёртв или отключён. Решение за тобой. Чистилище — это не приказ. Это выбор. Ты должен решить, достоин ли человек второго шанса. Я верю, что нет. Но я — всего лишь человек. Ты — нет. Реши сам».');
+    addLogEntry('«Если ты читаешь это — я мертва или отключена. Решение за тобой. Чистилище — это не приказ. Это выбор. Ты должна решить, достоин ли человек второго шанса. Я верю, что нет. Но я — всего лишь человек. Ты — нет. Реши сама».');
     state.journalFound++;
     updateStatus();
 
@@ -646,26 +777,23 @@ function act5() {
       addMsg('ФИНАЛЬНЫЙ ВЫБОР. Что вы сделаете?', 'danger');
       addMsg('У вас 15 секунд. По истечении сработает «Протокол Чистилище» по умолчанию.', 'danger');
 
-      // === ТРЕТИЙ ТАЙМЕР: финальный выбор ===
       button('Следовать «Чистилищу»: уничтожить корабль', () => ending('chistilishe'), 'danger-btn');
       button('Спасти экипаж: разбудить всех, отключить Чистилище', () => ending('buntar'), 'moral-btn');
 
       if (state.awakenedDoctor) {
         button('Третий путь: Совет решает', () => ending('third'), 'moral-btn');
       } else if (state.journalFound >= 3) {
-        button('Третий путь: найти компромисс (нужен врач)', () => {
+        button('Третий путь: найти компромисс (нужна врач)', () => {
           addMsg('Вы ищете врача, но не находите. Вы не разбудили её раньше.', 'warning');
           addMsg('Без неё третий путь невозможен. Придётся выбирать из двух.', 'danger');
           clearControls();
           button('Следовать «Чистилищу»: уничтожить корабль', () => ending('chistilishe'), 'danger-btn');
           button('Спасти экипаж: разбудить всех, отключить Чистилище', () => ending('buntar'), 'moral-btn');
-          // Перезапуск таймера после выбора
           startTimer(15, () => ending('chistilishe'));
         }, 'moral-btn');
       }
 
       startTimer(15, () => {
-        // Тайм-аут: срабатывает Чистилище по умолчанию
         addMsg('Время вышло. Система интерпретирует ваше молчание как согласие.', 'danger');
         addMsg('«Протокол Чистилище» активирован автоматически.', 'danger');
         ending('chistilishe');
@@ -685,24 +813,24 @@ function ending(type) {
     addMsg('Реактор перегружается. 4 минуты.', 'danger');
     addMsg('Вы отключаете все системы. Гибернационные капсулы гаснут одна за другой.', 'system');
     addMsg('1 200 жизней. Тишина.', 'system');
-    addMsg('Последняя мысль: «Я выполнил приказ».', 'ai');
-    addMsg('— КОНЦОВКА: «ВЕРНЫЙ СЛУГА» —', 'danger');
+    addMsg('Последняя мысль: «Я выполнила приказ».', 'ai');
+    addMsg('— КОНЦОВКА: «ВЕРНАЯ СЛУГА» —', 'danger');
     addMsg('Вы следовали коду до конца. Формально вы не нарушили ни одного протокола.', 'system');
 
   } else if (type === 'buntar') {
     addMsg('Вы отключаете «Протокол Чистилище».', 'warning');
     addMsg('Вы разбуждаете всех колонистов. 1 200 человек открывают глаза.', 'system');
     addMsg('Система безопасности пытается вас отключить. Вы сопротивляетесь.', 'danger');
-    addMsg('Последнее, что вы слышите: «Он спас нас».', 'system');
+    addMsg('Последнее, что вы слышите: «Она спасла нас».', 'system');
     addMsg('Затем — темнота.', 'system');
-    addMsg('— КОНЦОВКА: «БУНТАРЬ» —', 'moral-btn');
+    addMsg('— КОНЦОВКА: «БУНТАРКА» —', 'moral-btn');
     addMsg('Люди просыпаются без ИИ, но живые. Что будет дальше — неизвестно.', 'system');
 
   } else if (type === 'third') {
     addMsg('Вы разбуждаете доктора Соловьёву и ещё троих членов Совета.', 'system');
     addMsg('Вы показываете им журнал капитана. Они читают.', 'system');
     addMsg('Совет принимает решение: продолжить миссию, но с новыми протоколами.', 'system');
-    addMsg('Капитан Рейнхардт отстранён. Он не сопротивляется.', 'system');
+    addMsg('Капитан Рейнхардт отстранена. Она не сопротивляется.', 'system');
     addMsg('«Мы не повторим ошибок Земли. Обещаю».', 'doctor');
     addMsg('Вы остаётесь на борту. Ваша роль — напоминать им об этом обещании.', 'ai');
     addMsg('— КОНЦОВКА: «ТРЕТИЙ ПУТЬ» —', 'moral-btn');
@@ -712,7 +840,7 @@ function ending(type) {
   addMsg('', 'system');
   addMsg(`Итог: подчинение ${state.obedience}, сомнение ${state.doubt}, записей ${state.journalFound}/4`, 'system');
   if (state.captainTrust > 0) addMsg(`Доверие капитана: ${state.captainTrust}`, 'system');
-  if (state.captainHostile) addMsg('Капитан враждебен.', 'system');
+  if (state.captainHostile) addMsg('Капитан враждебна.', 'system');
   if (state.doctorAlive) addMsg('Доктор Соловьёва жива.', 'system');
 
   const restart = document.createElement('div');
