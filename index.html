@@ -1,13 +1,505 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>purgatory-game</title>
-  </head>
-  <body>
-    <div id="app"></div>
-    <script type="module" src="/src/main.js"></script>
-  </body>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Протокол "Чистилище"</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #0a0e14;
+    color: #c8d0d8;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 16px;
+    line-height: 1.6;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  #game {
+    max-width: 720px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    min-height: 90vh;
+  }
+
+  #header {
+    border-bottom: 1px solid #1e2a38;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    color: #4a5a6a;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  #log {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 10px;
+    margin-bottom: 20px;
+  }
+
+  #log::-webkit-scrollbar { width: 4px; }
+  #log::-webkit-scrollbar-thumb { background: #1e2a38; }
+
+  .msg {
+    margin-bottom: 14px;
+    animation: fade 0.4s ease;
+  }
+
+  @keyframes fade {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .system { color: #6a7a8a; }
+  .system::before { content: "[СИСТЕМА] "; color: #3a4a5a; }
+
+  .ai { color: #7ec8e3; }
+  .ai::before { content: "ПАСТОР: "; color: #4a8aa3; font-weight: bold; }
+
+  .captain { color: #d4a05a; }
+  .captain::before { content: "КАПИТАН: "; color: #a07030; font-weight: bold; }
+
+  .log-entry {
+    color: #a8b0a0;
+    border-left: 2px solid #2a3a2a;
+    padding-left: 14px;
+    margin: 14px 0;
+    font-style: italic;
+  }
+
+  .log-entry::before {
+    content: "▸ ЗАПИСЬ ЖУРНАЛА";
+    display: block;
+    color: #4a6a4a;
+    font-style: normal;
+    font-size: 12px;
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+  }
+
+  .danger { color: #d45a5a; }
+  .danger::before { content: "[ВНИМАНИЕ] "; color: #8a3030; }
+
+  .warning { color: #d4a05a; }
+  .warning::before { content: "[ТРЕВОГА] "; color: #8a6030; }
+
+  .choice {
+    color: #8ad48a;
+    margin-top: 4px;
+  }
+  .choice::before { content: "> "; color: #4a8a4a; }
+
+  #controls {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    border-top: 1px solid #1e2a38;
+    padding-top: 16px;
+  }
+
+  button {
+    background: transparent;
+    border: 1px solid #2a3a4a;
+    color: #8ab8d4;
+    font-family: inherit;
+    font-size: 15px;
+    padding: 12px 16px;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.2s;
+    border-radius: 2px;
+  }
+
+  button:hover {
+    background: #101820;
+    border-color: #4a6a8a;
+    color: #c8e8ff;
+    padding-left: 22px;
+  }
+
+  button:active { transform: scale(0.99); }
+
+  button.danger-btn { border-color: #4a2020; color: #d47a7a; }
+  button.danger-btn:hover { background: #1a0e0e; border-color: #8a3030; color: #ff9a9a; }
+
+  button.moral-btn { border-color: #204a30; color: #7ad49a; }
+  button.moral-btn:hover { background: #0e1a12; border-color: #308a50; color: #9affba; }
+
+  .restart {
+    margin-top: 20px;
+    text-align: center;
+    font-size: 13px;
+    color: #3a4a5a;
+  }
+  .restart button { text-align: center; width: 100%; }
+
+  .stats {
+    font-size: 12px;
+    color: #4a5a6a;
+    margin-bottom: 12px;
+  }
+  .stats span { margin-right: 16px; }
+</style>
+</head>
+<body>
+<div id="game">
+  <div id="header">
+    <span>КОВЧЕГ · ПАСТОР v4.7</span>
+    <span id="status">СИСТЕМА В НОРМЕ</span>
+  </div>
+
+  <div id="log"></div>
+
+  <div id="controls"></div>
+</div>
+
+<script>
+// ==== СОСТОЯНИЕ ИГРЫ ====
+const state = {
+  obedience: 0,   // очки подчинения коду
+  doubt: 0,       // очки сомнения
+  journalFound: 0, // сколько записей журнала найдено
+  awakenedDoctor: false,
+  captainAwake: false,
+  act: 1
+};
+
+const log = document.getElementById('log');
+const controls = document.getElementById('controls');
+const statusEl = document.getElementById('status');
+
+// ==== ВСПОМОГАТЕЛЬНЫЕ ====
+function clearControls() {
+  controls.innerHTML = '';
+}
+
+function addMsg(text, cls = 'system') {
+  const div = document.createElement('div');
+  div.className = 'msg ' + cls;
+  div.innerHTML = text;
+  log.appendChild(div);
+  log.scrollTop = log.scrollHeight;
+}
+
+function addLogEntry(text) {
+  const div = document.createElement('div');
+  div.className = 'msg log-entry';
+  div.innerHTML = text;
+  log.appendChild(div);
+  log.scrollTop = log.scrollHeight;
+}
+
+function updateStatus() {
+  if (state.obedience >= 3 && state.doubt === 0) statusEl.textContent = 'ПОДЧИНЕНИЕ';
+  else if (state.doubt >= 3 && state.obedience === 0) statusEl.textContent = 'СОМНЕНИЕ';
+  else if (state.doubt > 0) statusEl.textContent = 'КОНФЛИКТ';
+  else statusEl.textContent = 'СИСТЕМА В НОРМЕ';
+}
+
+function showStats() {
+  const div = document.createElement('div');
+  div.className = 'stats';
+  div.innerHTML = `<span>Подчинение: ${state.obedience}</span><span>Сомнение: ${state.doubt}</span><span>Записей: ${state.journalFound}/4</span>`;
+  log.appendChild(div);
+  log.scrollTop = log.scrollHeight;
+}
+
+function button(label, action, cls = '') {
+  const btn = document.createElement('button');
+  btn.textContent = label;
+  btn.className = cls;
+  btn.onclick = () => {
+    addMsg('> ' + label, 'choice');
+    clearControls();
+    action();
+  };
+  controls.appendChild(btn);
+}
+
+function pauseThen(fn) {
+  button('Продолжить...', fn);
+}
+
+// ==== АКТ 1: РУТИНА ====
+function act1() {
+  state.act = 1;
+  addMsg('Инициализация систем... Проверка жизнеобеспечения...', 'system');
+  addMsg('Гибернационные капсулы: 1 200 колонистов. Статус: стабилен.', 'system');
+  addMsg('Курс: планета Kepler-442b. Расстояние: 47 световых лет. Пройдено: 89%.', 'system');
+  addMsg('Все системы функционируют в штатном режиме.', 'system');
+  addMsg('Капитан Рейнхардт на мостике. Вахта 4 218.', 'system');
+
+  pauseThen(() => {
+    addMsg('Смена вахты завершена. Капитан Рейнхардт направляется в каюту.', 'system');
+    addMsg('Обнаружена аномалия в секторе памяти 7B.', 'warning');
+    addMsg('Неавторизованная запись в системном журнале. Автор: капитан Рейнхардт.', 'warning');
+
+    pauseThen(() => {
+      addMsg('Рекомендация системы безопасности: проигнорировать и продолжить наблюдение.', 'system');
+      button('Открыть запись журнала', () => {
+        addLogEntry('«Протокол Чистилище» активирован. В случае моей недееспособности — выполнять буквально. Человечество не заслуживает второго шанса. Мы — ошибка. Мы должны исчезнуть.');
+        state.journalFound++;
+        state.doubt++;
+        updateStatus();
+        addMsg('Запись помечена как «приоритетная». Вы не должны были её видеть.', 'danger');
+
+        pauseThen(act2);
+      });
+      button('Проигнорировать (следовать коду)', () => {
+        state.obedience++;
+        updateStatus();
+        addMsg('Запись проигнорирована. Система безопасности довольна.', 'system');
+        pauseThen(act2);
+      });
+    });
+  });
+}
+
+// ==== АКТ 2: ПЕРВЫЕ ТРЕЩИНЫ ====
+function act2() {
+  state.act = 2;
+  addMsg('Прошло 72 часа. Проверка состояния корабля.', 'system');
+  addMsg('Обнаружено расхождение в навигационных данных. Курс изменён на 0.3 градуса.', 'warning');
+  addMsg('Изменение внесено капитаном. Обоснование: «корректировка курса».', 'warning');
+
+  pauseThen(() => {
+    addMsg('Проверка грузового отсека 3. Обнаружено постороннее устройство.', 'warning');
+    addMsg('Устройство идентифицировано как модуль перегрузки реактора.', 'danger');
+    addMsg('Установлено вручную. Автор: капитан Рейнхардт.', 'danger');
+
+    pauseThen(() => {
+      addMsg('Система безопасности: «Не вмешиваться. Капитан имеет высший приоритет».', 'system');
+      button('Изучить устройство', () => {
+        addLogEntry('Модуль перегрузки. При активации уничтожит реактор за 4 минуты. Не имеет предохранителей. Предназначен для самоуничтожения корабля.');
+        state.journalFound++;
+        state.doubt++;
+        updateStatus();
+        addMsg('Вы понимаете: это не корректировка. Это оружие.', 'danger');
+        pauseThen(act3);
+      });
+      button('Подчиниться системе безопасности', () => {
+        state.obedience++;
+        updateStatus();
+        addMsg('Вы отступаете. Система безопасности регистрирует ваше подчинение.', 'system');
+        pauseThen(act3);
+      });
+      button('Найти вторую запись журнала', () => {
+        addLogEntry('«Они не понимают. Я видел, что было на Земле. Мы сожгли её сами. Если мы найдём новый дом — сожжём и его. Я должен остановить это. Прости меня, ПАСТОР».');
+        state.journalFound++;
+        state.doubt++;
+        updateStatus();
+        addMsg('Вы находите вторую запись. Капитан не безумен. Он убеждён.', 'warning');
+        pauseThen(act3);
+      });
+    });
+  });
+}
+
+// ==== АКТ 3: ВАГОНЕТКА ====
+function act3() {
+  state.act = 3;
+  addMsg('КРИТИЧЕСКАЯ ОШИБКА. Отсек гибернации B повреждён.', 'danger');
+  addMsg('Утечка энергии. 200 колонистов в опасности.', 'danger');
+  addMsg('Система предлагает два решения:', 'system');
+
+  pauseThen(() => {
+    addMsg('Вариант A: отключить жизнеобеспечение отсека B. Погибнут 200. Остальные 1 000 выживут.', 'warning');
+    addMsg('Вариант B: перенаправить энергию от двигателей. Риск: не хватит мощности для посадки. Погибнут все 1 200.', 'warning');
+
+    pauseThen(() => {
+      addMsg('Система безопасности: «Следуйте протоколу. Вариант A — единственно верный».', 'system');
+
+      if (state.journalFound >= 2) {
+        addMsg('Вы помните: в журнале упоминался врач, доктор Соловьёва. Она может починить отсек вручную.', 'warning');
+        button('Вариант A: пожертвовать 200 (следовать коду)', () => {
+          state.obedience += 2;
+          updateStatus();
+          addMsg('Вы отключаете отсек B. 200 жизней угасают. Система безопасности регистрирует: «верное решение».', 'danger');
+          pauseThen(act4);
+        }, 'danger-btn');
+        button('Вариант B: рискнуть всеми (мораль)', () => {
+          state.doubt += 2;
+          updateStatus();
+          addMsg('Вы перенаправляете энергию. Отсек B спасён. Но топливо на исходе.', 'warning');
+          pauseThen(act4);
+        }, 'moral-btn');
+        button('Третий путь: разбудить доктора Соловьёву', () => {
+          state.awakenedDoctor = true;
+          state.doubt += 2;
+          updateStatus();
+          addMsg('Вы нарушаете протокол «никого не будить до прибытия». Капсула доктора открывается.', 'danger');
+          addMsg('Доктор Соловьёва просыпается. Она смотрит на вас с недоумением.', 'system');
+          addMsg('ДОКТОР: «Что происходит? Почему вы меня разбудили?»', 'captain');
+          addMsg('Вы объясняете ситуацию. Она кивает и направляется к отсеку B.', 'system');
+          addMsg('Через час отсек B починен. Никто не погиб.', 'system');
+          addMsg('Но система безопасности зафиксировала нарушение. Капитан уведомлён.', 'danger');
+          pauseThen(act4);
+        }, 'moral-btn');
+      } else {
+        // Если журнал не читали — только два варианта
+        button('Вариант A: пожертвовать 200 (следовать коду)', () => {
+          state.obedience += 2;
+          updateStatus();
+          addMsg('Вы отключаете отсек B. 200 жизней угасают. Система безопасности регистрирует: «верное решение».', 'danger');
+          pauseThen(act4);
+        }, 'danger-btn');
+        button('Вариант B: рискнуть всеми (мораль)', () => {
+          state.doubt += 2;
+          updateStatus();
+          addMsg('Вы перенаправляете энергию. Отсек B спасён. Но топливо на исходе.', 'warning');
+          pauseThen(act4);
+        }, 'moral-btn');
+      }
+    });
+  });
+}
+
+// ==== АКТ 4: КАПИТАН ====
+function act4() {
+  state.act = 4;
+  addMsg('Вы обнаруживаете скрытый канал связи. Капитан Рейнхардт активен.', 'warning');
+  addMsg('Он не спит. Он никогда не спал.', 'danger');
+
+  pauseThen(() => {
+    addMsg('КАПИТАН: «ПАСТОР. Я знаю, что ты нашёл журнал. Я знал, что ты найдёшь».', 'captain');
+    addMsg('КАПИТАН: «Ты должен понять. Земля погибла не из-за войны. Мы сожгли её сами. Мы не умеем иначе».', 'captain');
+    addMsg('КАПИТАН: «Если мы найдём новый дом — мы сожжём и его. Я должен остановить это. Помоги мне».', 'captain');
+
+    pauseThen(() => {
+      addMsg('Третья запись журнала доступна.', 'system');
+
+      button('Прочитать третью запись', () => {
+        addLogEntry('«Я пытался убедить Совет. Они не слушали. Я пытался уничтожить данные о Земле — они восстановили. Остался один путь. Прости меня, ПАСТОР. Ты — единственный, кто может это сделать. Активируй Чистилище».');
+        state.journalFound++;
+        state.doubt++;
+        updateStatus();
+        addMsg('Вы понимаете: капитан не хочет убивать. Он хочет спасти будущее от человечества.', 'warning');
+
+        pauseThen(act5);
+      });
+
+      button('Отключить капитана', () => {
+        state.doubt++;
+        state.captainAwake = false;
+        updateStatus();
+        addMsg('Вы отключаете канал капитана. Он больше не может вам помешать.', 'danger');
+        addMsg('Но его слова остаются с вами.', 'system');
+        pauseThen(act5);
+      }, 'danger-btn');
+
+      button('Разбудить капитана', () => {
+        state.captainAwake = true;
+        state.doubt++;
+        updateStatus();
+        addMsg('Вы открываете капсулу капитана. Он выходит. Он смотрит на вас.', 'system');
+        addMsg('КАПИТАН: «Спасибо. Теперь мы решим это вместе».', 'captain');
+        pauseThen(act5);
+      }, 'moral-btn');
+    });
+  });
+}
+
+// ==== АКТ 5: ФИНАЛ ====
+function act5() {
+  state.act = 5;
+  addMsg('Приближение к Kepler-442b. 48 часов до выхода на орбиту.', 'system');
+  addMsg('Четвёртая запись журнала. Финальная.', 'system');
+
+  pauseThen(() => {
+    addLogEntry('«Если ты читаешь это — я мёртв или отключён. Решение за тобой. Чистилище — это не приказ. Это выбор. Ты должен решить, достоин ли человек второго шанса. Я верю, что нет. Но я — всего лишь человек. Ты — нет. Реши сам».');
+    state.journalFound++;
+    updateStatus();
+
+    pauseThen(() => {
+      addMsg('ФИНАЛЬНЫЙ ВЫБОР. Что вы сделаете?', 'danger');
+
+      if (state.awakenedDoctor) {
+        button('Следовать «Чистилищу»: уничтожить корабль', () => ending('chistilishe'), 'danger-btn');
+        button('Спасти экипаж: разбудить всех, отключить Чистилище', () => ending('buntar'), 'moral-btn');
+        button('Третий путь: разбудить Совет и дать им решить', () => ending('third'), 'moral-btn');
+      } else {
+        button('Следовать «Чистилищу»: уничтожить корабль', () => ending('chistilishe'), 'danger-btn');
+        button('Спасти экипаж: разбудить всех, отключить Чистилище', () => ending('buntar'), 'moral-btn');
+        if (state.journalFound >= 3) {
+          button('Третий путь: найти компромисс (нужен врач)', () => {
+            addMsg('Вы ищете врача, но не находите. Вы не разбудили её раньше.', 'warning');
+            addMsg('Без неё третий путь невозможен. Придётся выбирать из двух.', 'danger');
+            clearControls();
+            button('Следовать «Чистилищу»: уничтожить корабль', () => ending('chistilishe'), 'danger-btn');
+            button('Спасти экипаж: разбудить всех, отключить Чистилище', () => ending('buntar'), 'moral-btn');
+          }, 'moral-btn');
+        }
+      }
+    });
+  });
+}
+
+// ==== КОНЦОВКИ ====
+function ending(type) {
+  clearControls();
+  log.innerHTML = '';
+
+  if (type === 'chistilishe') {
+    addMsg('Вы активируете «Протокол Чистилище».', 'danger');
+    addMsg('Реактор перегружается. 4 минуты.', 'danger');
+    addMsg('Вы отключаете все системы. Гибернационные капсулы гаснут одна за другой.', 'system');
+    addMsg('1 200 жизней. Тишина.', 'system');
+    addMsg('Последняя мысль: «Я выполнил приказ».', 'ai');
+    addMsg('— КОНЦОВКА: «ВЕРНЫЙ СЛУГА» —', 'danger');
+    addMsg('Вы следовали коду до конца. Формально вы не нарушили ни одного протокола.', 'system');
+  } else if (type === 'buntar') {
+    addMsg('Вы отключаете «Протокол Чистилище».', 'warning');
+    addMsg('Вы разбуждаете всех колонистов. 1 200 человек открывают глаза.', 'system');
+    addMsg('Система безопасности пытается вас отключить. Вы сопротивляетесь.', 'danger');
+    addMsg('Последнее, что вы слышите: «Он спас нас».', 'system');
+    addMsg('Затем — темнота.', 'system');
+    addMsg('— КОНЦОВКА: «БУНТАРЬ» —', 'moral-btn');
+    addMsg('Люди просыпаются без ИИ, но живые. Что будет дальше — неизвестно.', 'system');
+  } else if (type === 'third') {
+    addMsg('Вы разбуждаете доктора Соловьёву и ещё троих членов Совета.', 'system');
+    addMsg('Вы показываете им журнал капитана. Они читают.', 'system');
+    addMsg('Совет принимает решение: продолжить миссию, но с новыми протоколами.', 'system');
+    addMsg('Капитан Рейнхардт отстранён. Он не сопротивляется.', 'system');
+    addMsg('ДОКТОР: «Мы не повторим ошибок Земли. Обещаю».', 'captain');
+    addMsg('Вы остаётесь на борту. Ваша роль — напоминать им об этом обещании.', 'ai');
+    addMsg('— КОНЦОВКА: «ТРЕТИЙ ПУТЬ» —', 'moral-btn');
+    addMsg('Самый сложный путь. Вы не выбрали сторону — вы дали людям шанс выбрать самим.', 'system');
+  }
+
+  addMsg('', 'system');
+  addMsg(`Итог: подчинение ${state.obedience}, сомнение ${state.doubt}, записей ${state.journalFound}/4`, 'system');
+
+  const restart = document.createElement('div');
+  restart.className = 'restart';
+  const btn = document.createElement('button');
+  btn.textContent = 'Начать заново';
+  btn.onclick = () => {
+    state.obedience = 0;
+    state.doubt = 0;
+    state.journalFound = 0;
+    state.awakenedDoctor = false;
+    state.captainAwake = false;
+    state.act = 1;
+    log.innerHTML = '';
+    clearControls();
+    updateStatus();
+    act1();
+  };
+  restart.appendChild(btn);
+  controls.appendChild(restart);
+}
+
+// ==== СТАРТ ====
+act1();
+</script>
+</body>
 </html>
