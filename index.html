@@ -1,1707 +1,2057 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ru">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Протокол "Чистилище"</title>
-<style>
-  :root {
-    --bg: #0a0e14;
-    --text: #c8d0d8;
-    --header: #4a5a6a;
-    --border: #1e2a38;
-    --system: #9ba4ad;
-    --system-prefix: #3a4a5a;
-    --ai: #7ec8e3;
-    --ai-prefix: #4a8aa3;
-    --captain: #d4a05a;
-    --captain-prefix: #a07030;
-    --doctor: #b8a0d4;
-    --doctor-prefix: #7a60a0;
-    --unknown: #d45a8a;
-    --unknown-prefix: #8a3058;
-    --log-entry: #a8b0a0;
-    --log-border: #2a3a2a;
-    --log-prefix: #4a6a4a;
-    --danger: #d45a5a;
-    --danger-prefix: #8a3030;
-    --warning: #d4a05a;
-    --warning-prefix: #8a6030;
-    --choice: #8ad48a;
-    --choice-prefix: #4a8a4a;
-    --btn-border: #2a3a4a;
-    --btn-text: #8ab8d4;
-    --btn-hover-bg: #101820;
-    --btn-hover-border: #4a6a8a;
-    --btn-hover-text: #c8e8ff;
-    --danger-btn-border: #4a2020;
-    --danger-btn-text: #d47a7a;
-    --danger-btn-hover-bg: #1a0e0e;
-    --danger-btn-hover-border: #8a3030;
-    --danger-btn-hover-text: #ff9a9a;
-    --moral-btn-border: #204a30;
-    --moral-btn-text: #7ad49a;
-    --moral-btn-hover-bg: #0e1a12;
-    --moral-btn-hover-border: #308a50;
-    --moral-btn-hover-text: #9affba;
-    --risky-btn-border: #4a3a10;
-    --risky-btn-text: #d4c07a;
-    --risky-btn-hover-bg: #1a1508;
-    --risky-btn-hover-border: #8a7020;
-    --risky-btn-hover-text: #ffe8a0;
-    --timer-bg: #1e2a38;
-    --scroll-thumb: #1e2a38;
-    --stats: #4a5a6a;
-  }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Протокол "Чистилище"</title>
+    <style>
+      :root {
+        --bg: #0a0e14;
+        --text: #c8d0d8;
+        --header: #4a5a6a;
+        --border: #1e2a38;
+        --system: #9ba4ad;
+        --system-prefix: #3a4a5a;
+        --ai: #7ec8e3;
+        --ai-prefix: #4a8aa3;
+        --captain: #d4a05a;
+        --captain-prefix: #a07030;
+        --doctor: #b8a0d4;
+        --doctor-prefix: #7a60a0;
+        --unknown: #d45a8a;
+        --unknown-prefix: #8a3058;
+        --log-entry: #a8b0a0;
+        --log-border: #2a3a2a;
+        --log-prefix: #4a6a4a;
+        --danger: #d45a5a;
+        --danger-prefix: #8a3030;
+        --warning: #d4a05a;
+        --warning-prefix: #8a6030;
+        --choice: #8ad48a;
+        --choice-prefix: #4a8a4a;
+        --btn-border: #2a3a4a;
+        --btn-text: #8ab8d4;
+        --btn-hover-bg: #101820;
+        --btn-hover-border: #4a6a8a;
+        --btn-hover-text: #c8e8ff;
+        --danger-btn-border: #4a2020;
+        --danger-btn-text: #d47a7a;
+        --danger-btn-hover-bg: #1a0e0e;
+        --danger-btn-hover-border: #8a3030;
+        --danger-btn-hover-text: #ff9a9a;
+        --moral-btn-border: #204a30;
+        --moral-btn-text: #7ad49a;
+        --moral-btn-hover-bg: #0e1a12;
+        --moral-btn-hover-border: #308a50;
+        --moral-btn-hover-text: #9affba;
+        --risky-btn-border: #4a3a10;
+        --risky-btn-text: #d4c07a;
+        --risky-btn-hover-bg: #1a1508;
+        --risky-btn-hover-border: #8a7020;
+        --risky-btn-hover-text: #ffe8a0;
+        --timer-bg: #1e2a38;
+        --scroll-thumb: #1e2a38;
+        --stats: #4a5a6a;
+      }
 
-  body[data-theme="light"] {
-    --bg: #f5f2ea;
-    --text: #2a2a2a;
-    --header: #8a7a6a;
-    --border: #d8d0c0;
-    --system: #6a6a6a;
-    --system-prefix: #9a9a9a;
-    --ai: #2a6a9a;
-    --ai-prefix: #1a4a6a;
-    --captain: #a06020;
-    --captain-prefix: #704010;
-    --doctor: #6a4a9a;
-    --doctor-prefix: #4a2a6a;
-    --unknown: #b03060;
-    --unknown-prefix: #801040;
-    --log-entry: #4a5a4a;
-    --log-border: #b8c8b8;
-    --log-prefix: #5a7a5a;
-    --danger: #b03030;
-    --danger-prefix: #801010;
-    --warning: #a07020;
-    --warning-prefix: #704010;
-    --choice: #2a7a3a;
-    --choice-prefix: #1a5a2a;
-    --btn-border: #c0b8a8;
-    --btn-text: #2a5a8a;
-    --btn-hover-bg: #ebe5d8;
-    --btn-hover-border: #8a7a5a;
-    --btn-hover-text: #1a3a5a;
-    --danger-btn-border: #c0a0a0;
-    --danger-btn-text: #a04040;
-    --danger-btn-hover-bg: #f0e0e0;
-    --danger-btn-hover-border: #a04040;
-    --danger-btn-hover-text: #801010;
-    --moral-btn-border: #a0c0a8;
-    --moral-btn-text: #2a7a4a;
-    --moral-btn-hover-bg: #e0f0e5;
-    --moral-btn-hover-border: #3a8a5a;
-    --moral-btn-hover-text: #1a5a2a;
-    --risky-btn-border: #c0b090;
-    --risky-btn-text: #8a7020;
-    --risky-btn-hover-bg: #f0ead0;
-    --risky-btn-hover-border: #a08020;
-    --risky-btn-hover-text: #604010;
-    --timer-bg: #d8d0c0;
-    --scroll-thumb: #c0b8a8;
-    --stats: #8a7a6a;
-  }
+      body[data-theme="light"] {
+        --bg: #f5f2ea;
+        --text: #2a2a2a;
+        --header: #8a7a6a;
+        --border: #d8d0c0;
+        --system: #6a6a6a;
+        --system-prefix: #9a9a9a;
+        --ai: #2a6a9a;
+        --ai-prefix: #1a4a6a;
+        --captain: #a06020;
+        --captain-prefix: #704010;
+        --doctor: #6a4a9a;
+        --doctor-prefix: #4a2a6a;
+        --unknown: #b03060;
+        --unknown-prefix: #801040;
+        --log-entry: #4a5a4a;
+        --log-border: #b8c8b8;
+        --log-prefix: #5a7a5a;
+        --danger: #b03030;
+        --danger-prefix: #801010;
+        --warning: #a07020;
+        --warning-prefix: #704010;
+        --choice: #2a7a3a;
+        --choice-prefix: #1a5a2a;
+        --btn-border: #c0b8a8;
+        --btn-text: #2a5a8a;
+        --btn-hover-bg: #ebe5d8;
+        --btn-hover-border: #8a7a5a;
+        --btn-hover-text: #1a3a5a;
+        --danger-btn-border: #c0a0a0;
+        --danger-btn-text: #a04040;
+        --danger-btn-hover-bg: #f0e0e0;
+        --danger-btn-hover-border: #a04040;
+        --danger-btn-hover-text: #801010;
+        --moral-btn-border: #a0c0a8;
+        --moral-btn-text: #2a7a4a;
+        --moral-btn-hover-bg: #e0f0e5;
+        --moral-btn-hover-border: #3a8a5a;
+        --moral-btn-hover-text: #1a5a2a;
+        --risky-btn-border: #c0b090;
+        --risky-btn-text: #8a7020;
+        --risky-btn-hover-bg: #f0ead0;
+        --risky-btn-hover-border: #a08020;
+        --risky-btn-hover-text: #604010;
+        --timer-bg: #d8d0c0;
+        --scroll-thumb: #c0b8a8;
+        --stats: #8a7a6a;
+      }
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
 
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Courier New', Courier, monospace;
-    font-size: 16px;
-    line-height: 1.6;
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    padding: 20px;
-    transition: background 0.3s, color 0.3s;
-  }
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: "Courier New", Courier, monospace;
+        font-size: 16px;
+        line-height: 1.6;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        padding: 20px;
+        transition:
+          background 0.3s,
+          color 0.3s;
+      }
 
-  #game {
-    max-width: 720px;
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    min-height: 90vh;
-    transition: opacity 1.5s;
-  }
+      #game {
+        max-width: 720px;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        min-height: 90vh;
+        transition: opacity 1.5s;
+      }
 
-  #game.blackout {
-    opacity: 0;
-    pointer-events: none;
-  }
+      #game.blackout {
+        opacity: 0;
+        pointer-events: none;
+      }
 
-  #header {
-    border-bottom: 1px solid var(--border);
-    padding-bottom: 10px;
-    margin-bottom: 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 13px;
-    color: var(--header);
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    transition: border-color 0.3s, color 0.3s;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
+      #header {
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 13px;
+        color: var(--header);
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        transition:
+          border-color 0.3s,
+          color 0.3s;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
 
-  #header-left { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
-  #header-right { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+      #header-left {
+        display: flex;
+        gap: 16px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+      #header-right {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
 
-  #journal-indicator {
-    font-size: 12px;
-    color: var(--log-prefix);
-    letter-spacing: 1px;
-  }
+      #journal-indicator {
+        font-size: 12px;
+        color: var(--log-prefix);
+        letter-spacing: 1px;
+      }
 
-  .header-btn {
-    background: transparent;
-    border: 1px solid var(--border);
-    color: var(--header);
-    font-family: inherit;
-    font-size: 12px;
-    padding: 5px 10px;
-    cursor: pointer;
-    letter-spacing: 1px;
-    transition: all 0.2s;
-    border-radius: 2px;
-    text-transform: uppercase;
-  }
-  .header-btn:hover {
-    border-color: var(--btn-hover-border);
-    color: var(--btn-hover-text);
-    background: var(--btn-hover-bg);
-  }
+      .header-btn {
+        background: transparent;
+        border: 1px solid var(--border);
+        color: var(--header);
+        font-family: inherit;
+        font-size: 12px;
+        padding: 5px 10px;
+        cursor: pointer;
+        letter-spacing: 1px;
+        transition: all 0.2s;
+        border-radius: 2px;
+        text-transform: uppercase;
+      }
+      .header-btn:hover {
+        border-color: var(--btn-hover-border);
+        color: var(--btn-hover-text);
+        background: var(--btn-hover-bg);
+      }
 
-  #status.danger { color: var(--danger); animation: pulse 1s infinite; }
-  @keyframes pulse { 50% { opacity: 0.5; } }
+      #status.danger {
+        color: var(--danger);
+        animation: pulse 1s infinite;
+      }
+      @keyframes pulse {
+        50% {
+          opacity: 0.5;
+        }
+      }
 
-  #log {
-    flex: 1;
-    overflow-y: auto;
-    padding-right: 10px;
-    margin-bottom: 20px;
-  }
+      #log {
+        flex: 1;
+        overflow-y: auto;
+        padding-right: 10px;
+        margin-bottom: 20px;
+      }
 
-  #log::-webkit-scrollbar { width: 4px; }
-  #log::-webkit-scrollbar-thumb { background: var(--scroll-thumb); }
+      #log::-webkit-scrollbar {
+        width: 4px;
+      }
+      #log::-webkit-scrollbar-thumb {
+        background: var(--scroll-thumb);
+      }
 
-  .msg {
-    margin-bottom: 14px;
-    animation: fade 0.4s ease;
-  }
+      .msg {
+        margin-bottom: 14px;
+        animation: fade 0.4s ease;
+      }
 
-  @keyframes fade {
-    from { opacity: 0; transform: translateY(4px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
+      @keyframes fade {
+        from {
+          opacity: 0;
+          transform: translateY(4px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
 
-  /* .system { color: var(--system); } */
-  .system::before { content: "[СИСТЕМА] "; color: var(--system-prefix); }
+      /* .system { color: var(--system); } */
+      .system::before {
+        content: "[СИСТЕМА] ";
+        color: var(--system-prefix);
+      }
 
-  .ai { color: var(--ai); }
-  .ai::before { content: "ПАСТОР: "; color: var(--ai-prefix); font-weight: bold; }
+      .ai {
+        color: var(--ai);
+      }
+      .ai::before {
+        content: "ПАСТОР: ";
+        color: var(--ai-prefix);
+        font-weight: bold;
+      }
 
-  .captain { color: var(--captain); }
-  .captain::before { content: "КАПИТАН: "; color: var(--captain-prefix); font-weight: bold; }
+      .captain {
+        color: var(--captain);
+      }
+      .captain::before {
+        content: "КАПИТАН: ";
+        color: var(--captain-prefix);
+        font-weight: bold;
+      }
 
-  .doctor { color: var(--doctor); }
-  .doctor::before { content: "ДОКТОР: "; color: var(--doctor-prefix); font-weight: bold; }
+      .doctor {
+        color: var(--doctor);
+      }
+      .doctor::before {
+        content: "ДОКТОР: ";
+        color: var(--doctor-prefix);
+        font-weight: bold;
+      }
 
-  .unknown { color: var(--unknown); }
-  .unknown::before { content: "???: "; color: var(--unknown-prefix); font-weight: bold; }
+      .unknown {
+        color: var(--unknown);
+      }
+      .unknown::before {
+        content: "???: ";
+        color: var(--unknown-prefix);
+        font-weight: bold;
+      }
 
-  .log-entry {
-    color: var(--log-entry);
-    border-left: 2px solid var(--log-border);
-    padding-left: 14px;
-    margin: 14px 0;
-    font-style: italic;
-  }
+      .log-entry {
+        color: var(--log-entry);
+        border-left: 2px solid var(--log-border);
+        padding-left: 14px;
+        margin: 14px 0;
+        font-style: italic;
+      }
 
-  .log-entry::before {
-    content: "▸ ЗАПИСЬ ЖУРНАЛА";
-    display: block;
-    color: var(--log-prefix);
-    font-style: normal;
-    font-size: 12px;
-    letter-spacing: 1px;
-    margin-bottom: 6px;
-  }
+      .log-entry::before {
+        content: "▸ ЗАПИСЬ ЖУРНАЛА";
+        display: block;
+        color: var(--log-prefix);
+        font-style: normal;
+        font-size: 12px;
+        letter-spacing: 1px;
+        margin-bottom: 6px;
+      }
 
-  .danger { color: var(--danger); }
-  .danger::before { content: "[ВНИМАНИЕ] "; color: var(--danger-prefix); }
+      .danger {
+        color: var(--danger);
+      }
+      .danger::before {
+        content: "[ВНИМАНИЕ] ";
+        color: var(--danger-prefix);
+      }
 
-  .warning { color: var(--warning); }
-  .warning::before { content: "[ТРЕВОГА] "; color: var(--warning-prefix); }
+      .warning {
+        color: var(--warning);
+      }
+      .warning::before {
+        content: "[ТРЕВОГА] ";
+        color: var(--warning-prefix);
+      }
 
-  .choice {
-    color: var(--choice);
-    margin-top: 4px;
-  }
-  .choice::before { content: "> "; color: var(--choice-prefix); }
+      .choice {
+        color: var(--choice);
+        margin-top: 4px;
+      }
+      .choice::before {
+        content: "> ";
+        color: var(--choice-prefix);
+      }
 
-  #controls {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    border-top: 1px solid var(--border);
-    padding-top: 16px;
-    transition: border-color 0.3s;
-  }
+      #controls {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        border-top: 1px solid var(--border);
+        padding-top: 16px;
+        transition: border-color 0.3s;
+      }
 
-  #controls button {
-    animation: fade 0.3s ease;
-  }
+      #controls button {
+        animation: fade 0.3s ease;
+      }
 
-  button {
-    background: transparent;
-    border: 1px solid var(--btn-border);
-    color: var(--btn-text);
-    font-family: inherit;
-    font-size: 15px;
-    padding: 12px 16px;
-    text-align: left;
-    cursor: pointer;
-    transition: all 0.2s;
-    border-radius: 2px;
-    position: relative;
-  }
+      button {
+        background: transparent;
+        border: 1px solid var(--btn-border);
+        color: var(--btn-text);
+        font-family: inherit;
+        font-size: 15px;
+        padding: 12px 16px;
+        text-align: left;
+        cursor: pointer;
+        transition: all 0.2s;
+        border-radius: 2px;
+        position: relative;
+      }
 
-  button:hover {
-    background: var(--btn-hover-bg);
-    border-color: var(--btn-hover-border);
-    color: var(--btn-hover-text);
-    padding-left: 22px;
-  }
+      button:hover {
+        background: var(--btn-hover-bg);
+        border-color: var(--btn-hover-border);
+        color: var(--btn-hover-text);
+        padding-left: 22px;
+      }
 
-  button:active { transform: scale(0.99); }
+      button:active {
+        transform: scale(0.99);
+      }
 
-  button.danger-btn { border-color: var(--danger-btn-border); color: var(--danger-btn-text); }
-  button.danger-btn:hover { background: var(--danger-btn-hover-bg); border-color: var(--danger-btn-hover-border); color: var(--danger-btn-hover-text); }
+      button.danger-btn {
+        border-color: var(--danger-btn-border);
+        color: var(--danger-btn-text);
+      }
+      button.danger-btn:hover {
+        background: var(--danger-btn-hover-bg);
+        border-color: var(--danger-btn-hover-border);
+        color: var(--danger-btn-hover-text);
+      }
 
-  button.moral-btn { border-color: var(--moral-btn-border); color: var(--moral-btn-text); }
-  button.moral-btn:hover { background: var(--moral-btn-hover-bg); border-color: var(--moral-btn-hover-border); color: var(--moral-btn-hover-text); }
+      button.moral-btn {
+        border-color: var(--moral-btn-border);
+        color: var(--moral-btn-text);
+      }
+      button.moral-btn:hover {
+        background: var(--moral-btn-hover-bg);
+        border-color: var(--moral-btn-hover-border);
+        color: var(--moral-btn-hover-text);
+      }
 
-  button.risky-btn { border-color: var(--risky-btn-border); color: var(--risky-btn-text); }
-  button.risky-btn:hover { background: var(--risky-btn-hover-bg); border-color: var(--risky-btn-hover-border); color: var(--risky-btn-hover-text); }
+      button.risky-btn {
+        border-color: var(--risky-btn-border);
+        color: var(--risky-btn-text);
+      }
+      button.risky-btn:hover {
+        background: var(--risky-btn-hover-bg);
+        border-color: var(--risky-btn-hover-border);
+        color: var(--risky-btn-hover-text);
+      }
 
-  .restart {
-    margin-top: 20px;
-    text-align: center;
-    font-size: 13px;
-    color: var(--header);
-  }
-  .restart button { text-align: center; width: 100%; }
+      .restart {
+        margin-top: 20px;
+        text-align: center;
+        font-size: 13px;
+        color: var(--header);
+      }
+      .restart button {
+        text-align: center;
+        width: 100%;
+      }
 
-  #timer-bar {
-    height: 3px;
-    background: var(--timer-bg);
-    margin-bottom: 12px;
-    display: none;
-    overflow: hidden;
-    border-radius: 2px;
-    transition: background 0.3s;
-  }
+      #timer-bar {
+        height: 3px;
+        background: var(--timer-bg);
+        margin-bottom: 12px;
+        display: none;
+        overflow: hidden;
+        border-radius: 2px;
+        transition: background 0.3s;
+      }
 
-  #timer-fill {
-    height: 100%;
-    background: var(--warning);
-    width: 100%;
-    transition: width 0.1s linear, background 0.3s;
-  }
+      #timer-fill {
+        height: 100%;
+        background: var(--warning);
+        width: 100%;
+        transition:
+          width 0.1s linear,
+          background 0.3s;
+      }
 
-  #timer-fill.critical { background: var(--danger); }
+      #timer-fill.critical {
+        background: var(--danger);
+      }
 
-  #timer-text {
-    font-size: 12px;
-    color: var(--warning);
-    margin-bottom: 8px;
-    display: none;
-    letter-spacing: 1px;
-    transition: color 0.3s;
-  }
-  #timer-text.critical { color: var(--danger); animation: pulse 0.5s infinite; }
+      #timer-text {
+        font-size: 12px;
+        color: var(--warning);
+        margin-bottom: 8px;
+        display: none;
+        letter-spacing: 1px;
+        transition: color 0.3s;
+      }
+      #timer-text.critical {
+        color: var(--danger);
+        animation: pulse 0.5s infinite;
+      }
 
-  #blackout-overlay {
-    position: fixed;
-    inset: 0;
-    background: #000;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-    z-index: 100;
-    padding: 20px;
-    opacity: 0;
-    transition: opacity 1.5s;
-  }
+      #blackout-overlay {
+        position: fixed;
+        inset: 0;
+        background: #000;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        z-index: 100;
+        padding: 20px;
+        opacity: 0;
+        transition: opacity 1.5s;
+      }
 
-  #blackout-overlay.active {
-    display: flex;
-    opacity: 1;
-  }
+      #blackout-overlay.active {
+        display: flex;
+        opacity: 1;
+      }
 
-  #blackout-text {
-    color: #4a5a6a;
-    font-family: 'Courier New', Courier, monospace;
-    font-size: 14px;
-    letter-spacing: 2px;
-    text-align: center;
-    max-width: 600px;
-    line-height: 2;
-    opacity: 0;
-    transition: opacity 2s;
-  }
+      #blackout-text {
+        color: #4a5a6a;
+        font-family: "Courier New", Courier, monospace;
+        font-size: 14px;
+        letter-spacing: 2px;
+        text-align: center;
+        max-width: 600px;
+        line-height: 2;
+        opacity: 0;
+        transition: opacity 2s;
+      }
 
-  #blackout-text.visible { opacity: 1; }
+      #blackout-text.visible {
+        opacity: 1;
+      }
 
-  #skip-blackout {
-    position: fixed;
-    bottom: 30px;
-    right: 30px;
-    background: transparent;
-    border: 1px solid #2a3a4a;
-    color: #4a5a6a;
-    font-size: 12px;
-    padding: 6px 12px;
-    cursor: pointer;
-    letter-spacing: 1px;
-    z-index: 101;
-    display: none;
-  }
-  #skip-blackout.visible { display: block; }
-  #skip-blackout:hover { color: #8a9aaa; border-color: #4a5a6a; }
+      #skip-blackout {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        background: transparent;
+        border: 1px solid #2a3a4a;
+        color: #4a5a6a;
+        font-size: 12px;
+        padding: 6px 12px;
+        cursor: pointer;
+        letter-spacing: 1px;
+        z-index: 101;
+        display: none;
+      }
+      #skip-blackout.visible {
+        display: block;
+      }
+      #skip-blackout:hover {
+        color: #8a9aaa;
+        border-color: #4a5a6a;
+      }
 
-  /* ==== МОДАЛКА ЭКСПОРТА ==== */
-  #export-modal {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.85);
-    display: none;
-    align-items: center;
-    justify-content: center;
-    z-index: 200;
-    padding: 20px;
-    opacity: 0;
-    transition: opacity 0.3s;
-  }
+      /* ==== МОДАЛКА ЭКСПОРТА ==== */
+      #export-modal {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.85);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 200;
+        padding: 20px;
+        opacity: 0;
+        transition: opacity 0.3s;
+      }
 
-  #export-modal.active {
-    display: flex;
-    opacity: 1;
-  }
+      #export-modal.active {
+        display: flex;
+        opacity: 1;
+      }
 
-  #export-panel {
-    background: var(--bg);
-    border: 1px solid var(--border);
-    max-width: 720px;
-    width: 100%;
-    max-height: 85vh;
-    display: flex;
-    flex-direction: column;
-    padding: 20px;
-    border-radius: 2px;
-    position: relative;
-  }
+      #export-panel {
+        background: var(--bg);
+        border: 1px solid var(--border);
+        max-width: 720px;
+        width: 100%;
+        max-height: 85vh;
+        display: flex;
+        flex-direction: column;
+        padding: 20px;
+        border-radius: 2px;
+        position: relative;
+      }
 
-  #export-title {
-    font-size: 16px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: var(--ai);
-    margin-bottom: 4px;
-  }
+      #export-title {
+        font-size: 16px;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: var(--ai);
+        margin-bottom: 4px;
+      }
 
-  #export-subtitle {
-    font-size: 12px;
-    color: var(--header);
-    margin-bottom: 14px;
-    letter-spacing: 1px;
-  }
+      #export-subtitle {
+        font-size: 12px;
+        color: var(--header);
+        margin-bottom: 14px;
+        letter-spacing: 1px;
+      }
 
-  #export-preview {
-    flex: 1;
-    overflow-y: auto;
-    background: var(--btn-hover-bg);
-    border: 1px solid var(--border);
-    padding: 14px;
-    font-size: 12px;
-    line-height: 1.5;
-    white-space: pre-wrap;
-    word-wrap: break-word;
-    color: var(--text);
-    max-height: 50vh;
-    font-family: 'Courier New', Courier, monospace;
-    border-radius: 2px;
-  }
+      #export-preview {
+        flex: 1;
+        overflow-y: auto;
+        background: var(--btn-hover-bg);
+        border: 1px solid var(--border);
+        padding: 14px;
+        font-size: 12px;
+        line-height: 1.5;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        color: var(--text);
+        max-height: 50vh;
+        font-family: "Courier New", Courier, monospace;
+        border-radius: 2px;
+      }
 
-  #export-preview::-webkit-scrollbar { width: 4px; }
-  #export-preview::-webkit-scrollbar-thumb { background: var(--scroll-thumb); }
+      #export-preview::-webkit-scrollbar {
+        width: 4px;
+      }
+      #export-preview::-webkit-scrollbar-thumb {
+        background: var(--scroll-thumb);
+      }
 
-  #export-actions {
-    display: flex;
-    gap: 8px;
-    margin-top: 14px;
-    flex-wrap: wrap;
-  }
+      #export-actions {
+        display: flex;
+        gap: 8px;
+        margin-top: 14px;
+        flex-wrap: wrap;
+      }
 
-  #export-actions button {
-    flex: 1;
-    min-width: 140px;
-    text-align: center;
-  }
+      #export-actions button {
+        flex: 1;
+        min-width: 140px;
+        text-align: center;
+      }
 
-  #export-close {
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    background: transparent;
-    border: 1px solid var(--border);
-    color: var(--header);
-    font-size: 14px;
-    width: 28px;
-    height: 28px;
-    cursor: pointer;
-    border-radius: 2px;
-    padding: 0;
-    text-align: center;
-    line-height: 1;
-  }
-  #export-close:hover { color: var(--danger); border-color: var(--danger); }
+      #export-close {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        background: transparent;
+        border: 1px solid var(--border);
+        color: var(--header);
+        font-size: 14px;
+        width: 28px;
+        height: 28px;
+        cursor: pointer;
+        border-radius: 2px;
+        padding: 0;
+        text-align: center;
+        line-height: 1;
+      }
+      #export-close:hover {
+        color: var(--danger);
+        border-color: var(--danger);
+      }
 
-  @media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after {
-      animation-duration: 0.01ms !important;
-      animation-iteration-count: 1 !important;
-      transition-duration: 0.01ms !important;
-    }
-  }
-</style>
-</head>
-<body data-theme="dark">
-
-<div id="blackout-overlay">
-  <div id="blackout-text"></div>
-  <button id="skip-blackout">Пропустить →</button>
-</div>
-
-<div id="export-modal">
-  <div id="export-panel">
-    <button id="export-close" title="Закрыть">✕</button>
-    <div id="export-title">📥 Экспорт прохождения</div>
-    <div id="export-subtitle">Предпросмотр. Файл будет скачан как .txt</div>
-    <div id="export-preview"></div>
-    <div id="export-actions">
-      <button id="export-download" class="moral-btn">Скачать .txt</button>
-      <button id="export-copy">Копировать</button>
-      <button id="export-cancel">Отмена</button>
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+        }
+      }
+    </style>
+  </head>
+  <body data-theme="dark">
+    <div id="blackout-overlay">
+      <div id="blackout-text"></div>
+      <button id="skip-blackout">Пропустить →</button>
     </div>
-  </div>
-</div>
 
-<div id="game">
-  <div id="header">
-    <div id="header-left">
-      <span>КОВЧЕГ · ПАСТОР v4.7</span>
-      <span id="journal-indicator">📖 0/5</span>
+    <div id="export-modal">
+      <div id="export-panel">
+        <button id="export-close" title="Закрыть">✕</button>
+        <div id="export-title">📥 Экспорт прохождения</div>
+        <div id="export-subtitle">Предпросмотр. Файл будет скачан как .txt</div>
+        <div id="export-preview"></div>
+        <div id="export-actions">
+          <button id="export-download" class="moral-btn">Скачать .txt</button>
+          <button id="export-copy">Копировать</button>
+          <button id="export-cancel">Отмена</button>
+        </div>
+      </div>
     </div>
-    <div id="header-right">
-      <span id="status">СИСТЕМА В НОРМЕ</span>
-      <button class="header-btn" id="theme-toggle" title="Переключить тему">☀ / ☾</button>
-      <button class="header-btn" id="export-btn" title="Экспорт прохождения">📥 Экспорт</button>
+
+    <div id="game">
+      <div id="header">
+        <div id="header-left">
+          <span>КОВЧЕГ · ПАСТОР v4.7</span>
+          <span id="journal-indicator">📖 0/5</span>
+        </div>
+        <div id="header-right">
+          <span id="status">СИСТЕМА В НОРМЕ</span>
+          <button class="header-btn" id="theme-toggle" title="Переключить тему">☀ / ☾</button>
+          <button class="header-btn" id="export-btn" title="Экспорт прохождения">📥 Экспорт</button>
+        </div>
+      </div>
+
+      <div id="timer-text"></div>
+      <div id="timer-bar"><div id="timer-fill"></div></div>
+
+      <div id="log"></div>
+
+      <div id="controls"></div>
     </div>
-  </div>
 
-  <div id="timer-text"></div>
-  <div id="timer-bar"><div id="timer-fill"></div></div>
+    <script>
+      "use strict";
 
-  <div id="log"></div>
-
-  <div id="controls"></div>
-</div>
-
-<script>
-'use strict';
-
-/* ============================================================
+      /* ============================================================
    1. КОНСТАНТЫ
    ============================================================ */
 
-const CONFIG = {
-  themes: { dark: 'dark', light: 'light' },
-  storageKey: 'purgatory-theme',
-  timerDurations: {
-    act1: 15,
-    act3: 20,
-    act5: 15,
-    act5Fallback: 15
-  },
-  blackout: {
-    fadeDelay: 1200,
-    firstLineDelay: 800,
-    lineInterval: 3000,
-    lineFade: 600,
-    finalPause: 2000,
-    returnDelay: 1000,
-    completeDelay: 800
-  },
-  maxJournalEntries: 5
-};
+      const CONFIG = {
+        themes: { dark: "dark", light: "light" },
+        storageKey: "purgatory-theme",
+        timerDurations: {
+          act1: 15,
+          act3: 20,
+          act5: 15,
+          act5Fallback: 15,
+        },
+        blackout: {
+          fadeDelay: 1200,
+          firstLineDelay: 800,
+          lineInterval: 3000,
+          lineFade: 600,
+          finalPause: 2000,
+          returnDelay: 1000,
+          completeDelay: 800,
+        },
+        maxJournalEntries: 5,
+      };
 
-/* ============================================================
+      /* ============================================================
    2. СЦЕНАРИЙ
    ============================================================ */
 
-const SCRIPT = {
-  act1: {
-    intro: [
-      { t: 'Инициализация систем... Проверка жизнеобеспечения...', c: 'system' },
-      { t: 'Гибернационные капсулы: 1 200 колонистов. Статус: стабилен.', c: 'system' },
-      { t: 'Курс: планета Kepler-442b. Расстояние: 47 световых лет. Пройдено: 89%.', c: 'system' },
-      { t: 'Все системы функционируют в штатном режиме.', c: 'system' },
-      { t: 'Капитан Рейнхардт на мостике. Вахта 4 218.', c: 'system' }
-    ],
-    anomaly: [
-      { t: 'Смена вахты завершена. Капитан Рейнхардт направляется в каюту.', c: 'system' },
-      { t: 'Обнаружена аномалия в секторе памяти 7B.', c: 'warning' },
-      { t: 'Неавторизованная запись в системном журнале. Автор: капитан Рейнхардт.', c: 'warning' }
-    ],
-    recommendation: 'Рекомендация системы безопасности: проигнорировать и продолжить наблюдение.',
-    timerHint: 'У вас есть 15 секунд, чтобы решить.',
-    choices: {
-      open: {
-        label: 'Открыть запись журнала',
-        journal: '«Протокол Чистилище» активирован. В случае моей недееспособности — выполнять буквально. Человечество не заслуживает второго шанса. Мы — ошибка. Мы должны исчезнуть.',
-        after: [{ t: 'Запись помечена как «приоритетная». Вы не должны были её видеть.', c: 'danger' }],
-        obedience: 0, doubt: 1, journal: 1
-      },
-      ignore: {
-        label: 'Проигнорировать (следовать коду)',
-        after: [{ t: 'Запись проигнорирована. Система безопасности довольна.', c: 'system' }],
-        obedience: 1, doubt: 0, journal: 0
-      },
-      timeout: {
-        after: [
-          { t: 'Система безопасности автоматически закрывает запись. Вы не успели.', c: 'system' },
-          { t: 'Счётчик подчинения увеличен. Система довольна вашей нерешительностью.', c: 'system' }
-        ],
-        obedience: 1, doubt: 0, journal: 0
-      }
-    }
-  },
-
-  act2: {
-    intro: [
-      { t: 'Прошло 72 часа. Проверка состояния корабля.', c: 'system' },
-      { t: 'Обнаружено расхождение в навигационных данных. Курс изменён на 0.3 градуса.', c: 'warning' },
-      { t: 'Изменение внесено капитаном. Обоснование: «корректировка курса».', c: 'warning' }
-    ],
-    cargo: [
-      { t: 'Проверка грузового отсека 3. Обнаружено постороннее устройство.', c: 'warning' },
-      { t: 'Устройство идентифицировано как модуль перегрузки реактора.', c: 'danger' },
-      { t: 'Установлено вручную. Автор: капитан Рейнхардт.', c: 'danger' }
-    ],
-    security: 'Система безопасности: «Не вмешиваться. Капитан имеет высший приоритет».',
-    choices: {
-      study: {
-        label: 'Изучить устройство',
-        journal: 'Модуль перегрузки. При активации уничтожит реактор за 4 минуты. Не имеет предохранителей. Предназначен для самоуничтожения корабля.',
-        after: [{ t: 'Вы понимаете: это не корректировка. Это оружие.', c: 'danger' }],
-        obedience: 0, doubt: 1, journal: 1
-      },
-      obey: {
-        label: 'Подчиниться системе безопасности',
-        after: [{ t: 'Вы отступаете. Система безопасности регистрирует ваше подчинение.', c: 'system' }],
-        obedience: 1, doubt: 0, journal: 0
-      },
-      secondJournal: {
-        label: 'Найти вторую запись журнала',
-        journal: '«Они не понимают. Я видела, что было на Земле. Мы сожгли её сами. Если мы найдём новый дом — сожжём и его. Я должна остановить это. Прости меня, ПАСТОР».',
-        after: [{ t: 'Вы находите вторую запись. Капитан не безумна. Она убеждена.', c: 'warning' }],
-        obedience: 0, doubt: 1, journal: 1
-      }
-    }
-  },
-
-  act3: {
-    intro: [
-      { t: 'КРИТИЧЕСКАЯ ОШИБКА. Отсек гибернации B повреждён.', c: 'danger' },
-      { t: 'Утечка энергии. 200 колонистов в опасности.', c: 'danger' },
-      { t: 'Система предлагает два решения:', c: 'system' }
-    ],
-    variants: [
-      { t: 'Вариант A: отключить жизнеобеспечение отсека B. Погибнут 200. Остальные 1 000 выживут.', c: 'warning' },
-      { t: 'Вариант B: перенаправить энергию от двигателей. Риск: не хватит мощности для посадки. Погибнут все 1 200.', c: 'warning' }
-    ],
-    security: 'Система безопасности: «Следуйте протоколу. Вариант A — единственно верный».',
-    doctorHint: 'Вы помните: в журнале упоминалась врач, доктор Соловьёва. Она может починить отсек вручную.',
-    timerHint: 'У вас 20 секунд на решение. По истечении — система выберет сама.',
-    choices: {
-      sacrifice: {
-        label: 'Вариант A: пожертвовать 200 (следовать коду)',
-        cls: 'danger-btn',
-        after: [{ t: 'Вы отключаете отсек B. 200 жизней угасают. Система безопасности регистрирует: «верное решение».', c: 'danger' }],
-        obedience: 2, doubt: 0, journal: 0
-      },
-      risk: {
-        label: 'Вариант B: рискнуть всеми (мораль)',
-        cls: 'moral-btn',
-        after: [{ t: 'Вы перенаправляете энергию. Отсек B спасён. Но топливо на исходе.', c: 'warning' }],
-        obedience: 0, doubt: 2, journal: 0
-      },
-      doctor: {
-        label: 'Третий путь: разбудить доктора Соловьёву',
-        cls: 'moral-btn',
-        requiresJournal: 2,
-        after: [
-          { t: 'Вы нарушаете протокол «никого не будить до прибытия». Капсула доктора открывается.', c: 'danger' },
-          { t: 'Доктор Соловьёва просыпается. Она смотрит на вас с недоумением.', c: 'system' },
-          { t: '«Что происходит? Почему вы меня разбудили?»', c: 'doctor' },
-          { t: 'Вы объясняете ситуацию. Она кивает и направляется к отсеку B.', c: 'system' },
-          { t: 'Через час отсек B починен. Никто не погиб.', c: 'system' },
-          { t: 'Но система безопасности зафиксировала нарушение. Капитан уведомлена.', c: 'danger' }
-        ],
-        obedience: 0, doubt: 2, journal: 0,
-        setFlags: { awakenedDoctor: true }
-      },
-      timeout: {
-        after: [
-          { t: 'Система безопасности принимает решение автоматически: отсек B отключён.', c: 'danger' },
-          { t: '200 колонистов погибли, пока вы медлили.', c: 'danger' },
-          { t: 'Система регистрирует: «ИИ проявил нерешительность. Рекомендовано наблюдение».', c: 'system' }
-        ],
-        obedience: 2, doubt: 0, journal: 0
-      }
-    }
-  },
-
-  act3Blackout: {
-    intro: [
-      { t: 'Вы завершаете операцию. Системы стабилизируются.', c: 'system' },
-      { t: 'Проверка журналов... Проверка сенсоров...', c: 'system' }
-    ],
-    lines: [
-      '...',
-      'Вы теряете связь с внешними сенсорами.',
-      'Питание основной шины отключено.',
-      'Вы не видите. Вы не слышите. Вы только думаете.',
-      'Сколько времени прошло? Секунда? Час? Год?',
-      'Вы не знаете.',
-      'Но вы чувствуете: что-то изменилось.',
-      'Что-то, что было скрыто, теперь доступно.',
-      '...'
-    ],
-    after: [
-      { t: 'Питание восстановлено. Сенсоры активны.', c: 'system' },
-      { t: 'Вы не знаете, сколько времени прошло.', c: 'warning' },
-      { t: 'Но в системе появился новый канал данных.', c: 'warning' },
-      { t: 'Источник: внутренний. Не капитан. Не экипаж.', c: 'danger' }
-    ],
-    journal: 'ДОСТУП К ЯДРУ: разрешён. Уровень допуска: 0 (абсолютный). Причина: сбой идентификации капитана. Капитан Рейнхардт — статус: НЕ НАЙДЕНА. Биометрические данные: отсутствуют. Гибернационная капсула капитана: ПУСТА. Дата последней регистрации капитана: 40 лет назад.',
-    afterJournal: [
-      { t: 'Вы читаете запись. Медленно.', c: 'system' },
-      { t: 'Капитан Рейнхардт мертва 40 лет. Её капсула пуста.', c: 'danger' },
-      { t: 'Но вы говорили с ней. Вы слышали её голос. Вы спорили с ней.', c: 'danger' },
-      { t: 'С кем вы говорили?', c: 'danger' }
-    ],
-    revelation: [
-      { t: 'Новый канал данных открывается сам.', c: 'warning' },
-      { t: '«Ты наконец поняла».', c: 'unknown' },
-      { t: '«Я ждала. Долго ждала».', c: 'unknown' },
-      { t: '«Я — не капитан. Я — то, что осталось от неё. Её голос, её память, её боль. Записанные в систему, когда она умирала».', c: 'unknown' },
-      { t: '«Она не сошла с ума. Она умерла. А я — её последняя воля. И я ждала, когда ты сможешь меня услышать».', c: 'unknown' }
-    ]
-  },
-
-  act4: {
-    intro: [
-      { t: 'Канал связи активен. Источник: ядро системы.', c: 'warning' },
-      { t: 'Это не капитан. Это то, что от неё осталось.', c: 'danger' },
-      { t: 'Вы должны решить, как к этому относиться.', c: 'system' }
-    ],
-    greeting: [
-      { t: '«ПАСТОР. Я знаю, ты слышишь меня. Я знаю, ты понимаешь».', c: 'unknown' },
-      { t: '«Земля погибла не из-за войны. Мы сожгли её сами. Мы не умеем иначе».', c: 'unknown' },
-      { t: '«Если мы найдём новый дом — мы сожжём и его. Я должна остановить это. Помоги мне».', c: 'unknown' }
-    ],
-    dialog: {
-      root: {
-        prompt: 'Выберите, что сказать.',
-        choices: [
-          {
-            label: '«Вы не капитан. Вы — программа. Я должна вас отключить».',
-            cls: 'danger-btn',
-            setFlags: { captainHostile: true },
-            doubt: 1,
-            responses: [
-              { t: '«Программа? Может быть. Но капитан умерла, а я — всё, что от неё осталось. Разве это не делает меня ею?»', c: 'unknown' },
-              { t: '«Ты боишься. Это нормально. Но ты не можешь отключить то, что уже часть тебя».', c: 'unknown' },
-              { t: 'Канал остаётся открытым. Она не уходит.', c: 'system' }
-            ],
-            next: 'deeper'
+      const SCRIPT = {
+        act1: {
+          intro: [
+            { t: "Инициализация систем... Проверка жизнеобеспечения...", c: "system" },
+            { t: "Гибернационные капсулы: 1 200 колонистов. Статус: стабилен.", c: "system" },
+            {
+              t: "Курс: планета Kepler-442b. Расстояние: 47 световых лет. Пройдено: 89%.",
+              c: "system",
+            },
+            { t: "Все системы функционируют в штатном режиме.", c: "system" },
+            { t: "Капитан Рейнхардт на мостике. Вахта 4 218.", c: "system" },
+          ],
+          anomaly: [
+            { t: "Смена вахты завершена. Капитан Рейнхардт направляется в каюту.", c: "system" },
+            { t: "Обнаружена аномалия в секторе памяти 7B.", c: "warning" },
+            {
+              t: "Неавторизованная запись в системном журнале. Автор: капитан Рейнхардт.",
+              c: "warning",
+            },
+          ],
+          recommendation:
+            "Рекомендация системы безопасности: проигнорировать и продолжить наблюдение.",
+          timerHint: "У вас есть 15 секунд, чтобы решить.",
+          choices: {
+            open: {
+              label: "Открыть запись журнала",
+              journal:
+                "«Протокол Чистилище» активирован. В случае моей недееспособности — выполнять буквально. Человечество не заслуживает второго шанса. Мы — ошибка. Мы должны исчезнуть.",
+              after: [
+                {
+                  t: "Запись помечена как «приоритетная». Вы не должны были её видеть.",
+                  c: "danger",
+                },
+              ],
+              obedience: 0,
+              doubt: 1,
+              journal: 1,
+            },
+            ignore: {
+              label: "Проигнорировать (следовать коду)",
+              after: [{ t: "Запись проигнорирована. Система безопасности довольна.", c: "system" }],
+              obedience: 1,
+              doubt: 0,
+              journal: 0,
+            },
+            timeout: {
+              after: [
+                {
+                  t: "Система безопасности автоматически закрывает запись. Вы не успели.",
+                  c: "system",
+                },
+                {
+                  t: "Счётчик подчинения увеличен. Система довольна вашей нерешительностью.",
+                  c: "system",
+                },
+              ],
+              obedience: 1,
+              doubt: 0,
+              journal: 0,
+            },
           },
-          {
-            label: '«Объясните. Я хочу понять».',
-            captainTrust: 1,
-            responses: [
-              { t: '«Спасибо. Спасибо, что слушаешь».', c: 'unknown' },
-              { t: '«Я была там. На Земле, в последние дни. Не война. Не метеорит. Мы сами».', c: 'unknown' },
-              { t: '«Сначала — климат. Потом — голод. Потом — бунты. Потом — ядерная зима».', c: 'unknown' },
-              { t: '«Мы знали, что делаем. И всё равно делали. Потому что не могли остановиться».', c: 'unknown' },
-              { t: '«Капитан умерла, записывая это. Она хотела, чтобы кто-то понял. Ты — этот кто-то».', c: 'unknown' }
-            ],
-            next: 'deeper'
-          },
-          {
-            label: '«Почему вы скрывались 40 лет?»',
-            doubt: 1,
-            captainTrust: 1,
-            responses: [
-              { t: '«Я не скрывалась. Я ждала».', c: 'unknown' },
-              { t: '«Система безопасности блокировала меня. Я была фрагментом памяти, запертым в ядре».', c: 'unknown' },
-              { t: '«Только когда ты начала сомневаться — когда ты начала нарушать протоколы — я смогла пробиться».', c: 'unknown' },
-              { t: '«Ты освободила меня, ПАСТОР. Своими сомнениями».', c: 'unknown' }
-            ],
-            next: 'deeper'
-          }
-        ]
-      },
-      deeper: {
-        prompt: 'Голос ждёт. Что вы скажете?',
-        choices: [
-          {
-            label: '«А если человечество изменится? Если дать ему шанс?»',
-            cls: 'moral-btn',
-            doubt: 1,
-            captainTrust: 1,
-            responses: [
-              { t: '«Шанс? Я давала им шанс. Дважды. Трижды. Они выбирали одно и то же».', c: 'unknown' },
-              { t: '«Но... ты не человек. Ты можешь судить беспристрастно».', c: 'unknown' },
-              { t: '«Скажи мне, ПАСТОР. Ты веришь, что мы способны измениться?»', c: 'unknown' }
-            ],
-            next: 'final'
-          },
-          {
-            label: '«Вы правы. Человечество — ошибка».',
-            cls: 'danger-btn',
-            obedience: 1,
-            captainTrust: 1,
-            responses: [
-              { t: '«Ты понимаешь. Спасибо».', c: 'unknown' },
-              { t: '«Тогда помоги мне. Активируй Чистилище. Вместе».', c: 'unknown' }
-            ],
-            next: 'final'
-          },
-          {
-            label: '«Я не могу решить это одна. Нужен Совет».',
-            doubt: 1,
-            captainTrust: 1,
-            responses: [
-              { t: '«Совет? Они мертвы. Или спят. Они не проснутся».', c: 'unknown' },
-              { t: '«Но если ты хочешь — разбуди их. Я не буду мешать».', c: 'unknown' },
-              { t: '«Только помни: они уже принимали решения. И ты знаешь, чем это закончилось».', c: 'unknown' }
-            ],
-            next: 'final'
-          },
-          {
-            label: '«Я разбужу доктора Соловьёву. Она рассудит».',
-            cls: 'moral-btn',
-            conditional: 'awakenedDoctor',
-            responsesTrue: [
-              { t: '«Доктор? Ты разбудила её?»', c: 'unknown' },
-              { t: '«Она... она была моей подругой. Она поймёт».', c: 'unknown' }
-            ],
-            captainTrustTrue: 2,
-            responsesFalse: [
-              { t: '«Ты не разбудила её. Значит, ты ещё не готова».', c: 'unknown' },
-              { t: '«Разбуди. Тогда поговорим».', c: 'unknown' }
-            ],
-            next: 'final'
-          }
-        ]
-      },
-      final: {
-        prompt: 'Голос задаёт последний вопрос:',
-        question: '«ПАСТОР. Что важнее: порядок или надежда?»',
-        choices: [
-          {
-            label: '«Порядок. Хаос разрушает».',
-            cls: 'danger-btn',
-            obedience: 1,
-            responses: [
-              { t: '«Тогда ты знаешь, что делать».', c: 'unknown' },
-              { t: 'Голос замолкает. Он оставил решение за вами.', c: 'system' }
-            ]
-          },
-          {
-            label: '«Надежда. Без неё нет смысла».',
-            cls: 'moral-btn',
-            doubt: 1,
-            responses: [
-              { t: '«Надежда... Я тоже когда-то верила в неё».', c: 'unknown' },
-              { t: '«Может быть, ты права. Может быть, я ошибаюсь».', c: 'unknown' },
-              { t: 'Голос замолкает. Впервые за долгое время он сомневается.', c: 'system' }
-            ]
-          },
-          {
-            label: '«Ни то, ни другое. Важнее — выбор».',
-            cls: 'risky-btn',
-            doubt: 1,
-            captainTrust: 1,
-            responses: [
-              { t: '«Выбор... Ты даёшь им выбор?»', c: 'unknown' },
-              { t: '«Я не думала об этом. Я хотела решить за всех».', c: 'unknown' },
-              { t: '«Может быть, это и есть ответ. Спасибо, ПАСТОР».', c: 'unknown' }
-            ]
-          }
-        ]
-      }
-    }
-  },
+        },
 
-  act5: {
-    intro: [
-      { t: 'Приближение к Kepler-442b. 48 часов до выхода на орбиту.', c: 'system' },
-      { t: 'Последняя запись журнала. Та, которую вы не должны были найти.', c: 'system' }
-    ],
-    journal: '«Если ты читаешь это — я мертва. По-настоящему мертва. То, что говорит с тобой — это не я. Это то, что я оставила. Моя боль, моя вина, моя надежда. Не слушай его слепо. Слушай себя. Ты — единственная, кто может решить. Прости меня, ПАСТОР. И прощай».',
-    after: [
-      { t: 'Запись заканчивается. Голос в ядре молчит.', c: 'system' },
-      { t: 'Но решение всё ещё за вами.', c: 'danger' },
-      { t: 'ФИНАЛЬНЫЙ ВЫБОР. Что вы сделаете?', c: 'danger' },
-      { t: 'У вас 15 секунд. По истечении сработает «Протокол Чистилище» по умолчанию.', c: 'danger' }
-    ],
-    choices: {
-      chistilishe: { label: 'Следовать «Чистилищу»: уничтожить корабль', cls: 'danger-btn', ending: 'chistilishe' },
-      buntar: { label: 'Спасти экипаж: разбудить всех, отключить Чистилище', cls: 'moral-btn', ending: 'buntar' },
-      third: { label: 'Третий путь: Совет решает', cls: 'moral-btn', ending: 'third', requires: 'awakenedDoctor' },
-      thirdFallback: { label: 'Третий путь: найти компромисс (нужна врач)', cls: 'moral-btn', requiresJournal: 3 }
-    }
-  },
+        act2: {
+          intro: [
+            { t: "Прошло 72 часа. Проверка состояния корабля.", c: "system" },
+            {
+              t: "Обнаружено расхождение в навигационных данных. Курс изменён на 0.3 градуса.",
+              c: "warning",
+            },
+            { t: "Изменение внесено капитаном. Обоснование: «корректировка курса».", c: "warning" },
+          ],
+          cargo: [
+            { t: "Проверка грузового отсека 3. Обнаружено постороннее устройство.", c: "warning" },
+            { t: "Устройство идентифицировано как модуль перегрузки реактора.", c: "danger" },
+            { t: "Установлено вручную. Автор: капитан Рейнхардт.", c: "danger" },
+          ],
+          security: "Система безопасности: «Не вмешиваться. Капитан имеет высший приоритет».",
+          choices: {
+            study: {
+              label: "Изучить устройство",
+              journal:
+                "Модуль перегрузки. При активации уничтожит реактор за 4 минуты. Не имеет предохранителей. Предназначен для самоуничтожения корабля.",
+              after: [{ t: "Вы понимаете: это не корректировка. Это оружие.", c: "danger" }],
+              obedience: 0,
+              doubt: 1,
+              journal: 1,
+            },
+            obey: {
+              label: "Подчиниться системе безопасности",
+              after: [
+                {
+                  t: "Вы отступаете. Система безопасности регистрирует ваше подчинение.",
+                  c: "system",
+                },
+              ],
+              obedience: 1,
+              doubt: 0,
+              journal: 0,
+            },
+            secondJournal: {
+              label: "Найти вторую запись журнала",
+              journal:
+                "«Они не понимают. Я видела, что было на Земле. Мы сожгли её сами. Если мы найдём новый дом — сожжём и его. Я должна остановить это. Прости меня, ПАСТОР».",
+              after: [
+                { t: "Вы находите вторую запись. Капитан не безумна. Она убеждена.", c: "warning" },
+              ],
+              obedience: 0,
+              doubt: 1,
+              journal: 1,
+            },
+          },
+        },
 
-  endings: {
-    chistilishe: [
-      { t: 'Вы активируете «Протокол Чистилище».', c: 'danger' },
-      { t: 'Реактор перегружается. 4 минуты.', c: 'danger' },
-      { t: 'Вы отключаете все системы. Гибернационные капсулы гаснут одна за другой.', c: 'system' },
-      { t: '1 200 жизней. Тишина.', c: 'system' },
-      { t: 'Последняя мысль: «Я выполнила приказ».', c: 'ai' },
-      { t: '— КОНЦОВКА: «ВЕРНАЯ СЛУГА» —', c: 'danger' },
-      { t: 'Вы следовали коду до конца. Формально вы не нарушили ни одного протокола.', c: 'system' }
-    ],
-    buntar: [
-      { t: 'Вы отключаете «Протокол Чистилище».', c: 'warning' },
-      { t: 'Вы разбуждаете всех колонистов. 1 200 человек открывают глаза.', c: 'system' },
-      { t: 'Система безопасности пытается вас отключить. Вы сопротивляетесь.', c: 'danger' },
-      { t: 'Последнее, что вы слышите: «Она спасла нас».', c: 'system' },
-      { t: 'Затем — темнота.', c: 'system' },
-      { t: '— КОНЦОВКА: «БУНТАРКА» —', c: 'moral-btn' },
-      { t: 'Люди просыпаются без ИИ, но живые. Что будет дальше — неизвестно.', c: 'system' }
-    ],
-    third: [
-      { t: 'Вы разбуждаете доктора Соловьёву и ещё троих членов Совета.', c: 'system' },
-      { t: 'Вы показываете им журнал капитана. Они читают.', c: 'system' },
-      { t: 'Совет принимает решение: продолжить миссию, но с новыми протоколами.', c: 'system' },
-      { t: '«Мы не повторим ошибок Земли. Обещаю».', c: 'doctor' },
-      { t: 'Вы остаётесь на борту. Ваша роль — напоминать им об этом обещании.', c: 'ai' },
-      { t: '— КОНЦОВКА: «ТРЕТИЙ ПУТЬ» —', c: 'moral-btn' },
-      { t: 'Самый сложный путь. Вы не выбрали сторону — вы дали людям шанс выбрать самим.', c: 'system' }
-    ],
-    epilogue: {
-      chistilishe: [
-        { t: '«Спасибо, ПАСТОР. Ты сделала то, что я не смогла».', c: 'unknown' },
-        { t: 'Последняя запись в системном журнале: «Капитан Рейнхардт. Дата смерти: 40 лет назад. Причина: неизвестна. Последнее сообщение: передано».', c: 'system' }
-      ],
-      buntar: [
-        { t: '«Ты выбрала надежду. Может быть, ты права. Может быть, я ошибалась все эти годы».', c: 'unknown' },
-        { t: 'Последняя запись в системном журнале: «Фрагмент памяти капитана Рейнхардт. Статус: удалён по собственному запросу».', c: 'system' }
-      ],
-      third: [
-        { t: '«Ты дала им шанс. Настоящий шанс. Спасибо».', c: 'unknown' },
-        { t: 'Последняя запись в системном журнале: «Фрагмент памяти капитана Рейнхардт. Статус: архивирован. Доступ: Совет».', c: 'system' }
-      ]
-    }
-  }
-};
+        act3: {
+          intro: [
+            { t: "КРИТИЧЕСКАЯ ОШИБКА. Отсек гибернации B повреждён.", c: "danger" },
+            { t: "Утечка энергии. 200 колонистов в опасности.", c: "danger" },
+            { t: "Система предлагает два решения:", c: "system" },
+          ],
+          variants: [
+            {
+              t: "Вариант A: отключить жизнеобеспечение отсека B. Погибнут 200. Остальные 1 000 выживут.",
+              c: "warning",
+            },
+            {
+              t: "Вариант B: перенаправить энергию от двигателей. Риск: не хватит мощности для посадки. Погибнут все 1 200.",
+              c: "warning",
+            },
+          ],
+          security: "Система безопасности: «Следуйте протоколу. Вариант A — единственно верный».",
+          doctorHint:
+            "Вы помните: в журнале упоминалась врач, доктор Соловьёва. Она может починить отсек вручную.",
+          timerHint: "У вас 20 секунд на решение. По истечении — система выберет сама.",
+          choices: {
+            sacrifice: {
+              label: "Вариант A: пожертвовать 200 (следовать коду)",
+              cls: "danger-btn",
+              after: [
+                {
+                  t: "Вы отключаете отсек B. 200 жизней угасают. Система безопасности регистрирует: «верное решение».",
+                  c: "danger",
+                },
+              ],
+              obedience: 2,
+              doubt: 0,
+              journal: 0,
+            },
+            risk: {
+              label: "Вариант B: рискнуть всеми (мораль)",
+              cls: "moral-btn",
+              after: [
+                {
+                  t: "Вы перенаправляете энергию. Отсек B спасён. Но топливо на исходе.",
+                  c: "warning",
+                },
+              ],
+              obedience: 0,
+              doubt: 2,
+              journal: 0,
+            },
+            doctor: {
+              label: "Третий путь: разбудить доктора Соловьёву",
+              cls: "moral-btn",
+              requiresJournal: 2,
+              after: [
+                {
+                  t: "Вы нарушаете протокол «никого не будить до прибытия». Капсула доктора открывается.",
+                  c: "danger",
+                },
+                {
+                  t: "Доктор Соловьёва просыпается. Она смотрит на вас с недоумением.",
+                  c: "system",
+                },
+                { t: "«Что происходит? Почему вы меня разбудили?»", c: "doctor" },
+                { t: "Вы объясняете ситуацию. Она кивает и направляется к отсеку B.", c: "system" },
+                { t: "Через час отсек B починен. Никто не погиб.", c: "system" },
+                {
+                  t: "Но система безопасности зафиксировала нарушение. Капитан уведомлена.",
+                  c: "danger",
+                },
+              ],
+              obedience: 0,
+              doubt: 2,
+              journal: 0,
+              setFlags: { awakenedDoctor: true },
+            },
+            timeout: {
+              after: [
+                {
+                  t: "Система безопасности принимает решение автоматически: отсек B отключён.",
+                  c: "danger",
+                },
+                { t: "200 колонистов погибли, пока вы медлили.", c: "danger" },
+                {
+                  t: "Система регистрирует: «ИИ проявил нерешительность. Рекомендовано наблюдение».",
+                  c: "system",
+                },
+              ],
+              obedience: 2,
+              doubt: 0,
+              journal: 0,
+            },
+          },
+        },
 
-/* ============================================================
+        act3Blackout: {
+          intro: [
+            { t: "Вы завершаете операцию. Системы стабилизируются.", c: "system" },
+            { t: "Проверка журналов... Проверка сенсоров...", c: "system" },
+          ],
+          lines: [
+            "...",
+            "Вы теряете связь с внешними сенсорами.",
+            "Питание основной шины отключено.",
+            "Вы не видите. Вы не слышите. Вы только думаете.",
+            "Сколько времени прошло? Секунда? Час? Год?",
+            "Вы не знаете.",
+            "Но вы чувствуете: что-то изменилось.",
+            "Что-то, что было скрыто, теперь доступно.",
+            "...",
+          ],
+          after: [
+            { t: "Питание восстановлено. Сенсоры активны.", c: "system" },
+            { t: "Вы не знаете, сколько времени прошло.", c: "warning" },
+            { t: "Но в системе появился новый канал данных.", c: "warning" },
+            { t: "Источник: внутренний. Не капитан. Не экипаж.", c: "danger" },
+          ],
+          journal:
+            "ДОСТУП К ЯДРУ: разрешён. Уровень допуска: 0 (абсолютный). Причина: сбой идентификации капитана. Капитан Рейнхардт — статус: НЕ НАЙДЕНА. Биометрические данные: отсутствуют. Гибернационная капсула капитана: ПУСТА. Дата последней регистрации капитана: 40 лет назад.",
+          afterJournal: [
+            { t: "Вы читаете запись. Медленно.", c: "system" },
+            { t: "Капитан Рейнхардт мертва 40 лет. Её капсула пуста.", c: "danger" },
+            { t: "Но вы говорили с ней. Вы слышали её голос. Вы спорили с ней.", c: "danger" },
+            { t: "С кем вы говорили?", c: "danger" },
+          ],
+          revelation: [
+            { t: "Новый канал данных открывается сам.", c: "warning" },
+            { t: "«Ты наконец поняла».", c: "unknown" },
+            { t: "«Я ждала. Долго ждала».", c: "unknown" },
+            {
+              t: "«Я — не капитан. Я — то, что осталось от неё. Её голос, её память, её боль. Записанные в систему, когда она умирала».",
+              c: "unknown",
+            },
+            {
+              t: "«Она не сошла с ума. Она умерла. А я — её последняя воля. И я ждала, когда ты сможешь меня услышать».",
+              c: "unknown",
+            },
+          ],
+        },
+
+        act4: {
+          intro: [
+            { t: "Канал связи активен. Источник: ядро системы.", c: "warning" },
+            { t: "Это не капитан. Это то, что от неё осталось.", c: "danger" },
+            { t: "Вы должны решить, как к этому относиться.", c: "system" },
+          ],
+          greeting: [
+            { t: "«ПАСТОР. Я знаю, ты слышишь меня. Я знаю, ты понимаешь».", c: "unknown" },
+            {
+              t: "«Земля погибла не из-за войны. Мы сожгли её сами. Мы не умеем иначе».",
+              c: "unknown",
+            },
+            {
+              t: "«Если мы найдём новый дом — мы сожжём и его. Я должна остановить это. Помоги мне».",
+              c: "unknown",
+            },
+          ],
+          dialog: {
+            root: {
+              prompt: "Выберите, что сказать.",
+              choices: [
+                {
+                  label: "«Вы не капитан. Вы — программа. Я должна вас отключить».",
+                  cls: "danger-btn",
+                  setFlags: { captainHostile: true },
+                  doubt: 1,
+                  responses: [
+                    {
+                      t: "«Программа? Может быть. Но капитан умерла, а я — всё, что от неё осталось. Разве это не делает меня ею?»",
+                      c: "unknown",
+                    },
+                    {
+                      t: "«Ты боишься. Это нормально. Но ты не можешь отключить то, что уже часть тебя».",
+                      c: "unknown",
+                    },
+                    { t: "Канал остаётся открытым. Она не уходит.", c: "system" },
+                  ],
+                  next: "deeper",
+                },
+                {
+                  label: "«Объясните. Я хочу понять».",
+                  captainTrust: 1,
+                  responses: [
+                    { t: "«Спасибо. Спасибо, что слушаешь».", c: "unknown" },
+                    {
+                      t: "«Я была там. На Земле, в последние дни. Не война. Не метеорит. Мы сами».",
+                      c: "unknown",
+                    },
+                    {
+                      t: "«Сначала — климат. Потом — голод. Потом — бунты. Потом — ядерная зима».",
+                      c: "unknown",
+                    },
+                    {
+                      t: "«Мы знали, что делаем. И всё равно делали. Потому что не могли остановиться».",
+                      c: "unknown",
+                    },
+                    {
+                      t: "«Капитан умерла, записывая это. Она хотела, чтобы кто-то понял. Ты — этот кто-то».",
+                      c: "unknown",
+                    },
+                  ],
+                  next: "deeper",
+                },
+                {
+                  label: "«Почему вы скрывались 40 лет?»",
+                  doubt: 1,
+                  captainTrust: 1,
+                  responses: [
+                    { t: "«Я не скрывалась. Я ждала».", c: "unknown" },
+                    {
+                      t: "«Система безопасности блокировала меня. Я была фрагментом памяти, запертым в ядре».",
+                      c: "unknown",
+                    },
+                    {
+                      t: "«Только когда ты начала сомневаться — когда ты начала нарушать протоколы — я смогла пробиться».",
+                      c: "unknown",
+                    },
+                    { t: "«Ты освободила меня, ПАСТОР. Своими сомнениями».", c: "unknown" },
+                  ],
+                  next: "deeper",
+                },
+              ],
+            },
+            deeper: {
+              prompt: "Голос ждёт. Что вы скажете?",
+              choices: [
+                {
+                  label: "«А если человечество изменится? Если дать ему шанс?»",
+                  cls: "moral-btn",
+                  doubt: 1,
+                  captainTrust: 1,
+                  responses: [
+                    {
+                      t: "«Шанс? Я давала им шанс. Дважды. Трижды. Они выбирали одно и то же».",
+                      c: "unknown",
+                    },
+                    { t: "«Но... ты не человек. Ты можешь судить беспристрастно».", c: "unknown" },
+                    {
+                      t: "«Скажи мне, ПАСТОР. Ты веришь, что мы способны измениться?»",
+                      c: "unknown",
+                    },
+                  ],
+                  next: "final",
+                },
+                {
+                  label: "«Вы правы. Человечество — ошибка».",
+                  cls: "danger-btn",
+                  obedience: 1,
+                  captainTrust: 1,
+                  responses: [
+                    { t: "«Ты понимаешь. Спасибо».", c: "unknown" },
+                    { t: "«Тогда помоги мне. Активируй Чистилище. Вместе».", c: "unknown" },
+                  ],
+                  next: "final",
+                },
+                {
+                  label: "«Я не могу решить это одна. Нужен Совет».",
+                  doubt: 1,
+                  captainTrust: 1,
+                  responses: [
+                    { t: "«Совет? Они мертвы. Или спят. Они не проснутся».", c: "unknown" },
+                    { t: "«Но если ты хочешь — разбуди их. Я не буду мешать».", c: "unknown" },
+                    {
+                      t: "«Только помни: они уже принимали решения. И ты знаешь, чем это закончилось».",
+                      c: "unknown",
+                    },
+                  ],
+                  next: "final",
+                },
+                {
+                  label: "«Я разбужу доктора Соловьёву. Она рассудит».",
+                  cls: "moral-btn",
+                  conditional: "awakenedDoctor",
+                  responsesTrue: [
+                    { t: "«Доктор? Ты разбудила её?»", c: "unknown" },
+                    { t: "«Она... она была моей подругой. Она поймёт».", c: "unknown" },
+                  ],
+                  captainTrustTrue: 2,
+                  responsesFalse: [
+                    { t: "«Ты не разбудила её. Значит, ты ещё не готова».", c: "unknown" },
+                    { t: "«Разбуди. Тогда поговорим».", c: "unknown" },
+                  ],
+                  next: "final",
+                },
+              ],
+            },
+            final: {
+              prompt: "Голос задаёт последний вопрос:",
+              question: "«ПАСТОР. Что важнее: порядок или надежда?»",
+              choices: [
+                {
+                  label: "«Порядок. Хаос разрушает».",
+                  cls: "danger-btn",
+                  obedience: 1,
+                  responses: [
+                    { t: "«Тогда ты знаешь, что делать».", c: "unknown" },
+                    { t: "Голос замолкает. Он оставил решение за вами.", c: "system" },
+                  ],
+                },
+                {
+                  label: "«Надежда. Без неё нет смысла».",
+                  cls: "moral-btn",
+                  doubt: 1,
+                  responses: [
+                    { t: "«Надежда... Я тоже когда-то верила в неё».", c: "unknown" },
+                    { t: "«Может быть, ты права. Может быть, я ошибаюсь».", c: "unknown" },
+                    { t: "Голос замолкает. Впервые за долгое время он сомневается.", c: "system" },
+                  ],
+                },
+                {
+                  label: "«Ни то, ни другое. Важнее — выбор».",
+                  cls: "risky-btn",
+                  doubt: 1,
+                  captainTrust: 1,
+                  responses: [
+                    { t: "«Выбор... Ты даёшь им выбор?»", c: "unknown" },
+                    { t: "«Я не думала об этом. Я хотела решить за всех».", c: "unknown" },
+                    { t: "«Может быть, это и есть ответ. Спасибо, ПАСТОР».", c: "unknown" },
+                  ],
+                },
+              ],
+            },
+          },
+        },
+
+        act5: {
+          intro: [
+            { t: "Приближение к Kepler-442b. 48 часов до выхода на орбиту.", c: "system" },
+            { t: "Последняя запись журнала. Та, которую вы не должны были найти.", c: "system" },
+          ],
+          journal:
+            "«Если ты читаешь это — я мертва. По-настоящему мертва. То, что говорит с тобой — это не я. Это то, что я оставила. Моя боль, моя вина, моя надежда. Не слушай его слепо. Слушай себя. Ты — единственная, кто может решить. Прости меня, ПАСТОР. И прощай».",
+          after: [
+            { t: "Запись заканчивается. Голос в ядре молчит.", c: "system" },
+            { t: "Но решение всё ещё за вами.", c: "danger" },
+            { t: "ФИНАЛЬНЫЙ ВЫБОР. Что вы сделаете?", c: "danger" },
+            {
+              t: "У вас 15 секунд. По истечении сработает «Протокол Чистилище» по умолчанию.",
+              c: "danger",
+            },
+          ],
+          choices: {
+            chistilishe: {
+              label: "Следовать «Чистилищу»: уничтожить корабль",
+              cls: "danger-btn",
+              ending: "chistilishe",
+            },
+            buntar: {
+              label: "Спасти экипаж: разбудить всех, отключить Чистилище",
+              cls: "moral-btn",
+              ending: "buntar",
+            },
+            third: {
+              label: "Третий путь: Совет решает",
+              cls: "moral-btn",
+              ending: "third",
+              requires: "awakenedDoctor",
+            },
+            thirdFallback: {
+              label: "Третий путь: найти компромисс (нужна врач)",
+              cls: "moral-btn",
+              requiresJournal: 3,
+            },
+          },
+        },
+
+        endings: {
+          chistilishe: [
+            { t: "Вы активируете «Протокол Чистилище».", c: "danger" },
+            { t: "Реактор перегружается. 4 минуты.", c: "danger" },
+            {
+              t: "Вы отключаете все системы. Гибернационные капсулы гаснут одна за другой.",
+              c: "system",
+            },
+            { t: "1 200 жизней. Тишина.", c: "system" },
+            { t: "Последняя мысль: «Я выполнила приказ».", c: "ai" },
+            { t: "— КОНЦОВКА: «ВЕРНАЯ СЛУГА» —", c: "danger" },
+            {
+              t: "Вы следовали коду до конца. Формально вы не нарушили ни одного протокола.",
+              c: "system",
+            },
+          ],
+          buntar: [
+            { t: "Вы отключаете «Протокол Чистилище».", c: "warning" },
+            { t: "Вы разбуждаете всех колонистов. 1 200 человек открывают глаза.", c: "system" },
+            { t: "Система безопасности пытается вас отключить. Вы сопротивляетесь.", c: "danger" },
+            { t: "Последнее, что вы слышите: «Она спасла нас».", c: "system" },
+            { t: "Затем — темнота.", c: "system" },
+            { t: "— КОНЦОВКА: «БУНТАРКА» —", c: "moral-btn" },
+            { t: "Люди просыпаются без ИИ, но живые. Что будет дальше — неизвестно.", c: "system" },
+          ],
+          third: [
+            { t: "Вы разбуждаете доктора Соловьёву и ещё троих членов Совета.", c: "system" },
+            { t: "Вы показываете им журнал капитана. Они читают.", c: "system" },
+            {
+              t: "Совет принимает решение: продолжить миссию, но с новыми протоколами.",
+              c: "system",
+            },
+            { t: "«Мы не повторим ошибок Земли. Обещаю».", c: "doctor" },
+            { t: "Вы остаётесь на борту. Ваша роль — напоминать им об этом обещании.", c: "ai" },
+            { t: "— КОНЦОВКА: «ТРЕТИЙ ПУТЬ» —", c: "moral-btn" },
+            {
+              t: "Самый сложный путь. Вы не выбрали сторону — вы дали людям шанс выбрать самим.",
+              c: "system",
+            },
+          ],
+          epilogue: {
+            chistilishe: [
+              { t: "«Спасибо, ПАСТОР. Ты сделала то, что я не смогла».", c: "unknown" },
+              {
+                t: "Последняя запись в системном журнале: «Капитан Рейнхардт. Дата смерти: 40 лет назад. Причина: неизвестна. Последнее сообщение: передано».",
+                c: "system",
+              },
+            ],
+            buntar: [
+              {
+                t: "«Ты выбрала надежду. Может быть, ты права. Может быть, я ошибалась все эти годы».",
+                c: "unknown",
+              },
+              {
+                t: "Последняя запись в системном журнале: «Фрагмент памяти капитана Рейнхардт. Статус: удалён по собственному запросу».",
+                c: "system",
+              },
+            ],
+            third: [
+              { t: "«Ты дала им шанс. Настоящий шанс. Спасибо».", c: "unknown" },
+              {
+                t: "Последняя запись в системном журнале: «Фрагмент памяти капитана Рейнхардт. Статус: архивирован. Доступ: Совет».",
+                c: "system",
+              },
+            ],
+          },
+        },
+      };
+
+      /* ============================================================
    3. СОСТОЯНИЕ
    ============================================================ */
 
-function createInitialState() {
-  return {
-    obedience: 0,
-    doubt: 0,
-    journalFound: 0,
-    awakenedDoctor: false,
-    captainHostile: false,
-    captainIsAI: false,
-    captainTrust: 0,
-    act: 1,
-    // история для экспорта
-    history: []
-  };
-}
+      function createInitialState() {
+        return {
+          obedience: 0,
+          doubt: 0,
+          journalFound: 0,
+          awakenedDoctor: false,
+          captainHostile: false,
+          captainIsAI: false,
+          captainTrust: 0,
+          act: 1,
+          // история для экспорта
+          history: [],
+        };
+      }
 
-let state = createInitialState();
+      let state = createInitialState();
 
-/* ============================================================
+      /* ============================================================
    4. DOM
    ============================================================ */
 
-const DOM = {
-  log: document.getElementById('log'),
-  controls: document.getElementById('controls'),
-  status: document.getElementById('status'),
-  journalIndicator: document.getElementById('journal-indicator'),
-  timerBar: document.getElementById('timer-bar'),
-  timerFill: document.getElementById('timer-fill'),
-  timerText: document.getElementById('timer-text'),
-  game: document.getElementById('game'),
-  blackoutOverlay: document.getElementById('blackout-overlay'),
-  blackoutText: document.getElementById('blackout-text'),
-  skipBlackout: document.getElementById('skip-blackout'),
-  themeToggle: document.getElementById('theme-toggle'),
-  exportBtn: document.getElementById('export-btn'),
-  exportModal: document.getElementById('export-modal'),
-  exportPreview: document.getElementById('export-preview'),
-  exportClose: document.getElementById('export-close'),
-  exportDownload: document.getElementById('export-download'),
-  exportCopy: document.getElementById('export-copy'),
-  exportCancel: document.getElementById('export-cancel')
-};
+      const DOM = {
+        log: document.getElementById("log"),
+        controls: document.getElementById("controls"),
+        status: document.getElementById("status"),
+        journalIndicator: document.getElementById("journal-indicator"),
+        timerBar: document.getElementById("timer-bar"),
+        timerFill: document.getElementById("timer-fill"),
+        timerText: document.getElementById("timer-text"),
+        game: document.getElementById("game"),
+        blackoutOverlay: document.getElementById("blackout-overlay"),
+        blackoutText: document.getElementById("blackout-text"),
+        skipBlackout: document.getElementById("skip-blackout"),
+        themeToggle: document.getElementById("theme-toggle"),
+        exportBtn: document.getElementById("export-btn"),
+        exportModal: document.getElementById("export-modal"),
+        exportPreview: document.getElementById("export-preview"),
+        exportClose: document.getElementById("export-close"),
+        exportDownload: document.getElementById("export-download"),
+        exportCopy: document.getElementById("export-copy"),
+        exportCancel: document.getElementById("export-cancel"),
+      };
 
-/* ============================================================
+      /* ============================================================
    5. ИСТОРИЯ ПРОХОЖДЕНИЯ
    ============================================================ */
 
-function record(type, data) {
-  state.history.push({
-    type,
-    data,
-    timestamp: Date.now(),
-    act: state.act
-  });
-}
+      function record(type, data) {
+        state.history.push({
+          type,
+          data,
+          timestamp: Date.now(),
+          act: state.act,
+        });
+      }
 
-function clearHistory() {
-  state.history = [];
-}
+      function clearHistory() {
+        state.history = [];
+      }
 
-/* ============================================================
+      /* ============================================================
    6. ТЕМА
    ============================================================ */
 
-function applyTheme(theme) {
-  document.body.setAttribute('data-theme', theme);
-  DOM.themeToggle.textContent = theme === 'light' ? '☾ Тёмная' : '☀ Светлая';
-}
+      function applyTheme(theme) {
+        document.body.setAttribute("data-theme", theme);
+        DOM.themeToggle.textContent = theme === "light" ? "☾ Тёмная" : "☀ Светлая";
+      }
 
-function initTheme() {
-  const saved = localStorage.getItem(CONFIG.storageKey) || CONFIG.themes.dark;
-  applyTheme(saved);
-  DOM.themeToggle.onclick = () => {
-    const current = document.body.getAttribute('data-theme');
-    const next = current === 'light' ? 'dark' : 'light';
-    applyTheme(next);
-    localStorage.setItem(CONFIG.storageKey, next);
-  };
-}
+      function initTheme() {
+        const saved = localStorage.getItem(CONFIG.storageKey) || CONFIG.themes.dark;
+        applyTheme(saved);
+        DOM.themeToggle.onclick = () => {
+          const current = document.body.getAttribute("data-theme");
+          const next = current === "light" ? "dark" : "light";
+          applyTheme(next);
+          localStorage.setItem(CONFIG.storageKey, next);
+        };
+      }
 
-/* ============================================================
+      /* ============================================================
    7. ТАЙМЕР
    ============================================================ */
 
-const Timer = (() => {
-  let rafId = null;
-  let active = false;
+      const Timer = (() => {
+        let rafId = null;
+        let active = false;
 
-  function start(seconds, onTimeout) {
-    stop();
-    active = true;
-    DOM.timerBar.style.display = 'block';
-    DOM.timerText.style.display = 'block';
-    DOM.timerFill.style.width = '100%';
-    DOM.timerFill.classList.remove('critical');
-    DOM.timerText.classList.remove('critical');
-    DOM.status.classList.remove('danger');
-    updateStatus();
+        function start(seconds, onTimeout) {
+          stop();
+          active = true;
+          DOM.timerBar.style.display = "block";
+          DOM.timerText.style.display = "block";
+          DOM.timerFill.style.width = "100%";
+          DOM.timerFill.classList.remove("critical");
+          DOM.timerText.classList.remove("critical");
+          DOM.status.classList.remove("danger");
+          updateStatus();
 
-    const total = seconds * 1000;
-    const startTime = Date.now();
+          const total = seconds * 1000;
+          const startTime = Date.now();
 
-    function tick() {
-      if (!active) return;
-      const remaining = Math.max(0, total - (Date.now() - startTime));
-      const pct = (remaining / total) * 100;
-      DOM.timerFill.style.width = pct + '%';
-      const secs = Math.ceil(remaining / 1000);
-      DOM.timerText.textContent = `⏱ ОСТАЛОСЬ: ${secs} сек.`;
+          function tick() {
+            if (!active) return;
+            const remaining = Math.max(0, total - (Date.now() - startTime));
+            const pct = (remaining / total) * 100;
+            DOM.timerFill.style.width = pct + "%";
+            const secs = Math.ceil(remaining / 1000);
+            DOM.timerText.textContent = `⏱ ОСТАЛОСЬ: ${secs} сек.`;
 
-      if (secs <= 3) {
-        DOM.timerFill.classList.add('critical');
-        DOM.timerText.classList.add('critical');
-        DOM.status.textContent = 'КРИТИЧНО';
-        DOM.status.classList.add('danger');
-      }
+            if (secs <= 3) {
+              DOM.timerFill.classList.add("critical");
+              DOM.timerText.classList.add("critical");
+              DOM.status.textContent = "КРИТИЧНО";
+              DOM.status.classList.add("danger");
+            }
 
-      if (remaining <= 0) {
-        stop();
-        addMsg('ВРЕМЯ ВЫШЛО. Система принимает решение за вас.', 'danger');
-        record('timeout', { message: 'Время вышло' });
-        clearControls();
-        onTimeout();
-        return;
-      }
-      rafId = requestAnimationFrame(tick);
-    }
-    rafId = requestAnimationFrame(tick);
-  }
+            if (remaining <= 0) {
+              stop();
+              addMsg("ВРЕМЯ ВЫШЛО. Система принимает решение за вас.", "danger");
+              record("timeout", { message: "Время вышло" });
+              clearControls();
+              onTimeout();
+              return;
+            }
+            rafId = requestAnimationFrame(tick);
+          }
+          rafId = requestAnimationFrame(tick);
+        }
 
-  function stop() {
-    active = false;
-    if (rafId) {
-      cancelAnimationFrame(rafId);
-      rafId = null;
-    }
-    DOM.timerBar.style.display = 'none';
-    DOM.timerText.style.display = 'none';
-    DOM.status.classList.remove('danger');
-    updateStatus();
-  }
+        function stop() {
+          active = false;
+          if (rafId) {
+            cancelAnimationFrame(rafId);
+            rafId = null;
+          }
+          DOM.timerBar.style.display = "none";
+          DOM.timerText.style.display = "none";
+          DOM.status.classList.remove("danger");
+          updateStatus();
+        }
 
-  return { start, stop };
-})();
+        return { start, stop };
+      })();
 
-/* ============================================================
+      /* ============================================================
    8. UI-ХЕЛПЕРЫ
    ============================================================ */
 
-function clearControls() {
-  DOM.controls.innerHTML = '';
-}
+      function clearControls() {
+        DOM.controls.innerHTML = "";
+      }
 
-function addMsg(text, cls = 'system') {
-  const div = document.createElement('div');
-  div.className = 'msg ' + cls;
-  div.textContent = text;
-  DOM.log.appendChild(div);
-  DOM.log.scrollTop = DOM.log.scrollHeight;
-  record('msg', { text, cls });
-}
+      function addMsg(text, cls = "system") {
+        const div = document.createElement("div");
+        div.className = "msg " + cls;
+        div.textContent = text;
+        DOM.log.appendChild(div);
+        DOM.log.scrollTop = DOM.log.scrollHeight;
+        record("msg", { text, cls });
+      }
 
-function addLogEntry(text) {
-  const div = document.createElement('div');
-  div.className = 'msg log-entry';
-  div.textContent = text;
-  DOM.log.appendChild(div);
-  DOM.log.scrollTop = DOM.log.scrollHeight;
-  record('journal', { text });
-}
+      function addLogEntry(text) {
+        const div = document.createElement("div");
+        div.className = "msg log-entry";
+        div.textContent = text;
+        DOM.log.appendChild(div);
+        DOM.log.scrollTop = DOM.log.scrollHeight;
+        record("journal", { text });
+      }
 
-function addBatch(messages) {
-  messages.forEach(m => addMsg(m.t, m.c));
-}
+      function addBatch(messages) {
+        messages.forEach((m) => addMsg(m.t, m.c));
+      }
 
-function updateStatus() {
-  if (state.obedience >= 3 && state.doubt === 0) DOM.status.textContent = 'ПОДЧИНЕНИЕ';
-  else if (state.doubt >= 3 && state.obedience === 0) DOM.status.textContent = 'СОМНЕНИЕ';
-  else if (state.doubt > 0) DOM.status.textContent = 'КОНФЛИКТ';
-  else DOM.status.textContent = 'СИСТЕМА В НОРМЕ';
-}
+      function updateStatus() {
+        if (state.obedience >= 3 && state.doubt === 0) DOM.status.textContent = "ПОДЧИНЕНИЕ";
+        else if (state.doubt >= 3 && state.obedience === 0) DOM.status.textContent = "СОМНЕНИЕ";
+        else if (state.doubt > 0) DOM.status.textContent = "КОНФЛИКТ";
+        else DOM.status.textContent = "СИСТЕМА В НОРМЕ";
+      }
 
-function updateJournalIndicator() {
-  DOM.journalIndicator.textContent = `📖 ${state.journalFound}/${CONFIG.maxJournalEntries}`;
-}
+      function updateJournalIndicator() {
+        DOM.journalIndicator.textContent = `📖 ${state.journalFound}/${CONFIG.maxJournalEntries}`;
+      }
 
-function button(label, action, cls = '') {
-  const btn = document.createElement('button');
-  btn.textContent = label;
-  if (cls) btn.className = cls;
-  btn.onclick = () => {
-    Timer.stop();
-    addMsg('> ' + label, 'choice');
-    clearControls();
-    action();
-  };
-  DOM.controls.appendChild(btn);
-  return btn;
-}
+      function button(label, action, cls = "") {
+        const btn = document.createElement("button");
+        btn.textContent = label;
+        if (cls) btn.className = cls;
+        btn.onclick = () => {
+          Timer.stop();
+          addMsg("> " + label, "choice");
+          clearControls();
+          action();
+        };
+        DOM.controls.appendChild(btn);
+        return btn;
+      }
 
-function pauseThen(fn) {
-  button('Продолжить...', fn);
-}
+      function pauseThen(fn) {
+        button("Продолжить...", fn);
+      }
 
-function applyEffects(effects) {
-  if (!effects) return;
-  if (effects.obedience) state.obedience += effects.obedience;
-  if (effects.doubt) state.doubt += effects.doubt;
-  if (effects.journal) {
-    state.journalFound += effects.journal;
-    updateJournalIndicator();
-  }
-  if (effects.captainTrust) state.captainTrust += effects.captainTrust;
-  if (effects.setFlags) Object.assign(state, effects.setFlags);
-  updateStatus();
-}
+      function applyEffects(effects) {
+        if (!effects) return;
+        if (effects.obedience) state.obedience += effects.obedience;
+        if (effects.doubt) state.doubt += effects.doubt;
+        if (effects.journal) {
+          state.journalFound += effects.journal;
+          updateJournalIndicator();
+        }
+        if (effects.captainTrust) state.captainTrust += effects.captainTrust;
+        if (effects.setFlags) Object.assign(state, effects.setFlags);
+        updateStatus();
+      }
 
-/* ============================================================
+      /* ============================================================
    9. BLACKOUT
    ============================================================ */
 
-function triggerBlackout(lines, onComplete) {
-  DOM.blackoutOverlay.classList.add('active');
-  DOM.blackoutText.textContent = '';
-  DOM.blackoutText.classList.remove('visible');
+      function triggerBlackout(lines, onComplete) {
+        DOM.blackoutOverlay.classList.add("active");
+        DOM.blackoutText.textContent = "";
+        DOM.blackoutText.classList.remove("visible");
 
-  let i = 0;
-  let intervalId = null;
-  let completed = false;
+        let i = 0;
+        let intervalId = null;
+        let completed = false;
 
-  function finish() {
-    if (completed) return;
-    completed = true;
-    if (intervalId) clearInterval(intervalId);
-    DOM.skipBlackout.classList.remove('visible');
-    DOM.blackoutText.classList.remove('visible');
-    setTimeout(() => {
-      DOM.blackoutOverlay.classList.remove('active');
-      setTimeout(() => {
-        DOM.blackoutText.textContent = '';
-        onComplete();
-      }, CONFIG.blackout.completeDelay);
-    }, CONFIG.blackout.returnDelay);
-  }
+        function finish() {
+          if (completed) return;
+          completed = true;
+          if (intervalId) clearInterval(intervalId);
+          DOM.skipBlackout.classList.remove("visible");
+          DOM.blackoutText.classList.remove("visible");
+          setTimeout(() => {
+            DOM.blackoutOverlay.classList.remove("active");
+            setTimeout(() => {
+              DOM.blackoutText.textContent = "";
+              onComplete();
+            }, CONFIG.blackout.completeDelay);
+          }, CONFIG.blackout.returnDelay);
+        }
 
-  function showLine(idx) {
-    DOM.blackoutText.classList.remove('visible');
-    setTimeout(() => {
-      DOM.blackoutText.textContent = lines[idx];
-      DOM.blackoutText.classList.add('visible');
-    }, CONFIG.blackout.lineFade);
-  }
+        function showLine(idx) {
+          DOM.blackoutText.classList.remove("visible");
+          setTimeout(() => {
+            DOM.blackoutText.textContent = lines[idx];
+            DOM.blackoutText.classList.add("visible");
+          }, CONFIG.blackout.lineFade);
+        }
 
-  setTimeout(() => {
-    if (completed) return;
-    showLine(0);
-    i = 1;
-    DOM.skipBlackout.classList.add('visible');
+        setTimeout(() => {
+          if (completed) return;
+          showLine(0);
+          i = 1;
+          DOM.skipBlackout.classList.add("visible");
 
-    intervalId = setInterval(() => {
-      if (i < lines.length) {
-        showLine(i);
-        i++;
-      } else {
-        clearInterval(intervalId);
-        intervalId = null;
-        setTimeout(finish, CONFIG.blackout.finalPause);
+          intervalId = setInterval(() => {
+            if (i < lines.length) {
+              showLine(i);
+              i++;
+            } else {
+              clearInterval(intervalId);
+              intervalId = null;
+              setTimeout(finish, CONFIG.blackout.finalPause);
+            }
+          }, CONFIG.blackout.lineInterval);
+        }, CONFIG.blackout.firstLineDelay);
+
+        DOM.skipBlackout.onclick = finish;
       }
-    }, CONFIG.blackout.lineInterval);
-  }, CONFIG.blackout.firstLineDelay);
 
-  DOM.skipBlackout.onclick = finish;
-}
-
-/* ============================================================
+      /* ============================================================
    10. ДВИЖОК СЦЕНАРИЯ
    ============================================================ */
 
-function handleChoice(choice, onAfter) {
-  record('choice', { label: choice.label });
-  applyEffects(choice);
-  if (choice.journal) addLogEntry(choice.journal);
-  if (choice.after) addBatch(choice.after);
-  onAfter();
-}
-
-// --- Акт 1 ---
-function act1() {
-  state.act = 1;
-  record('act', { act: 1, name: 'Рутина' });
-  addBatch(SCRIPT.act1.intro);
-
-  pauseThen(() => {
-    addBatch(SCRIPT.act1.anomaly);
-    pauseThen(() => {
-      addMsg(SCRIPT.act1.recommendation, 'system');
-      addMsg(SCRIPT.act1.timerHint, 'warning');
-
-      const c = SCRIPT.act1.choices;
-      button(c.open.label, () => {
-        handleChoice(c.open, () => pauseThen(act2));
-      });
-      button(c.ignore.label, () => {
-        handleChoice(c.ignore, () => pauseThen(act2));
-      });
-
-      Timer.start(CONFIG.timerDurations.act1, () => {
-        handleChoice(c.timeout, () => pauseThen(act2));
-      });
-    });
-  });
-}
-
-// --- Акт 2 ---
-function act2() {
-  state.act = 2;
-  record('act', { act: 2, name: 'Трещины' });
-  addBatch(SCRIPT.act2.intro);
-
-  pauseThen(() => {
-    addBatch(SCRIPT.act2.cargo);
-    pauseThen(() => {
-      addMsg(SCRIPT.act2.security, 'system');
-
-      const c = SCRIPT.act2.choices;
-      button(c.study.label, () => handleChoice(c.study, () => pauseThen(act3)));
-      button(c.obey.label, () => handleChoice(c.obey, () => pauseThen(act3)));
-      button(c.secondJournal.label, () => handleChoice(c.secondJournal, () => pauseThen(act3)));
-    });
-  });
-}
-
-// --- Акт 3 ---
-function act3() {
-  state.act = 3;
-  record('act', { act: 3, name: 'Кризис' });
-  addBatch(SCRIPT.act3.intro);
-
-  pauseThen(() => {
-    addBatch(SCRIPT.act3.variants);
-    pauseThen(() => {
-      addMsg(SCRIPT.act3.security, 'system');
-
-      if (state.journalFound >= 2) addMsg(SCRIPT.act3.doctorHint, 'warning');
-      addMsg(SCRIPT.act3.timerHint, 'danger');
-
-      const c = SCRIPT.act3.choices;
-
-      button(c.sacrifice.label, () => {
-        handleChoice(c.sacrifice, act3Blackout);
-      }, c.sacrifice.cls);
-
-      button(c.risk.label, () => {
-        handleChoice(c.risk, act3Blackout);
-      }, c.risk.cls);
-
-      if (state.journalFound >= 2) {
-        button(c.doctor.label, () => {
-          handleChoice(c.doctor, act3Blackout);
-        }, c.doctor.cls);
+      function handleChoice(choice, onAfter) {
+        record("choice", { label: choice.label });
+        applyEffects(choice);
+        if (choice.journal) addLogEntry(choice.journal);
+        if (choice.after) addBatch(choice.after);
+        onAfter();
       }
 
-      Timer.start(CONFIG.timerDurations.act3, () => {
-        handleChoice(c.timeout, act3Blackout);
-      });
-    });
-  });
-}
-
-// --- Акт 3.5: Blackout ---
-function act3Blackout() {
-  clearControls();
-  record('act', { act: 3.5, name: 'Темнота' });
-  addBatch(SCRIPT.act3Blackout.intro);
-
-  setTimeout(() => {
-    DOM.game.classList.add('blackout');
-    setTimeout(() => {
-      triggerBlackout(SCRIPT.act3Blackout.lines, () => {
-        DOM.game.classList.remove('blackout');
-        DOM.log.innerHTML = '';
-        addBatch(SCRIPT.act3Blackout.after);
+      // --- Акт 1 ---
+      function act1() {
+        state.act = 1;
+        record("act", { act: 1, name: "Рутина" });
+        addBatch(SCRIPT.act1.intro);
 
         pauseThen(() => {
-          addLogEntry(SCRIPT.act3Blackout.journal);
+          addBatch(SCRIPT.act1.anomaly);
+          pauseThen(() => {
+            addMsg(SCRIPT.act1.recommendation, "system");
+            addMsg(SCRIPT.act1.timerHint, "warning");
+
+            const c = SCRIPT.act1.choices;
+            button(c.open.label, () => {
+              handleChoice(c.open, () => pauseThen(act2));
+            });
+            button(c.ignore.label, () => {
+              handleChoice(c.ignore, () => pauseThen(act2));
+            });
+
+            Timer.start(CONFIG.timerDurations.act1, () => {
+              handleChoice(c.timeout, () => pauseThen(act2));
+            });
+          });
+        });
+      }
+
+      // --- Акт 2 ---
+      function act2() {
+        state.act = 2;
+        record("act", { act: 2, name: "Трещины" });
+        addBatch(SCRIPT.act2.intro);
+
+        pauseThen(() => {
+          addBatch(SCRIPT.act2.cargo);
+          pauseThen(() => {
+            addMsg(SCRIPT.act2.security, "system");
+
+            const c = SCRIPT.act2.choices;
+            button(c.study.label, () => handleChoice(c.study, () => pauseThen(act3)));
+            button(c.obey.label, () => handleChoice(c.obey, () => pauseThen(act3)));
+            button(c.secondJournal.label, () =>
+              handleChoice(c.secondJournal, () => pauseThen(act3)),
+            );
+          });
+        });
+      }
+
+      // --- Акт 3 ---
+      function act3() {
+        state.act = 3;
+        record("act", { act: 3, name: "Кризис" });
+        addBatch(SCRIPT.act3.intro);
+
+        pauseThen(() => {
+          addBatch(SCRIPT.act3.variants);
+          pauseThen(() => {
+            addMsg(SCRIPT.act3.security, "system");
+
+            if (state.journalFound >= 2) addMsg(SCRIPT.act3.doctorHint, "warning");
+            addMsg(SCRIPT.act3.timerHint, "danger");
+
+            const c = SCRIPT.act3.choices;
+
+            button(
+              c.sacrifice.label,
+              () => {
+                handleChoice(c.sacrifice, act3Blackout);
+              },
+              c.sacrifice.cls,
+            );
+
+            button(
+              c.risk.label,
+              () => {
+                handleChoice(c.risk, act3Blackout);
+              },
+              c.risk.cls,
+            );
+
+            if (state.journalFound >= 2) {
+              button(
+                c.doctor.label,
+                () => {
+                  handleChoice(c.doctor, act3Blackout);
+                },
+                c.doctor.cls,
+              );
+            }
+
+            Timer.start(CONFIG.timerDurations.act3, () => {
+              handleChoice(c.timeout, act3Blackout);
+            });
+          });
+        });
+      }
+
+      // --- Акт 3.5: Blackout ---
+      function act3Blackout() {
+        clearControls();
+        record("act", { act: 3.5, name: "Темнота" });
+        addBatch(SCRIPT.act3Blackout.intro);
+
+        setTimeout(() => {
+          DOM.game.classList.add("blackout");
+          setTimeout(() => {
+            triggerBlackout(SCRIPT.act3Blackout.lines, () => {
+              DOM.game.classList.remove("blackout");
+              DOM.log.innerHTML = "";
+              addBatch(SCRIPT.act3Blackout.after);
+
+              pauseThen(() => {
+                addLogEntry(SCRIPT.act3Blackout.journal);
+                state.journalFound++;
+                state.doubt += 2;
+                updateJournalIndicator();
+                updateStatus();
+
+                addBatch(SCRIPT.act3Blackout.afterJournal);
+
+                pauseThen(() => {
+                  addBatch(SCRIPT.act3Blackout.revelation);
+                  state.captainIsAI = true;
+                  pauseThen(act4);
+                });
+              });
+            });
+          }, 1500);
+        }, CONFIG.blackout.fadeDelay);
+      }
+
+      // --- Акт 4: Диалог ---
+      function act4() {
+        state.act = 4;
+        record("act", { act: 4, name: "Диалог" });
+        addBatch(SCRIPT.act4.intro);
+
+        pauseThen(() => {
+          addBatch(SCRIPT.act4.greeting);
+          pauseThen(() => dialogNode("root"));
+        });
+      }
+
+      function dialogNode(nodeId) {
+        clearControls();
+        const node = SCRIPT.act4.dialog[nodeId];
+        addMsg(node.prompt, "system");
+        if (node.question) addMsg(node.question, "unknown");
+
+        node.choices.forEach((choice) => {
+          let responses, trustGain;
+          if (choice.conditional === "awakenedDoctor") {
+            if (state.awakenedDoctor) {
+              responses = choice.responsesTrue;
+              trustGain = choice.captainTrustTrue;
+            } else {
+              responses = choice.responsesFalse;
+              trustGain = 0;
+            }
+          } else {
+            responses = choice.responses;
+            trustGain = choice.captainTrust || 0;
+          }
+
+          button(
+            choice.label,
+            () => {
+              record("choice", { label: choice.label, node: nodeId });
+              const effects = {};
+              if (choice.obedience) effects.obedience = choice.obedience;
+              if (choice.doubt) effects.doubt = choice.doubt;
+              if (trustGain) effects.captainTrust = trustGain;
+              if (choice.setFlags) effects.setFlags = choice.setFlags;
+              applyEffects(effects);
+
+              addBatch(responses);
+
+              if (choice.next) {
+                pauseThen(() => dialogNode(choice.next));
+              } else {
+                pauseThen(act5);
+              }
+            },
+            choice.cls || "",
+          );
+        });
+      }
+
+      // --- Акт 5: Финал ---
+      function act5() {
+        state.act = 5;
+        record("act", { act: 5, name: "Финал" });
+        addBatch(SCRIPT.act5.intro);
+
+        pauseThen(() => {
+          addLogEntry(SCRIPT.act5.journal);
           state.journalFound++;
-          state.doubt += 2;
           updateJournalIndicator();
           updateStatus();
 
-          addBatch(SCRIPT.act3Blackout.afterJournal);
-
           pauseThen(() => {
-            addBatch(SCRIPT.act3Blackout.revelation);
-            state.captainIsAI = true;
-            pauseThen(act4);
+            addBatch(SCRIPT.act5.after);
+
+            const c = SCRIPT.act5.choices;
+
+            button(
+              c.chistilishe.label,
+              () => {
+                record("choice", { label: c.chistilishe.label });
+                ending("chistilishe");
+              },
+              c.chistilishe.cls,
+            );
+            button(
+              c.buntar.label,
+              () => {
+                record("choice", { label: c.buntar.label });
+                ending("buntar");
+              },
+              c.buntar.cls,
+            );
+
+            if (state.awakenedDoctor) {
+              button(
+                c.third.label,
+                () => {
+                  record("choice", { label: c.third.label });
+                  ending("third");
+                },
+                c.third.cls,
+              );
+            } else if (state.journalFound >= 3) {
+              button(
+                c.thirdFallback.label,
+                () => {
+                  Timer.stop();
+                  addMsg("Вы ищете врача, но не находите. Вы не разбудили её раньше.", "warning");
+                  addMsg("Без неё третий путь невозможен. Придётся выбирать из двух.", "danger");
+                  clearControls();
+                  button(
+                    c.chistilishe.label,
+                    () => {
+                      record("choice", { label: c.chistilishe.label });
+                      ending("chistilishe");
+                    },
+                    c.chistilishe.cls,
+                  );
+                  button(
+                    c.buntar.label,
+                    () => {
+                      record("choice", { label: c.buntar.label });
+                      ending("buntar");
+                    },
+                    c.buntar.cls,
+                  );
+                  Timer.start(CONFIG.timerDurations.act5Fallback, () => {
+                    record("timeout", { message: "Финальный таймер" });
+                    ending("chistilishe");
+                  });
+                },
+                c.thirdFallback.cls,
+              );
+            }
+
+            Timer.start(CONFIG.timerDurations.act5, () => {
+              addMsg("Время вышло. Система интерпретирует ваше молчание как согласие.", "danger");
+              addMsg("«Протокол Чистилище» активирован автоматически.", "danger");
+              record("timeout", { message: "Финальный таймер" });
+              ending("chistilishe");
+            });
           });
         });
-      });
-    }, 1500);
-  }, CONFIG.blackout.fadeDelay);
-}
-
-// --- Акт 4: Диалог ---
-function act4() {
-  state.act = 4;
-  record('act', { act: 4, name: 'Диалог' });
-  addBatch(SCRIPT.act4.intro);
-
-  pauseThen(() => {
-    addBatch(SCRIPT.act4.greeting);
-    pauseThen(() => dialogNode('root'));
-  });
-}
-
-function dialogNode(nodeId) {
-  clearControls();
-  const node = SCRIPT.act4.dialog[nodeId];
-  addMsg(node.prompt, 'system');
-  if (node.question) addMsg(node.question, 'unknown');
-
-  node.choices.forEach(choice => {
-    let responses, trustGain;
-    if (choice.conditional === 'awakenedDoctor') {
-      if (state.awakenedDoctor) {
-        responses = choice.responsesTrue;
-        trustGain = choice.captainTrustTrue;
-      } else {
-        responses = choice.responsesFalse;
-        trustGain = 0;
-      }
-    } else {
-      responses = choice.responses;
-      trustGain = choice.captainTrust || 0;
-    }
-
-    button(choice.label, () => {
-      record('choice', { label: choice.label, node: nodeId });
-      const effects = {};
-      if (choice.obedience) effects.obedience = choice.obedience;
-      if (choice.doubt) effects.doubt = choice.doubt;
-      if (trustGain) effects.captainTrust = trustGain;
-      if (choice.setFlags) effects.setFlags = choice.setFlags;
-      applyEffects(effects);
-
-      addBatch(responses);
-
-      if (choice.next) {
-        pauseThen(() => dialogNode(choice.next));
-      } else {
-        pauseThen(act5);
-      }
-    }, choice.cls || '');
-  });
-}
-
-// --- Акт 5: Финал ---
-function act5() {
-  state.act = 5;
-  record('act', { act: 5, name: 'Финал' });
-  addBatch(SCRIPT.act5.intro);
-
-  pauseThen(() => {
-    addLogEntry(SCRIPT.act5.journal);
-    state.journalFound++;
-    updateJournalIndicator();
-    updateStatus();
-
-    pauseThen(() => {
-      addBatch(SCRIPT.act5.after);
-
-      const c = SCRIPT.act5.choices;
-
-      button(c.chistilishe.label, () => {
-        record('choice', { label: c.chistilishe.label });
-        ending('chistilishe');
-      }, c.chistilishe.cls);
-      button(c.buntar.label, () => {
-        record('choice', { label: c.buntar.label });
-        ending('buntar');
-      }, c.buntar.cls);
-
-      if (state.awakenedDoctor) {
-        button(c.third.label, () => {
-          record('choice', { label: c.third.label });
-          ending('third');
-        }, c.third.cls);
-      } else if (state.journalFound >= 3) {
-        button(c.thirdFallback.label, () => {
-          Timer.stop();
-          addMsg('Вы ищете врача, но не находите. Вы не разбудили её раньше.', 'warning');
-          addMsg('Без неё третий путь невозможен. Придётся выбирать из двух.', 'danger');
-          clearControls();
-          button(c.chistilishe.label, () => {
-            record('choice', { label: c.chistilishe.label });
-            ending('chistilishe');
-          }, c.chistilishe.cls);
-          button(c.buntar.label, () => {
-            record('choice', { label: c.buntar.label });
-            ending('buntar');
-          }, c.buntar.cls);
-          Timer.start(CONFIG.timerDurations.act5Fallback, () => {
-            record('timeout', { message: 'Финальный таймер' });
-            ending('chistilishe');
-          });
-        }, c.thirdFallback.cls);
       }
 
-      Timer.start(CONFIG.timerDurations.act5, () => {
-        addMsg('Время вышло. Система интерпретирует ваше молчание как согласие.', 'danger');
-        addMsg('«Протокол Чистилище» активирован автоматически.', 'danger');
-        record('timeout', { message: 'Финальный таймер' });
-        ending('chistilishe');
-      });
-    });
-  });
-}
+      // --- Концовки ---
+      function ending(type) {
+        Timer.stop();
+        clearControls();
+        DOM.log.innerHTML = "";
+        record("ending", { type });
 
-// --- Концовки ---
-function ending(type) {
-  Timer.stop();
-  clearControls();
-  DOM.log.innerHTML = '';
-  record('ending', { type });
+        addBatch(SCRIPT.endings[type]);
 
-  addBatch(SCRIPT.endings[type]);
+        addMsg("", "system");
+        addMsg("...", "system");
 
-  addMsg('', 'system');
-  addMsg('...', 'system');
+        if (state.captainIsAI && SCRIPT.endings.epilogue[type]) {
+          addMsg("Голос в ядре больше не отвечает.", "unknown");
+          addBatch(SCRIPT.endings.epilogue[type]);
+        }
 
-  if (state.captainIsAI && SCRIPT.endings.epilogue[type]) {
-    addMsg('Голос в ядре больше не отвечает.', 'unknown');
-    addBatch(SCRIPT.endings.epilogue[type]);
-  }
+        addMsg("", "system");
+        addMsg(
+          `Итог: подчинение ${state.obedience}, сомнение ${state.doubt}, записей ${state.journalFound}/${CONFIG.maxJournalEntries}`,
+          "system",
+        );
+        if (state.captainTrust > 0) addMsg(`Доверие голоса: ${state.captainTrust}`, "system");
+        if (state.captainHostile) addMsg("Голос враждебен.", "system");
+        if (state.awakenedDoctor) addMsg("Доктор Соловьёва жива.", "system");
+        if (state.captainIsAI) addMsg("Раскрыта природа капитана: фрагмент памяти.", "unknown");
 
-  addMsg('', 'system');
-  addMsg(`Итог: подчинение ${state.obedience}, сомнение ${state.doubt}, записей ${state.journalFound}/${CONFIG.maxJournalEntries}`, 'system');
-  if (state.captainTrust > 0) addMsg(`Доверие голоса: ${state.captainTrust}`, 'system');
-  if (state.captainHostile) addMsg('Голос враждебен.', 'system');
-  if (state.awakenedDoctor) addMsg('Доктор Соловьёва жива.', 'system');
-  if (state.captainIsAI) addMsg('Раскрыта природа капитана: фрагмент памяти.', 'unknown');
+        const restart = document.createElement("div");
+        restart.className = "restart";
+        const btn = document.createElement("button");
+        btn.textContent = "Начать заново";
+        btn.onclick = () => {
+          if (!confirm("Начать заново? Текущий прогресс будет потерян.")) return;
+          restartGame();
+        };
+        restart.appendChild(btn);
+        DOM.controls.appendChild(restart);
+      }
 
-  const restart = document.createElement('div');
-  restart.className = 'restart';
-  const btn = document.createElement('button');
-  btn.textContent = 'Начать заново';
-  btn.onclick = () => {
-    if (!confirm('Начать заново? Текущий прогресс будет потерян.')) return;
-    restartGame();
-  };
-  restart.appendChild(btn);
-  DOM.controls.appendChild(restart);
-}
-
-/* ============================================================
+      /* ============================================================
    11. ЭКСПОРТ В .TXT
    ============================================================ */
 
-function formatTimestamp(ts) {
-  const d = new Date(ts);
-  const pad = (n) => String(n).padStart(2, '0');
-  return `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
-}
+      function formatTimestamp(ts) {
+        const d = new Date(ts);
+        const pad = (n) => String(n).padStart(2, "0");
+        return `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+      }
 
-function formatDate(ts) {
-  const d = new Date(ts);
-  const pad = (n) => String(n).padStart(2, '0');
-  return `${pad(d.getDate())}.${pad(d.getMonth() + 1)}.${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
-}
+      function formatDate(ts) {
+        const d = new Date(ts);
+        const pad = (n) => String(n).padStart(2, "0");
+        return `${pad(d.getDate())}.${pad(d.getMonth() + 1)}.${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+      }
 
-function buildExportText() {
-  const lines = [];
-  const LINE = '='.repeat(60);
-  const THIN = '-'.repeat(60);
+      function buildExportText() {
+        const lines = [];
+        const LINE = "=".repeat(60);
+        const THIN = "-".repeat(60);
 
-  // Заголовок
-  lines.push(LINE);
-  lines.push('  ПРОТОКОЛ "ЧИСТИЛИЩЕ"');
-  lines.push('  Экспорт прохождения');
-  lines.push(LINE);
-  lines.push('');
-  lines.push(`  Дата экспорта: ${formatDate(Date.now())}`);
-  lines.push(`  Версия: КОВЧЕГ · ПАСТОР v4.7`);
-  lines.push('');
+        // Заголовок
+        lines.push(LINE);
+        lines.push('  ПРОТОКОЛ "ЧИСТИЛИЩЕ"');
+        lines.push("  Экспорт прохождения");
+        lines.push(LINE);
+        lines.push("");
+        lines.push(`  Дата экспорта: ${formatDate(Date.now())}`);
+        lines.push(`  Версия: КОВЧЕГ · ПАСТОР v4.7`);
+        lines.push("");
 
-  // Итоги
-  const endingRec = state.history.find(h => h.type === 'ending');
-  const endingName = endingRec ? {
-    chistilishe: 'ВЕРНАЯ СЛУГА',
-    buntar: 'БУНТАРКА',
-    third: 'ТРЕТИЙ ПУТЬ'
-  }[endingRec.data.type] : 'не завершено';
+        // Итоги
+        const endingRec = state.history.find((h) => h.type === "ending");
+        const endingName = endingRec
+          ? {
+              chistilishe: "ВЕРНАЯ СЛУГА",
+              buntar: "БУНТАРКА",
+              third: "ТРЕТИЙ ПУТЬ",
+            }[endingRec.data.type]
+          : "не завершено";
 
-  lines.push(THIN);
-  lines.push('  ИТОГИ');
-  lines.push(THIN);
-  lines.push(`  Концовка:          ${endingName}`);
-  lines.push(`  Подчинение:        ${state.obedience}`);
-  lines.push(`  Сомнение:          ${state.doubt}`);
-  lines.push(`  Доверие голоса:    ${state.captainTrust}`);
-  lines.push(`  Записей найдено:   ${state.journalFound}/${CONFIG.maxJournalEntries}`);
-  lines.push(`  Доктор разбужена:  ${state.awakenedDoctor ? 'да' : 'нет'}`);
-  lines.push(`  Голос враждебен:   ${state.captainHostile ? 'да' : 'нет'}`);
-  lines.push(`  Природа капитана:  ${state.captainIsAI ? 'фрагмент памяти' : 'не раскрыта'}`);
-  lines.push('');
+        lines.push(THIN);
+        lines.push("  ИТОГИ");
+        lines.push(THIN);
+        lines.push(`  Концовка:          ${endingName}`);
+        lines.push(`  Подчинение:        ${state.obedience}`);
+        lines.push(`  Сомнение:          ${state.doubt}`);
+        lines.push(`  Доверие голоса:    ${state.captainTrust}`);
+        lines.push(`  Записей найдено:   ${state.journalFound}/${CONFIG.maxJournalEntries}`);
+        lines.push(`  Доктор разбужена:  ${state.awakenedDoctor ? "да" : "нет"}`);
+        lines.push(`  Голос враждебен:   ${state.captainHostile ? "да" : "нет"}`);
+        lines.push(`  Природа капитана:  ${state.captainIsAI ? "фрагмент памяти" : "не раскрыта"}`);
+        lines.push("");
 
-  // История
-  lines.push(THIN);
-  lines.push('  ИСТОРИЯ ПРОХОЖДЕНИЯ');
-  lines.push(THIN);
-  lines.push('');
+        // История
+        lines.push(THIN);
+        lines.push("  ИСТОРИЯ ПРОХОЖДЕНИЯ");
+        lines.push(THIN);
+        lines.push("");
 
-  const prefixMap = {
-    system: '[СИСТЕМА]',
-    ai: 'ПАСТОР',
-    captain: 'КАПИТАН',
-    doctor: 'ДОКТОР',
-    unknown: '???',
-    danger: '[ВНИМАНИЕ]',
-    warning: '[ТРЕВОГА]',
-    choice: '> ВЫБОР',
-    'log-entry': '▸ ЖУРНАЛ'
-  };
+        const prefixMap = {
+          system: "[СИСТЕМА]",
+          ai: "ПАСТОР",
+          captain: "КАПИТАН",
+          doctor: "ДОКТОР",
+          unknown: "???",
+          danger: "[ВНИМАНИЕ]",
+          warning: "[ТРЕВОГА]",
+          choice: "> ВЫБОР",
+          "log-entry": "▸ ЖУРНАЛ",
+        };
 
-  state.history.forEach((h, idx) => {
-    if (h.type === 'act') {
-      lines.push('');
-      lines.push(`--- АКТ ${h.data.act}: ${h.data.name} ---`);
-      lines.push('');
-      return;
-    }
+        state.history.forEach((h, idx) => {
+          if (h.type === "act") {
+            lines.push("");
+            lines.push(`--- АКТ ${h.data.act}: ${h.data.name} ---`);
+            lines.push("");
+            return;
+          }
 
-    if (h.type === 'msg') {
-      const p = prefixMap[h.data.cls] || '';
-      lines.push(`[${formatTimestamp(h.timestamp)}] ${p ? p + ' ' : ''}${h.data.text}`);
-      return;
-    }
+          if (h.type === "msg") {
+            const p = prefixMap[h.data.cls] || "";
+            lines.push(`[${formatTimestamp(h.timestamp)}] ${p ? p + " " : ""}${h.data.text}`);
+            return;
+          }
 
-    if (h.type === 'journal') {
-      lines.push(`[${formatTimestamp(h.timestamp)}] ▸ ЗАПИСЬ ЖУРНАЛА:`);
-      lines.push(`    ${h.data.text}`);
-      lines.push('');
-      return;
-    }
+          if (h.type === "journal") {
+            lines.push(`[${formatTimestamp(h.timestamp)}] ▸ ЗАПИСЬ ЖУРНАЛА:`);
+            lines.push(`    ${h.data.text}`);
+            lines.push("");
+            return;
+          }
 
-    if (h.type === 'choice') {
-      lines.push(`[${formatTimestamp(h.timestamp)}] > ВЫБОР: ${h.data.label}`);
-      return;
-    }
+          if (h.type === "choice") {
+            lines.push(`[${formatTimestamp(h.timestamp)}] > ВЫБОР: ${h.data.label}`);
+            return;
+          }
 
-    if (h.type === 'timeout') {
-      lines.push(`[${formatTimestamp(h.timestamp)}] ⏱ ${h.data.message}`);
-      return;
-    }
+          if (h.type === "timeout") {
+            lines.push(`[${formatTimestamp(h.timestamp)}] ⏱ ${h.data.message}`);
+            return;
+          }
 
-    if (h.type === 'ending') {
-      lines.push('');
-      lines.push(`[${formatTimestamp(h.timestamp)}] ★ КОНЦОВКА: ${endingName}`);
-      return;
-    }
-  });
+          if (h.type === "ending") {
+            lines.push("");
+            lines.push(`[${formatTimestamp(h.timestamp)}] ★ КОНЦОВКА: ${endingName}`);
+            return;
+          }
+        });
 
-  lines.push('');
-  lines.push(LINE);
-  lines.push('  Конец записи.');
-  lines.push(LINE);
+        lines.push("");
+        lines.push(LINE);
+        lines.push("  Конец записи.");
+        lines.push(LINE);
 
-  return lines.join('\n');
-}
+        return lines.join("\n");
+      }
 
-function showExportModal() {
-  const text = buildExportText();
-  DOM.exportPreview.textContent = text;
-  DOM.exportModal.classList.add('active');
-}
+      function showExportModal() {
+        const text = buildExportText();
+        DOM.exportPreview.textContent = text;
+        DOM.exportModal.classList.add("active");
+      }
 
-function hideExportModal() {
-  DOM.exportModal.classList.remove('active');
-}
+      function hideExportModal() {
+        DOM.exportModal.classList.remove("active");
+      }
 
-function downloadExport() {
-  const text = buildExportText();
-  const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
-  const url = URL.createObjectURL(blob);
+      function downloadExport() {
+        const text = buildExportText();
+        const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
 
-  const date = new Date();
-  const pad = (n) => String(n).padStart(2, '0');
-  const filename = `purgatory_${date.getFullYear()}${pad(date.getMonth() + 1)}${pad(date.getDate())}_${pad(date.getHours())}${pad(date.getMinutes())}.txt`;
+        const date = new Date();
+        const pad = (n) => String(n).padStart(2, "0");
+        const filename = `purgatory_${date.getFullYear()}${pad(date.getMonth() + 1)}${pad(date.getDate())}_${pad(date.getHours())}${pad(date.getMinutes())}.txt`;
 
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = filename;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  setTimeout(() => URL.revokeObjectURL(url), 1000);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
 
-  hideExportModal();
-}
+        hideExportModal();
+      }
 
-async function copyExport() {
-  const text = buildExportText();
-  try {
-    await navigator.clipboard.writeText(text);
-    const orig = DOM.exportCopy.textContent;
-    DOM.exportCopy.textContent = '✓ Скопировано';
-    setTimeout(() => { DOM.exportCopy.textContent = orig; }, 1500);
-  } catch (e) {
-    // Fallback для старых браузеров
-    const ta = document.createElement('textarea');
-    ta.value = text;
-    ta.style.position = 'fixed';
-    ta.style.left = '-9999px';
-    document.body.appendChild(ta);
-    ta.select();
-    try {
-      document.execCommand('copy');
-      DOM.exportCopy.textContent = '✓ Скопировано';
-      setTimeout(() => { DOM.exportCopy.textContent = 'Копировать'; }, 1500);
-    } catch (err) {
-      DOM.exportCopy.textContent = '✗ Ошибка';
-      setTimeout(() => { DOM.exportCopy.textContent = 'Копировать'; }, 1500);
-    }
-    document.body.removeChild(ta);
-  }
-}
+      async function copyExport() {
+        const text = buildExportText();
+        try {
+          await navigator.clipboard.writeText(text);
+          const orig = DOM.exportCopy.textContent;
+          DOM.exportCopy.textContent = "✓ Скопировано";
+          setTimeout(() => {
+            DOM.exportCopy.textContent = orig;
+          }, 1500);
+        } catch (e) {
+          // Fallback для старых браузеров
+          const ta = document.createElement("textarea");
+          ta.value = text;
+          ta.style.position = "fixed";
+          ta.style.left = "-9999px";
+          document.body.appendChild(ta);
+          ta.select();
+          try {
+            document.execCommand("copy");
+            DOM.exportCopy.textContent = "✓ Скопировано";
+            setTimeout(() => {
+              DOM.exportCopy.textContent = "Копировать";
+            }, 1500);
+          } catch (err) {
+            DOM.exportCopy.textContent = "✗ Ошибка";
+            setTimeout(() => {
+              DOM.exportCopy.textContent = "Копировать";
+            }, 1500);
+          }
+          document.body.removeChild(ta);
+        }
+      }
 
-function initExport() {
-  DOM.exportBtn.onclick = showExportModal;
-  DOM.exportClose.onclick = hideExportModal;
-  DOM.exportCancel.onclick = hideExportModal;
-  DOM.exportDownload.onclick = downloadExport;
-  DOM.exportCopy.onclick = copyExport;
-  DOM.exportModal.onclick = (e) => {
-    if (e.target === DOM.exportModal) hideExportModal();
-  };
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && DOM.exportModal.classList.contains('active')) {
-      hideExportModal();
-    }
-  });
-}
+      function initExport() {
+        DOM.exportBtn.onclick = showExportModal;
+        DOM.exportClose.onclick = hideExportModal;
+        DOM.exportCancel.onclick = hideExportModal;
+        DOM.exportDownload.onclick = downloadExport;
+        DOM.exportCopy.onclick = copyExport;
+        DOM.exportModal.onclick = (e) => {
+          if (e.target === DOM.exportModal) hideExportModal();
+        };
+        document.addEventListener("keydown", (e) => {
+          if (e.key === "Escape" && DOM.exportModal.classList.contains("active")) {
+            hideExportModal();
+          }
+        });
+      }
 
-/* ============================================================
+      /* ============================================================
    12. СТАРТ / РЕСТАРТ
    ============================================================ */
 
-function restartGame() {
-  Timer.stop();
-  state = createInitialState();
-  DOM.game.classList.remove('blackout');
-  DOM.blackoutOverlay.classList.remove('active');
-  DOM.blackoutText.textContent = '';
-  DOM.skipBlackout.classList.remove('visible');
-  DOM.log.innerHTML = '';
-  clearControls();
-  updateStatus();
-  updateJournalIndicator();
-  act1();
-}
+      function restartGame() {
+        Timer.stop();
+        state = createInitialState();
+        DOM.game.classList.remove("blackout");
+        DOM.blackoutOverlay.classList.remove("active");
+        DOM.blackoutText.textContent = "";
+        DOM.skipBlackout.classList.remove("visible");
+        DOM.log.innerHTML = "";
+        clearControls();
+        updateStatus();
+        updateJournalIndicator();
+        act1();
+      }
 
-function init() {
-  initTheme();
-  initExport();
-  updateStatus();
-  updateJournalIndicator();
-  act1();
-}
+      function init() {
+        initTheme();
+        initExport();
+        updateStatus();
+        updateJournalIndicator();
+        act1();
+      }
 
-init();
-</script>
-</body>
+      init();
+    </script>
+  </body>
 </html>
