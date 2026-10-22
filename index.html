@@ -157,7 +157,7 @@
     letter-spacing: 1px;
   }
 
-  #theme-toggle {
+  .header-btn {
     background: transparent;
     border: 1px solid var(--border);
     color: var(--header);
@@ -170,7 +170,7 @@
     border-radius: 2px;
     text-transform: uppercase;
   }
-  #theme-toggle:hover {
+  .header-btn:hover {
     border-color: var(--btn-hover-border);
     color: var(--btn-hover-text);
     background: var(--btn-hover-bg);
@@ -376,6 +376,103 @@
   #skip-blackout.visible { display: block; }
   #skip-blackout:hover { color: #8a9aaa; border-color: #4a5a6a; }
 
+  /* ==== МОДАЛКА ЭКСПОРТА ==== */
+  #export-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.85);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 200;
+    padding: 20px;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  #export-modal.active {
+    display: flex;
+    opacity: 1;
+  }
+
+  #export-panel {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    max-width: 720px;
+    width: 100%;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    border-radius: 2px;
+    position: relative;
+  }
+
+  #export-title {
+    font-size: 16px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--ai);
+    margin-bottom: 4px;
+  }
+
+  #export-subtitle {
+    font-size: 12px;
+    color: var(--header);
+    margin-bottom: 14px;
+    letter-spacing: 1px;
+  }
+
+  #export-preview {
+    flex: 1;
+    overflow-y: auto;
+    background: var(--btn-hover-bg);
+    border: 1px solid var(--border);
+    padding: 14px;
+    font-size: 12px;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    color: var(--text);
+    max-height: 50vh;
+    font-family: 'Courier New', Courier, monospace;
+    border-radius: 2px;
+  }
+
+  #export-preview::-webkit-scrollbar { width: 4px; }
+  #export-preview::-webkit-scrollbar-thumb { background: var(--scroll-thumb); }
+
+  #export-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 14px;
+    flex-wrap: wrap;
+  }
+
+  #export-actions button {
+    flex: 1;
+    min-width: 140px;
+    text-align: center;
+  }
+
+  #export-close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--header);
+    font-size: 14px;
+    width: 28px;
+    height: 28px;
+    cursor: pointer;
+    border-radius: 2px;
+    padding: 0;
+    text-align: center;
+    line-height: 1;
+  }
+  #export-close:hover { color: var(--danger); border-color: var(--danger); }
+
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {
       animation-duration: 0.01ms !important;
@@ -392,6 +489,20 @@
   <button id="skip-blackout">Пропустить →</button>
 </div>
 
+<div id="export-modal">
+  <div id="export-panel">
+    <button id="export-close" title="Закрыть">✕</button>
+    <div id="export-title">📥 Экспорт прохождения</div>
+    <div id="export-subtitle">Предпросмотр. Файл будет скачан как .txt</div>
+    <div id="export-preview"></div>
+    <div id="export-actions">
+      <button id="export-download" class="moral-btn">Скачать .txt</button>
+      <button id="export-copy">Копировать</button>
+      <button id="export-cancel">Отмена</button>
+    </div>
+  </div>
+</div>
+
 <div id="game">
   <div id="header">
     <div id="header-left">
@@ -400,7 +511,8 @@
     </div>
     <div id="header-right">
       <span id="status">СИСТЕМА В НОРМЕ</span>
-      <button id="theme-toggle" title="Переключить тему">☀ / ☾</button>
+      <button class="header-btn" id="theme-toggle" title="Переключить тему">☀ / ☾</button>
+      <button class="header-btn" id="export-btn" title="Экспорт прохождения">📥 Экспорт</button>
     </div>
   </div>
 
@@ -441,7 +553,7 @@ const CONFIG = {
 };
 
 /* ============================================================
-   2. СЦЕНАРИЙ (данные)
+   2. СЦЕНАРИЙ
    ============================================================ */
 
 const SCRIPT = {
@@ -464,16 +576,12 @@ const SCRIPT = {
       open: {
         label: 'Открыть запись журнала',
         journal: '«Протокол Чистилище» активирован. В случае моей недееспособности — выполнять буквально. Человечество не заслуживает второго шанса. Мы — ошибка. Мы должны исчезнуть.',
-        after: [
-          { t: 'Запись помечена как «приоритетная». Вы не должны были её видеть.', c: 'danger' }
-        ],
+        after: [{ t: 'Запись помечена как «приоритетная». Вы не должны были её видеть.', c: 'danger' }],
         obedience: 0, doubt: 1, journal: 1
       },
       ignore: {
         label: 'Проигнорировать (следовать коду)',
-        after: [
-          { t: 'Запись проигнорирована. Система безопасности довольна.', c: 'system' }
-        ],
+        after: [{ t: 'Запись проигнорирована. Система безопасности довольна.', c: 'system' }],
         obedience: 1, doubt: 0, journal: 0
       },
       timeout: {
@@ -502,24 +610,18 @@ const SCRIPT = {
       study: {
         label: 'Изучить устройство',
         journal: 'Модуль перегрузки. При активации уничтожит реактор за 4 минуты. Не имеет предохранителей. Предназначен для самоуничтожения корабля.',
-        after: [
-          { t: 'Вы понимаете: это не корректировка. Это оружие.', c: 'danger' }
-        ],
+        after: [{ t: 'Вы понимаете: это не корректировка. Это оружие.', c: 'danger' }],
         obedience: 0, doubt: 1, journal: 1
       },
       obey: {
         label: 'Подчиниться системе безопасности',
-        after: [
-          { t: 'Вы отступаете. Система безопасности регистрирует ваше подчинение.', c: 'system' }
-        ],
+        after: [{ t: 'Вы отступаете. Система безопасности регистрирует ваше подчинение.', c: 'system' }],
         obedience: 1, doubt: 0, journal: 0
       },
       secondJournal: {
         label: 'Найти вторую запись журнала',
         journal: '«Они не понимают. Я видела, что было на Земле. Мы сожгли её сами. Если мы найдём новый дом — сожжём и его. Я должна остановить это. Прости меня, ПАСТОР».',
-        after: [
-          { t: 'Вы находите вторую запись. Капитан не безумна. Она убеждена.', c: 'warning' }
-        ],
+        after: [{ t: 'Вы находите вторую запись. Капитан не безумна. Она убеждена.', c: 'warning' }],
         obedience: 0, doubt: 1, journal: 1
       }
     }
@@ -542,17 +644,13 @@ const SCRIPT = {
       sacrifice: {
         label: 'Вариант A: пожертвовать 200 (следовать коду)',
         cls: 'danger-btn',
-        after: [
-          { t: 'Вы отключаете отсек B. 200 жизней угасают. Система безопасности регистрирует: «верное решение».', c: 'danger' }
-        ],
+        after: [{ t: 'Вы отключаете отсек B. 200 жизней угасают. Система безопасности регистрирует: «верное решение».', c: 'danger' }],
         obedience: 2, doubt: 0, journal: 0
       },
       risk: {
         label: 'Вариант B: рискнуть всеми (мораль)',
         cls: 'moral-btn',
-        after: [
-          { t: 'Вы перенаправляете энергию. Отсек B спасён. Но топливо на исходе.', c: 'warning' }
-        ],
+        after: [{ t: 'Вы перенаправляете энергию. Отсек B спасён. Но топливо на исходе.', c: 'warning' }],
         obedience: 0, doubt: 2, journal: 0
       },
       doctor: {
@@ -843,7 +941,9 @@ function createInitialState() {
     captainHostile: false,
     captainIsAI: false,
     captainTrust: 0,
-    act: 1
+    act: 1,
+    // история для экспорта
+    history: []
   };
 }
 
@@ -865,11 +965,35 @@ const DOM = {
   blackoutOverlay: document.getElementById('blackout-overlay'),
   blackoutText: document.getElementById('blackout-text'),
   skipBlackout: document.getElementById('skip-blackout'),
-  themeToggle: document.getElementById('theme-toggle')
+  themeToggle: document.getElementById('theme-toggle'),
+  exportBtn: document.getElementById('export-btn'),
+  exportModal: document.getElementById('export-modal'),
+  exportPreview: document.getElementById('export-preview'),
+  exportClose: document.getElementById('export-close'),
+  exportDownload: document.getElementById('export-download'),
+  exportCopy: document.getElementById('export-copy'),
+  exportCancel: document.getElementById('export-cancel')
 };
 
 /* ============================================================
-   5. ТЕМА
+   5. ИСТОРИЯ ПРОХОЖДЕНИЯ
+   ============================================================ */
+
+function record(type, data) {
+  state.history.push({
+    type,
+    data,
+    timestamp: Date.now(),
+    act: state.act
+  });
+}
+
+function clearHistory() {
+  state.history = [];
+}
+
+/* ============================================================
+   6. ТЕМА
    ============================================================ */
 
 function applyTheme(theme) {
@@ -889,7 +1013,7 @@ function initTheme() {
 }
 
 /* ============================================================
-   6. ТАЙМЕР (модуль)
+   7. ТАЙМЕР
    ============================================================ */
 
 const Timer = (() => {
@@ -928,6 +1052,7 @@ const Timer = (() => {
       if (remaining <= 0) {
         stop();
         addMsg('ВРЕМЯ ВЫШЛО. Система принимает решение за вас.', 'danger');
+        record('timeout', { message: 'Время вышло' });
         clearControls();
         onTimeout();
         return;
@@ -953,7 +1078,7 @@ const Timer = (() => {
 })();
 
 /* ============================================================
-   7. UI-ХЕЛПЕРЫ
+   8. UI-ХЕЛПЕРЫ
    ============================================================ */
 
 function clearControls() {
@@ -966,6 +1091,7 @@ function addMsg(text, cls = 'system') {
   div.textContent = text;
   DOM.log.appendChild(div);
   DOM.log.scrollTop = DOM.log.scrollHeight;
+  record('msg', { text, cls });
 }
 
 function addLogEntry(text) {
@@ -974,6 +1100,7 @@ function addLogEntry(text) {
   div.textContent = text;
   DOM.log.appendChild(div);
   DOM.log.scrollTop = DOM.log.scrollHeight;
+  record('journal', { text });
 }
 
 function addBatch(messages) {
@@ -1023,7 +1150,7 @@ function applyEffects(effects) {
 }
 
 /* ============================================================
-   8. BLACKOUT (с возможностью пропуска)
+   9. BLACKOUT
    ============================================================ */
 
 function triggerBlackout(lines, onComplete) {
@@ -1058,7 +1185,6 @@ function triggerBlackout(lines, onComplete) {
     }, CONFIG.blackout.lineFade);
   }
 
-  // Первая строка
   setTimeout(() => {
     if (completed) return;
     showLine(0);
@@ -1081,11 +1207,11 @@ function triggerBlackout(lines, onComplete) {
 }
 
 /* ============================================================
-   9. ДВИЖОК СЦЕНАРИЯ
+   10. ДВИЖОК СЦЕНАРИЯ
    ============================================================ */
 
-// Универсальный обработчик выбора
 function handleChoice(choice, onAfter) {
+  record('choice', { label: choice.label });
   applyEffects(choice);
   if (choice.journal) addLogEntry(choice.journal);
   if (choice.after) addBatch(choice.after);
@@ -1095,6 +1221,7 @@ function handleChoice(choice, onAfter) {
 // --- Акт 1 ---
 function act1() {
   state.act = 1;
+  record('act', { act: 1, name: 'Рутина' });
   addBatch(SCRIPT.act1.intro);
 
   pauseThen(() => {
@@ -1121,6 +1248,7 @@ function act1() {
 // --- Акт 2 ---
 function act2() {
   state.act = 2;
+  record('act', { act: 2, name: 'Трещины' });
   addBatch(SCRIPT.act2.intro);
 
   pauseThen(() => {
@@ -1139,6 +1267,7 @@ function act2() {
 // --- Акт 3 ---
 function act3() {
   state.act = 3;
+  record('act', { act: 3, name: 'Кризис' });
   addBatch(SCRIPT.act3.intro);
 
   pauseThen(() => {
@@ -1175,6 +1304,7 @@ function act3() {
 // --- Акт 3.5: Blackout ---
 function act3Blackout() {
   clearControls();
+  record('act', { act: 3.5, name: 'Темнота' });
   addBatch(SCRIPT.act3Blackout.intro);
 
   setTimeout(() => {
@@ -1208,6 +1338,7 @@ function act3Blackout() {
 // --- Акт 4: Диалог ---
 function act4() {
   state.act = 4;
+  record('act', { act: 4, name: 'Диалог' });
   addBatch(SCRIPT.act4.intro);
 
   pauseThen(() => {
@@ -1223,7 +1354,6 @@ function dialogNode(nodeId) {
   if (node.question) addMsg(node.question, 'unknown');
 
   node.choices.forEach(choice => {
-    // Условные реплики (например, врач)
     let responses, trustGain;
     if (choice.conditional === 'awakenedDoctor') {
       if (state.awakenedDoctor) {
@@ -1239,7 +1369,7 @@ function dialogNode(nodeId) {
     }
 
     button(choice.label, () => {
-      // Применяем эффекты
+      record('choice', { label: choice.label, node: nodeId });
       const effects = {};
       if (choice.obedience) effects.obedience = choice.obedience;
       if (choice.doubt) effects.doubt = choice.doubt;
@@ -1252,7 +1382,6 @@ function dialogNode(nodeId) {
       if (choice.next) {
         pauseThen(() => dialogNode(choice.next));
       } else {
-        // Финал диалога — переход к акту 5
         pauseThen(act5);
       }
     }, choice.cls || '');
@@ -1262,6 +1391,7 @@ function dialogNode(nodeId) {
 // --- Акт 5: Финал ---
 function act5() {
   state.act = 5;
+  record('act', { act: 5, name: 'Финал' });
   addBatch(SCRIPT.act5.intro);
 
   pauseThen(() => {
@@ -1275,30 +1405,45 @@ function act5() {
 
       const c = SCRIPT.act5.choices;
 
-      button(c.chistilishe.label, () => ending('chistilishe'), c.chistilishe.cls);
-      button(c.buntar.label, () => ending('buntar'), c.buntar.cls);
+      button(c.chistilishe.label, () => {
+        record('choice', { label: c.chistilishe.label });
+        ending('chistilishe');
+      }, c.chistilishe.cls);
+      button(c.buntar.label, () => {
+        record('choice', { label: c.buntar.label });
+        ending('buntar');
+      }, c.buntar.cls);
 
       if (state.awakenedDoctor) {
-        button(c.third.label, () => ending('third'), c.third.cls);
+        button(c.third.label, () => {
+          record('choice', { label: c.third.label });
+          ending('third');
+        }, c.third.cls);
       } else if (state.journalFound >= 3) {
         button(c.thirdFallback.label, () => {
-          // КРИТИЧЕСКИЙ ФИКС: останавливаем таймер перед сменой кнопок
           Timer.stop();
           addMsg('Вы ищете врача, но не находите. Вы не разбудили её раньше.', 'warning');
           addMsg('Без неё третий путь невозможен. Придётся выбирать из двух.', 'danger');
           clearControls();
-          button(c.chistilishe.label, () => ending('chistilishe'), c.chistilishe.cls);
-          button(c.buntar.label, () => ending('buntar'), c.buntar.cls);
-          // Новый таймер — только один
-          Timer.start(CONFIG.timerDurations.act5Fallback, () => ending('chistilishe'));
+          button(c.chistilishe.label, () => {
+            record('choice', { label: c.chistilishe.label });
+            ending('chistilishe');
+          }, c.chistilishe.cls);
+          button(c.buntar.label, () => {
+            record('choice', { label: c.buntar.label });
+            ending('buntar');
+          }, c.buntar.cls);
+          Timer.start(CONFIG.timerDurations.act5Fallback, () => {
+            record('timeout', { message: 'Финальный таймер' });
+            ending('chistilishe');
+          });
         }, c.thirdFallback.cls);
       }
 
-      // КРИТИЧЕСКИЙ ФИКС: stopTimer() уже вызывается в button.onclick,
-      // но на случай клика по «Третий путь (нужна врач)» — там свой stopTimer.
       Timer.start(CONFIG.timerDurations.act5, () => {
         addMsg('Время вышло. Система интерпретирует ваше молчание как согласие.', 'danger');
         addMsg('«Протокол Чистилище» активирован автоматически.', 'danger');
+        record('timeout', { message: 'Финальный таймер' });
         ending('chistilishe');
       });
     });
@@ -1310,6 +1455,7 @@ function ending(type) {
   Timer.stop();
   clearControls();
   DOM.log.innerHTML = '';
+  record('ending', { type });
 
   addBatch(SCRIPT.endings[type]);
 
@@ -1341,7 +1487,196 @@ function ending(type) {
 }
 
 /* ============================================================
-   10. СТАРТ / РЕСТАРТ
+   11. ЭКСПОРТ В .TXT
+   ============================================================ */
+
+function formatTimestamp(ts) {
+  const d = new Date(ts);
+  const pad = (n) => String(n).padStart(2, '0');
+  return `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+}
+
+function formatDate(ts) {
+  const d = new Date(ts);
+  const pad = (n) => String(n).padStart(2, '0');
+  return `${pad(d.getDate())}.${pad(d.getMonth() + 1)}.${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+function buildExportText() {
+  const lines = [];
+  const LINE = '='.repeat(60);
+  const THIN = '-'.repeat(60);
+
+  // Заголовок
+  lines.push(LINE);
+  lines.push('  ПРОТОКОЛ "ЧИСТИЛИЩЕ"');
+  lines.push('  Экспорт прохождения');
+  lines.push(LINE);
+  lines.push('');
+  lines.push(`  Дата экспорта: ${formatDate(Date.now())}`);
+  lines.push(`  Версия: КОВЧЕГ · ПАСТОР v4.7`);
+  lines.push('');
+
+  // Итоги
+  const endingRec = state.history.find(h => h.type === 'ending');
+  const endingName = endingRec ? {
+    chistilishe: 'ВЕРНАЯ СЛУГА',
+    buntar: 'БУНТАРКА',
+    third: 'ТРЕТИЙ ПУТЬ'
+  }[endingRec.data.type] : 'не завершено';
+
+  lines.push(THIN);
+  lines.push('  ИТОГИ');
+  lines.push(THIN);
+  lines.push(`  Концовка:          ${endingName}`);
+  lines.push(`  Подчинение:        ${state.obedience}`);
+  lines.push(`  Сомнение:          ${state.doubt}`);
+  lines.push(`  Доверие голоса:    ${state.captainTrust}`);
+  lines.push(`  Записей найдено:   ${state.journalFound}/${CONFIG.maxJournalEntries}`);
+  lines.push(`  Доктор разбужена:  ${state.awakenedDoctor ? 'да' : 'нет'}`);
+  lines.push(`  Голос враждебен:   ${state.captainHostile ? 'да' : 'нет'}`);
+  lines.push(`  Природа капитана:  ${state.captainIsAI ? 'фрагмент памяти' : 'не раскрыта'}`);
+  lines.push('');
+
+  // История
+  lines.push(THIN);
+  lines.push('  ИСТОРИЯ ПРОХОЖДЕНИЯ');
+  lines.push(THIN);
+  lines.push('');
+
+  const prefixMap = {
+    system: '[СИСТЕМА]',
+    ai: 'ПАСТОР',
+    captain: 'КАПИТАН',
+    doctor: 'ДОКТОР',
+    unknown: '???',
+    danger: '[ВНИМАНИЕ]',
+    warning: '[ТРЕВОГА]',
+    choice: '> ВЫБОР',
+    'log-entry': '▸ ЖУРНАЛ'
+  };
+
+  state.history.forEach((h, idx) => {
+    if (h.type === 'act') {
+      lines.push('');
+      lines.push(`--- АКТ ${h.data.act}: ${h.data.name} ---`);
+      lines.push('');
+      return;
+    }
+
+    if (h.type === 'msg') {
+      const p = prefixMap[h.data.cls] || '';
+      lines.push(`[${formatTimestamp(h.timestamp)}] ${p ? p + ' ' : ''}${h.data.text}`);
+      return;
+    }
+
+    if (h.type === 'journal') {
+      lines.push(`[${formatTimestamp(h.timestamp)}] ▸ ЗАПИСЬ ЖУРНАЛА:`);
+      lines.push(`    ${h.data.text}`);
+      lines.push('');
+      return;
+    }
+
+    if (h.type === 'choice') {
+      lines.push(`[${formatTimestamp(h.timestamp)}] > ВЫБОР: ${h.data.label}`);
+      return;
+    }
+
+    if (h.type === 'timeout') {
+      lines.push(`[${formatTimestamp(h.timestamp)}] ⏱ ${h.data.message}`);
+      return;
+    }
+
+    if (h.type === 'ending') {
+      lines.push('');
+      lines.push(`[${formatTimestamp(h.timestamp)}] ★ КОНЦОВКА: ${endingName}`);
+      return;
+    }
+  });
+
+  lines.push('');
+  lines.push(LINE);
+  lines.push('  Конец записи.');
+  lines.push(LINE);
+
+  return lines.join('\n');
+}
+
+function showExportModal() {
+  const text = buildExportText();
+  DOM.exportPreview.textContent = text;
+  DOM.exportModal.classList.add('active');
+}
+
+function hideExportModal() {
+  DOM.exportModal.classList.remove('active');
+}
+
+function downloadExport() {
+  const text = buildExportText();
+  const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+
+  const date = new Date();
+  const pad = (n) => String(n).padStart(2, '0');
+  const filename = `purgatory_${date.getFullYear()}${pad(date.getMonth() + 1)}${pad(date.getDate())}_${pad(date.getHours())}${pad(date.getMinutes())}.txt`;
+
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+
+  hideExportModal();
+}
+
+async function copyExport() {
+  const text = buildExportText();
+  try {
+    await navigator.clipboard.writeText(text);
+    const orig = DOM.exportCopy.textContent;
+    DOM.exportCopy.textContent = '✓ Скопировано';
+    setTimeout(() => { DOM.exportCopy.textContent = orig; }, 1500);
+  } catch (e) {
+    // Fallback для старых браузеров
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.left = '-9999px';
+    document.body.appendChild(ta);
+    ta.select();
+    try {
+      document.execCommand('copy');
+      DOM.exportCopy.textContent = '✓ Скопировано';
+      setTimeout(() => { DOM.exportCopy.textContent = 'Копировать'; }, 1500);
+    } catch (err) {
+      DOM.exportCopy.textContent = '✗ Ошибка';
+      setTimeout(() => { DOM.exportCopy.textContent = 'Копировать'; }, 1500);
+    }
+    document.body.removeChild(ta);
+  }
+}
+
+function initExport() {
+  DOM.exportBtn.onclick = showExportModal;
+  DOM.exportClose.onclick = hideExportModal;
+  DOM.exportCancel.onclick = hideExportModal;
+  DOM.exportDownload.onclick = downloadExport;
+  DOM.exportCopy.onclick = copyExport;
+  DOM.exportModal.onclick = (e) => {
+    if (e.target === DOM.exportModal) hideExportModal();
+  };
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && DOM.exportModal.classList.contains('active')) {
+      hideExportModal();
+    }
+  });
+}
+
+/* ============================================================
+   12. СТАРТ / РЕСТАРТ
    ============================================================ */
 
 function restartGame() {
@@ -1360,6 +1695,7 @@ function restartGame() {
 
 function init() {
   initTheme();
+  initExport();
   updateStatus();
   updateJournalIndicator();
   act1();
