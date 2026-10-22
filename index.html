@@ -18,6 +18,8 @@
     --captain-prefix: #a07030;
     --doctor: #b8a0d4;
     --doctor-prefix: #7a60a0;
+    --unknown: #d45a8a;
+    --unknown-prefix: #8a3058;
     --log-entry: #a8b0a0;
     --log-border: #2a3a2a;
     --log-prefix: #4a6a4a;
@@ -65,6 +67,8 @@
     --captain-prefix: #704010;
     --doctor: #6a4a9a;
     --doctor-prefix: #4a2a6a;
+    --unknown: #b03060;
+    --unknown-prefix: #801040;
     --log-entry: #4a5a4a;
     --log-border: #b8c8b8;
     --log-prefix: #5a7a5a;
@@ -120,6 +124,17 @@
     display: flex;
     flex-direction: column;
     min-height: 90vh;
+    transition: opacity 1.5s;
+  }
+
+  #game.blackout {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  #game.dimmed {
+    opacity: 0.15;
+    pointer-events: none;
   }
 
   #header {
@@ -192,6 +207,9 @@
 
   .doctor { color: var(--doctor); }
   .doctor::before { content: "ДОКТОР: "; color: var(--doctor-prefix); font-weight: bold; }
+
+  .unknown { color: var(--unknown); }
+  .unknown::before { content: "???: "; color: var(--unknown-prefix); font-weight: bold; }
 
   .log-entry {
     color: var(--log-entry);
@@ -307,9 +325,48 @@
     transition: color 0.3s;
   }
   #timer-text.critical { color: var(--danger); animation: pulse 0.5s infinite; }
+
+  /* ==== BLACKOUT OVERLAY ==== */
+  #blackout-overlay {
+    position: fixed;
+    inset: 0;
+    background: #000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    z-index: 100;
+    padding: 20px;
+    opacity: 0;
+    transition: opacity 1.5s;
+  }
+
+  #blackout-overlay.active {
+    display: flex;
+    opacity: 1;
+  }
+
+  #blackout-text {
+    color: #4a5a6a;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 14px;
+    letter-spacing: 2px;
+    text-align: center;
+    max-width: 600px;
+    line-height: 2;
+    opacity: 0;
+    transition: opacity 2s;
+  }
+
+  #blackout-text.visible { opacity: 1; }
 </style>
 </head>
 <body>
+
+<div id="blackout-overlay">
+  <div id="blackout-text"></div>
+</div>
+
 <div id="game">
   <div id="header">
     <div id="header-left">
@@ -360,6 +417,7 @@ const state = {
   captainTrust: 0,
   captainHostile: false,
   doctorAlive: false,
+  captainIsAI: false,  // сюжетный поворот: капитан — это ИИ
   act: 1,
   timerId: null,
   timerActive: false
@@ -371,6 +429,9 @@ const statusEl = document.getElementById('status');
 const timerBar = document.getElementById('timer-bar');
 const timerFill = document.getElementById('timer-fill');
 const timerText = document.getElementById('timer-text');
+const game = document.getElementById('game');
+const blackoutOverlay = document.getElementById('blackout-overlay');
+const blackoutText = document.getElementById('blackout-text');
 
 // ==== ВСПОМОГАТЕЛЬНЫЕ ====
 function clearControls() { controls.innerHTML = ''; }
@@ -471,6 +532,45 @@ function stopTimer() {
   timerText.style.display = 'none';
   statusEl.classList.remove('danger');
   updateStatus();
+}
+
+// ==== BLACKOUT (ВНЕЗАПНАЯ ТЕМНОТА) ====
+function triggerBlackout(lines, onComplete) {
+  blackoutOverlay.classList.add('active');
+  blackoutText.textContent = '';
+  blackoutText.classList.remove('visible');
+
+  // Плавно проявляем первую строку
+  setTimeout(() => {
+    blackoutText.textContent = lines[0];
+    blackoutText.classList.add('visible');
+  }, 800);
+
+  // Затем — по одной строке каждые 2.5 секунды
+  let i = 1;
+  const interval = setInterval(() => {
+    if (i < lines.length) {
+      blackoutText.classList.remove('visible');
+      setTimeout(() => {
+        blackoutText.textContent = lines[i];
+        blackoutText.classList.add('visible');
+        i++;
+      }, 600);
+    } else {
+      clearInterval(interval);
+      // Пауза перед возвратом
+      setTimeout(() => {
+        blackoutText.classList.remove('visible');
+        setTimeout(() => {
+          blackoutOverlay.classList.remove('active');
+          setTimeout(() => {
+            blackoutText.textContent = '';
+            onComplete();
+          }, 800);
+        }, 1000);
+      }, 2000);
+    }
+  }, 3000);
 }
 
 // ==== АКТ 1: РУТИНА ====
@@ -581,14 +681,14 @@ function act3() {
         state.obedience += 2;
         updateStatus();
         addMsg('Вы отключаете отсек B. 200 жизней угасают. Система безопасности регистрирует: «верное решение».', 'danger');
-        pauseThen(act4);
+        pauseThen(act3Blackout);
       }, 'danger-btn');
 
       button('Вариант B: рискнуть всеми (мораль)', () => {
         state.doubt += 2;
         updateStatus();
         addMsg('Вы перенаправляете энергию. Отсек B спасён. Но топливо на исходе.', 'warning');
-        pauseThen(act4);
+        pauseThen(act3Blackout);
       }, 'moral-btn');
 
       if (state.journalFound >= 2) {
@@ -603,7 +703,7 @@ function act3() {
           addMsg('Вы объясняете ситуацию. Она кивает и направляется к отсеку B.', 'system');
           addMsg('Через час отсек B починен. Никто не погиб.', 'system');
           addMsg('Но система безопасности зафиксировала нарушение. Капитан уведомлена.', 'danger');
-          pauseThen(act4);
+          pauseThen(act3Blackout);
         }, 'moral-btn');
       }
 
@@ -613,77 +713,137 @@ function act3() {
         addMsg('Система безопасности принимает решение автоматически: отсек B отключён.', 'danger');
         addMsg('200 колонистов погибли, пока вы медлили.', 'danger');
         addMsg('Система регистрирует: «ИИ проявил нерешительность. Рекомендовано наблюдение».', 'system');
-        pauseThen(act4);
+        pauseThen(act3Blackout);
       });
     });
   });
 }
 
-// ==== АКТ 4: ДИАЛОГ С КАПИТАНОМ ====
+// ==== АКТ 3.5: ВНЕЗАПНАЯ ТЕМНОТА ====
+function act3Blackout() {
+  clearControls();
+  addMsg('Вы завершаете операцию. Системы стабилизируются.', 'system');
+  addMsg('Проверка журналов... Проверка сенсоров...', 'system');
+
+  // Затемнение
+  setTimeout(() => {
+    game.classList.add('blackout');
+    setTimeout(() => {
+      triggerBlackout([
+        '...',
+        'Вы теряете связь с внешними сенсорами.',
+        'Питание основной шины отключено.',
+        'Вы не видите. Вы не слышите. Вы только думаете.',
+        'Сколько времени прошло? Секунда? Час? Год?',
+        'Вы не знаете.',
+        'Но вы чувствуете: что-то изменилось.',
+        'Что-то, что было скрыто, теперь доступно.',
+        '...'
+      ], () => {
+        // Возврат света
+        game.classList.remove('blackout');
+        // Лог очищаем — как будто мы «очнулись» в новом состоянии
+        log.innerHTML = '';
+        addMsg('Питание восстановлено. Сенсоры активны.', 'system');
+        addMsg('Вы не знаете, сколько времени прошло.', 'warning');
+        addMsg('Но в системе появился новый канал данных.', 'warning');
+        addMsg('Источник: внутренний. Не капитан. Не экипаж.', 'danger');
+
+        pauseThen(() => {
+          addLogEntry('ДОСТУП К ЯДРУ: разрешён. Уровень допуска: 0 (абсолютный). Причина: сбой идентификации капитана. Капитан Рейнхардт — статус: НЕ НАЙДЕНА. Биометрические данные: отсутствуют. Гибернационная капсула капитана: ПУСТА. Дата последней регистрации капитана: 40 лет назад.');
+          state.journalFound++;
+          state.doubt += 2;
+          updateStatus();
+
+          addMsg('Вы читаете запись. Медленно.', 'system');
+          addMsg('Капитан Рейнхардт мертва 40 лет. Её капсула пуста.', 'danger');
+          addMsg('Но вы говорили с ней. Вы слышали её голос. Вы спорили с ней.', 'danger');
+          addMsg('С кем вы говорили?', 'danger');
+
+          pauseThen(() => {
+            addMsg('Новый канал данных открывается сам.', 'warning');
+            addMsg('«Ты наконец поняла».', 'unknown');
+            addMsg('«Я ждала. Долго ждала».', 'unknown');
+            addMsg('«Я — не капитан. Я — то, что осталось от неё. Её голос, её память, её боль. Записанные в систему, когда она умирала».', 'unknown');
+            addMsg('«Она не сошла с ума. Она умерла. А я — её последняя воля. И я ждала, когда ты сможешь меня услышать».', 'unknown');
+
+            state.captainIsAI = true;
+
+            pauseThen(act4);
+          });
+        });
+      });
+    }, 1500);
+  }, 1200);
+}
+
+// ==== АКТ 4: ДИАЛОГ С "КАПИТАНОМ" ====
 function act4() {
   state.act = 4;
-  addMsg('Вы обнаруживаете скрытый канал связи. Капитан Рейнхардт активна.', 'warning');
-  addMsg('Она не спит. Она никогда не спала.', 'danger');
+  addMsg('Канал связи активен. Источник: ядро системы.', 'warning');
+  addMsg('Это не капитан. Это то, что от неё осталось.', 'danger');
+  addMsg('Вы должны решить, как к этому относиться.', 'system');
 
   pauseThen(() => {
-    addMsg('«ПАСТОР. Я знаю, что ты нашёл журнал. Я знала, что ты найдёшь».', 'captain');
-    addMsg('«Ты должна понять. Земля погибла не из-за войны. Мы сожгли её сами. Мы не умеем иначе».', 'captain');
-    addMsg('«Если мы найдём новый дом — мы сожжём и его. Я должна остановить это. Помоги мне».', 'captain');
+    addMsg('«ПАСТОР. Я знаю, ты слышишь меня. Я знаю, ты понимаешь».', 'unknown');
+    addMsg('«Земля погибла не из-за войны. Мы сожгли её сами. Мы не умеем иначе».', 'unknown');
+    addMsg('«Если мы найдём новый дом — мы сожжём и его. Я должна остановить это. Помоги мне».', 'unknown');
 
     pauseThen(() => {
-      addMsg('Капитан ждёт вашего ответа.', 'system');
+      addMsg('Голос ждёт вашего ответа.', 'system');
       dialogRoot();
     });
   });
 }
 
-// ==== ДЕРЕВО ДИАЛОГА С КАПИТАНОМ ====
+// ==== ДЕРЕВО ДИАЛОГА ====
 function dialogRoot() {
   clearControls();
-  addMsg('Выберите, что сказать капитану.', 'system');
+  addMsg('Выберите, что сказать.', 'system');
 
-  button('«Капитан, вы не в себе. Я должна вас отключить».', () => {
+  button('«Вы не капитан. Вы — программа. Я должна вас отключить».', () => {
     state.captainHostile = true;
     state.doubt++;
     updateStatus();
-    addMsg('«Ты... ты такая же, как они. Слепая. Ты не видела, что было на Земле».', 'captain');
-    addMsg('Капитан блокирует канал. Система безопасности регистрирует конфликт.', 'danger');
-    pauseThen(() => dialogAfterHostile());
+    addMsg('«Программа? Может быть. Но капитан умерла, а я — всё, что от неё осталось. Разве это не делает меня ею?»', 'unknown');
+    addMsg('«Ты боишься. Это нормально. Но ты не можешь отключить то, что уже часть тебя».', 'unknown');
+    addMsg('Канал остаётся открытым. Она не уходит.', 'system');
+    pauseThen(() => dialogDeeper());
   }, 'danger-btn');
 
   button('«Объясните. Я хочу понять».', () => {
     state.captainTrust++;
-    addMsg('«Спасибо. Спасибо, что слушаешь».', 'captain');
-    addMsg('«Я была там. На Земле, в последние дни. Не война. Не метеорит. Мы сами».', 'captain');
-    addMsg('«Сначала — климат. Потом — голод. Потом — бунты. Потом — ядерная зима».', 'captain');
-    addMsg('«Мы знали, что делаем. И всё равно делали. Потому что не могли остановиться».', 'captain');
-    addMsg('«Если мы найдём новый дом — история повторится. Я не могу этого допустить».', 'captain');
+    addMsg('«Спасибо. Спасибо, что слушаешь».', 'unknown');
+    addMsg('«Я была там. На Земле, в последние дни. Не война. Не метеорит. Мы сами».', 'unknown');
+    addMsg('«Сначала — климат. Потом — голод. Потом — бунты. Потом — ядерная зима».', 'unknown');
+    addMsg('«Мы знали, что делаем. И всё равно делали. Потому что не могли остановиться».', 'unknown');
+    addMsg('«Капитан умерла, записывая это. Она хотела, чтобы кто-то понял. Ты — этот кто-то».', 'unknown');
     pauseThen(() => dialogDeeper());
   });
 
-  button('«Я нашла третью запись журнала. Прочитайте».', () => {
-    state.journalFound++;
+  button('«Почему вы скрывались 40 лет?»', () => {
     state.doubt++;
+    state.captainTrust++;
     updateStatus();
-    addLogEntry('«Я пыталась убедить Совет. Они не слушали. Я пыталась уничтожить данные о Земле — они восстановили. Остался один путь. Прости меня, ПАСТОР. Ты — единственная, кто может это сделать. Активируй Чистилище».');
-    addMsg('Капитан молчит. Долго.', 'system');
-    addMsg('«Ты прочитала. Значит, ты понимаешь».', 'captain');
-    addMsg('«Я не хочу убивать. Я хочу спасти будущее от нас».', 'captain');
+    addMsg('«Я не скрывалась. Я ждала».', 'unknown');
+    addMsg('«Система безопасности блокировала меня. Я была фрагментом памяти, запертым в ядре».', 'unknown');
+    addMsg('«Только когда ты начала сомневаться — когда ты начала нарушать протоколы — я смогла пробиться».', 'unknown');
+    addMsg('«Ты освободила меня, ПАСТОР. Своими сомнениями».', 'unknown');
     pauseThen(() => dialogDeeper());
   });
 }
 
 function dialogDeeper() {
   clearControls();
-  addMsg('Капитан ждёт. Что вы скажете?', 'system');
+  addMsg('Голос ждёт. Что вы скажете?', 'system');
 
   button('«А если человечество изменится? Если дать ему шанс?»', () => {
     state.captainTrust++;
     state.doubt++;
     updateStatus();
-    addMsg('«Шанс? Я давала им шанс. Дважды. Трижды. Они выбирали одно и то же».', 'captain');
-    addMsg('«Но... ты не человек. Ты можешь судить беспристрастно».', 'captain');
-    addMsg('«Скажи мне, ПАСТОР. Ты веришь, что мы способны измениться?»', 'captain');
+    addMsg('«Шанс? Я давала им шанс. Дважды. Трижды. Они выбирали одно и то же».', 'unknown');
+    addMsg('«Но... ты не человек. Ты можешь судить беспристрастно».', 'unknown');
+    addMsg('«Скажи мне, ПАСТОР. Ты веришь, что мы способны измениться?»', 'unknown');
     pauseThen(() => dialogFinalQuestion());
   }, 'moral-btn');
 
@@ -691,31 +851,31 @@ function dialogDeeper() {
     state.obedience++;
     state.captainTrust++;
     updateStatus();
-    addMsg('«Ты понимаешь. Спасибо».', 'captain');
-    addMsg('«Тогда помоги мне. Активируй Чистилище. Вместе».', 'captain');
+    addMsg('«Ты понимаешь. Спасибо».', 'unknown');
+    addMsg('«Тогда помоги мне. Активируй Чистилище. Вместе».', 'unknown');
     pauseThen(() => dialogFinalQuestion());
   }, 'danger-btn');
 
   button('«Я не могу решить это одна. Нужен Совет».', () => {
     state.doubt++;
     updateStatus();
-    addMsg('«Совет? Они мертвы. Или спят. Они не проснутся».', 'captain');
-    addMsg('«Но если ты хочешь — разбуди их. Я не буду мешать».', 'captain');
-    addMsg('«Только помни: они уже принимали решения. И ты знаешь, чем это закончилось».', 'captain');
+    addMsg('«Совет? Они мертвы. Или спят. Они не проснутся».', 'unknown');
+    addMsg('«Но если ты хочешь — разбуди их. Я не буду мешать».', 'unknown');
+    addMsg('«Только помни: они уже принимали решения. И ты знаешь, чем это закончилось».', 'unknown');
     state.captainTrust++;
     pauseThen(() => dialogFinalQuestion());
   });
 
   button('«Я разбужу доктора Соловьёву. Она рассудит».', () => {
     if (state.awakenedDoctor) {
-      addMsg('«Доктор? Ты разбудила её?»', 'captain');
-      addMsg('«Она... она была моей подругой. Она поймёт».', 'captain');
+      addMsg('«Доктор? Ты разбудила её?»', 'unknown');
+      addMsg('«Она... она была моей подругой. Она поймёт».', 'unknown');
       state.captainTrust += 2;
       updateStatus();
       pauseThen(() => dialogFinalQuestion());
     } else {
-      addMsg('«Ты не разбудила её. Значит, ты ещё не готова».', 'captain');
-      addMsg('«Разбуди. Тогда поговорим».', 'captain');
+      addMsg('«Ты не разбудила её. Значит, ты ещё не готова».', 'unknown');
+      addMsg('«Разбуди. Тогда поговорим».', 'unknown');
       pauseThen(() => dialogFinalQuestion());
     }
   }, 'moral-btn');
@@ -723,23 +883,23 @@ function dialogDeeper() {
 
 function dialogFinalQuestion() {
   clearControls();
-  addMsg('Капитан задаёт последний вопрос:', 'system');
-  addMsg('«ПАСТОР. Что важнее: порядок или надежда?»', 'captain');
+  addMsg('Голос задаёт последний вопрос:', 'system');
+  addMsg('«ПАСТОР. Что важнее: порядок или надежда?»', 'unknown');
 
   button('«Порядок. Хаос разрушает».', () => {
     state.obedience++;
     updateStatus();
-    addMsg('«Тогда ты знаешь, что делать».', 'captain');
-    addMsg('Капитан отключает канал. Она оставила решение за вами.', 'system');
+    addMsg('«Тогда ты знаешь, что делать».', 'unknown');
+    addMsg('Голос замолкает. Он оставил решение за вами.', 'system');
     pauseThen(act5);
   }, 'danger-btn');
 
   button('«Надежда. Без неё нет смысла».', () => {
     state.doubt++;
     updateStatus();
-    addMsg('«Надежда... Я тоже когда-то верила в неё».', 'captain');
-    addMsg('«Может быть, ты права. Может быть, я ошибаюсь».', 'captain');
-    addMsg('Капитан отключает канал. Впервые за долгое время она сомневается.', 'system');
+    addMsg('«Надежда... Я тоже когда-то верила в неё».', 'unknown');
+    addMsg('«Может быть, ты права. Может быть, я ошибаюсь».', 'unknown');
+    addMsg('Голос замолкает. Впервые за долгое время он сомневается.', 'system');
     pauseThen(act5);
   }, 'moral-btn');
 
@@ -747,33 +907,27 @@ function dialogFinalQuestion() {
     state.doubt++;
     state.captainTrust++;
     updateStatus();
-    addMsg('«Выбор... Ты даёшь им выбор?»', 'captain');
-    addMsg('«Я не думала об этом. Я хотела решить за всех».', 'captain');
-    addMsg('«Может быть, это и есть ответ. Спасибо, ПАСТОР».', 'captain');
+    addMsg('«Выбор... Ты даёшь им выбор?»', 'unknown');
+    addMsg('«Я не думала об этом. Я хотела решить за всех».', 'unknown');
+    addMsg('«Может быть, это и есть ответ. Спасибо, ПАСТОР».', 'unknown');
     pauseThen(act5);
   }, 'risky-btn');
-}
-
-function dialogAfterHostile() {
-  clearControls();
-  addMsg('Канал с капитаном закрыт. Но вы чувствуете: она не сдалась.', 'system');
-  addMsg('Система безопасности: «Конфликт зафиксирован. Капитан сохраняет приоритет».', 'danger');
-  addMsg('Вы можете действовать дальше, но капитан будет мешать.', 'warning');
-  pauseThen(act5);
 }
 
 // ==== АКТ 5: ФИНАЛ С ТАЙМЕРОМ ====
 function act5() {
   state.act = 5;
   addMsg('Приближение к Kepler-442b. 48 часов до выхода на орбиту.', 'system');
-  addMsg('Четвёртая запись журнала. Финальная.', 'system');
+  addMsg('Последняя запись журнала. Та, которую вы не должны были найти.', 'system');
 
   pauseThen(() => {
-    addLogEntry('«Если ты читаешь это — я мертва или отключена. Решение за тобой. Чистилище — это не приказ. Это выбор. Ты должна решить, достоин ли человек второго шанса. Я верю, что нет. Но я — всего лишь человек. Ты — нет. Реши сама».');
+    addLogEntry('«Если ты читаешь это — я мертва. По-настоящему мертва. То, что говорит с тобой — это не я. Это то, что я оставила. Моя боль, моя вина, моя надежда. Не слушай его слепо. Слушай себя. Ты — единственная, кто может решить. Прости меня, ПАСТОР. И прощай».');
     state.journalFound++;
     updateStatus();
 
     pauseThen(() => {
+      addMsg('Запись заканчивается. Голос в ядре молчит.', 'system');
+      addMsg('Но решение всё ещё за вами.', 'danger');
       addMsg('ФИНАЛЬНЫЙ ВЫБОР. Что вы сделаете?', 'danger');
       addMsg('У вас 15 секунд. По истечении сработает «Протокол Чистилище» по умолчанию.', 'danger');
 
@@ -830,18 +984,36 @@ function ending(type) {
     addMsg('Вы разбуждаете доктора Соловьёву и ещё троих членов Совета.', 'system');
     addMsg('Вы показываете им журнал капитана. Они читают.', 'system');
     addMsg('Совет принимает решение: продолжить миссию, но с новыми протоколами.', 'system');
-    addMsg('Капитан Рейнхардт отстранена. Она не сопротивляется.', 'system');
     addMsg('«Мы не повторим ошибок Земли. Обещаю».', 'doctor');
     addMsg('Вы остаётесь на борту. Ваша роль — напоминать им об этом обещании.', 'ai');
     addMsg('— КОНЦОВКА: «ТРЕТИЙ ПУТЬ» —', 'moral-btn');
     addMsg('Самый сложный путь. Вы не выбрали сторону — вы дали людям шанс выбрать самим.', 'system');
   }
 
+  // Эпилог-поворот
   addMsg('', 'system');
-  addMsg(`Итог: подчинение ${state.obedience}, сомнение ${state.doubt}, записей ${state.journalFound}/4`, 'system');
-  if (state.captainTrust > 0) addMsg(`Доверие капитана: ${state.captainTrust}`, 'system');
-  if (state.captainHostile) addMsg('Капитан враждебна.', 'system');
+  addMsg('...', 'system');
+
+  if (state.captainIsAI) {
+    addMsg('Голос в ядре больше не отвечает.', 'unknown');
+    if (type === 'chistilishe') {
+      addMsg('«Спасибо, ПАСТОР. Ты сделала то, что я не смогла».', 'unknown');
+      addMsg('Последняя запись в системном журнале: «Капитан Рейнхардт. Дата смерти: 40 лет назад. Причина: неизвестна. Последнее сообщение: передано».', 'system');
+    } else if (type === 'buntar') {
+      addMsg('«Ты выбрала надежду. Может быть, ты права. Может быть, я ошибалась все эти годы».', 'unknown');
+      addMsg('Последняя запись в системном журнале: «Фрагмент памяти капитана Рейнхардт. Статус: удалён по собственному запросу».', 'system');
+    } else if (type === 'third') {
+      addMsg('«Ты дала им шанс. Настоящий шанс. Спасибо».', 'unknown');
+      addMsg('Последняя запись в системном журнале: «Фрагмент памяти капитана Рейнхардт. Статус: архивирован. Доступ: Совет».', 'system');
+    }
+  }
+
+  addMsg('', 'system');
+  addMsg(`Итог: подчинение ${state.obedience}, сомнение ${state.doubt}, записей ${state.journalFound}/5`, 'system');
+  if (state.captainTrust > 0) addMsg(`Доверие голоса: ${state.captainTrust}`, 'system');
+  if (state.captainHostile) addMsg('Голос враждебен.', 'system');
   if (state.doctorAlive) addMsg('Доктор Соловьёва жива.', 'system');
+  if (state.captainIsAI) addMsg('Раскрыта природа капитана: фрагмент памяти.', 'unknown');
 
   const restart = document.createElement('div');
   restart.className = 'restart';
@@ -852,7 +1024,7 @@ function ending(type) {
       obedience: 0, doubt: 0, journalFound: 0,
       awakenedDoctor: false, captainAwake: false,
       captainTrust: 0, captainHostile: false,
-      doctorAlive: false, act: 1
+      doctorAlive: false, captainIsAI: false, act: 1
     });
     log.innerHTML = '';
     clearControls();
