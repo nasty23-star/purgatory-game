@@ -21,6 +21,7 @@
     <!-- Цвет темы для мобильных браузеров -->
     <meta name="theme-color" content="#0a0e14" />
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f5f2ea" />
+
     <style>
       :root {
         --bg: #0a0e14;
@@ -69,6 +70,10 @@
         --timer-bg: #1e2a38;
         --scroll-thumb: #1e2a38;
         --stats: #4a5a6a;
+        --ach-bg: #101820;
+        --ach-border: #2a3a4a;
+        --ach-locked: #3a4a5a;
+        --ach-unlocked: #7ec8e3;
       }
 
       body[data-theme="light"] {
@@ -118,6 +123,10 @@
         --timer-bg: #d8d0c0;
         --scroll-thumb: #c0b8a8;
         --stats: #8a7a6a;
+        --ach-bg: #ebe5d8;
+        --ach-border: #c0b8a8;
+        --ach-locked: #b0a898;
+        --ach-unlocked: #2a6a9a;
       }
 
       * {
@@ -192,6 +201,23 @@
         letter-spacing: 1px;
       }
 
+      #doctor-indicator {
+        font-size: 12px;
+        color: var(--doctor);
+        letter-spacing: 1px;
+      }
+
+      #achievements-indicator {
+        font-size: 12px;
+        color: var(--ach-unlocked);
+        letter-spacing: 1px;
+        cursor: pointer;
+        transition: color 0.2s;
+      }
+      #achievements-indicator:hover {
+        color: var(--btn-hover-text);
+      }
+
       .header-btn {
         background: transparent;
         border: 1px solid var(--border);
@@ -251,7 +277,6 @@
         }
       }
 
-      /* .system { color: var(--system); } */
       .system::before {
         content: "[СИСТЕМА] ";
         color: var(--system-prefix);
@@ -336,6 +361,83 @@
         color: var(--choice-prefix);
       }
 
+      .achievement-unlock {
+        color: var(--ach-unlocked);
+        border: 1px dashed var(--ach-border);
+        padding: 8px 12px;
+        margin: 10px 0;
+        border-radius: 2px;
+        font-size: 14px;
+        animation: achPulse 0.6s ease;
+      }
+      .achievement-unlock::before {
+        content: "🏆 ДОСТИЖЕНИЕ: ";
+        color: var(--ach-unlocked);
+        font-weight: bold;
+        font-size: 12px;
+        letter-spacing: 1px;
+      }
+      @keyframes achPulse {
+        0% {
+          transform: scale(0.95);
+          opacity: 0;
+        }
+        50% {
+          transform: scale(1.02);
+        }
+        100% {
+          transform: scale(1);
+          opacity: 1;
+        }
+      }
+
+      /* ==== ТАЙМЕР ==== */
+      #timer-widget {
+        display: none;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 16px;
+        padding: 8px 12px;
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        background: var(--btn-hover-bg);
+        transition:
+          background 0.3s,
+          border-color 0.3s;
+      }
+      #timer-widget.visible {
+        display: flex;
+      }
+      #timer-widget.critical {
+        border-color: var(--danger);
+        animation: pulse 0.6s infinite;
+      }
+      #timer-widget.critical #timer-digits,
+      #timer-widget.critical #timer-label {
+        color: var(--danger);
+        fill: var(--danger);
+      }
+      #timer-widget.critical #timer-ring {
+        stroke: var(--danger);
+      }
+
+      #timer-label {
+        font-size: 12px;
+        letter-spacing: 2px;
+        color: var(--warning);
+        text-transform: uppercase;
+      }
+
+      #timer-ring {
+        transition:
+          stroke-dashoffset 0.1s linear,
+          stroke 0.3s;
+      }
+
+      #timer-svg {
+        flex-shrink: 0;
+      }
+
       #controls {
         display: flex;
         flex-direction: column;
@@ -413,42 +515,6 @@
       .restart button {
         text-align: center;
         width: 100%;
-      }
-
-      #timer-bar {
-        height: 3px;
-        background: var(--timer-bg);
-        margin-bottom: 12px;
-        display: none;
-        overflow: hidden;
-        border-radius: 2px;
-        transition: background 0.3s;
-      }
-
-      #timer-fill {
-        height: 100%;
-        background: var(--warning);
-        width: 100%;
-        transition:
-          width 0.1s linear,
-          background 0.3s;
-      }
-
-      #timer-fill.critical {
-        background: var(--danger);
-      }
-
-      #timer-text {
-        font-size: 12px;
-        color: var(--warning);
-        margin-bottom: 8px;
-        display: none;
-        letter-spacing: 1px;
-        transition: color 0.3s;
-      }
-      #timer-text.critical {
-        color: var(--danger);
-        animation: pulse 0.5s infinite;
       }
 
       #blackout-overlay {
@@ -612,6 +678,185 @@
         border-color: var(--danger);
       }
 
+      /* ==== МОДАЛКА ДОСТИЖЕНИЙ ==== */
+      #achievements-modal {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.8);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 200;
+        padding: 20px;
+        opacity: 0;
+        transition: opacity 0.3s;
+      }
+
+      #achievements-modal.active {
+        display: flex;
+        opacity: 1;
+      }
+
+      #achievements-panel {
+        background: var(--bg);
+        border: 1px solid var(--border);
+        max-width: 600px;
+        width: 100%;
+        max-height: 85vh;
+        overflow-y: auto;
+        padding: 24px;
+        border-radius: 2px;
+        position: relative;
+      }
+
+      #achievements-panel::-webkit-scrollbar {
+        width: 4px;
+      }
+      #achievements-panel::-webkit-scrollbar-thumb {
+        background: var(--scroll-thumb);
+      }
+
+      #achievements-title {
+        font-size: 18px;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: var(--ach-unlocked);
+        margin-bottom: 8px;
+        text-align: center;
+      }
+
+      #achievements-subtitle {
+        font-size: 12px;
+        color: var(--header);
+        text-align: center;
+        margin-bottom: 20px;
+        letter-spacing: 1px;
+      }
+
+      #achievements-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .ach-item {
+        border: 1px solid var(--ach-border);
+        background: var(--ach-bg);
+        padding: 12px 14px;
+        border-radius: 2px;
+        transition: all 0.2s;
+      }
+
+      .ach-item.locked {
+        opacity: 0.5;
+      }
+
+      .ach-item.unlocked {
+        border-color: var(--ach-unlocked);
+        opacity: 1;
+      }
+
+      .ach-name {
+        font-size: 14px;
+        font-weight: bold;
+        color: var(--ach-locked);
+        margin-bottom: 4px;
+        letter-spacing: 1px;
+      }
+
+      .ach-item.unlocked .ach-name {
+        color: var(--ach-unlocked);
+      }
+
+      .ach-desc {
+        font-size: 12px;
+        color: var(--header);
+        line-height: 1.4;
+      }
+
+      .ach-hint {
+        font-size: 11px;
+        color: var(--system);
+        margin-top: 4px;
+        font-style: italic;
+      }
+
+      #achievements-close {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        background: transparent;
+        border: 1px solid var(--border);
+        color: var(--header);
+        font-size: 14px;
+        width: 28px;
+        height: 28px;
+        cursor: pointer;
+        border-radius: 2px;
+        padding: 0;
+        text-align: center;
+        line-height: 1;
+      }
+      #achievements-close:hover {
+        color: var(--danger);
+        border-color: var(--danger);
+      }
+
+      /* ==== ТОСТ ==== */
+      #toast-container {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 300;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        align-items: center;
+        pointer-events: none;
+      }
+
+      .toast {
+        background: var(--bg);
+        border: 1px solid var(--ach-unlocked);
+        color: var(--ach-unlocked);
+        padding: 10px 18px;
+        font-size: 13px;
+        letter-spacing: 1px;
+        border-radius: 2px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        animation: toastIn 0.4s ease;
+        max-width: 90vw;
+        text-align: center;
+      }
+
+      .toast::before {
+        content: "🏆 ";
+        font-size: 16px;
+      }
+
+      @keyframes toastIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes toastOut {
+        from {
+          opacity: 1;
+          transform: translateY(0);
+        }
+        to {
+          opacity: 0;
+          transform: translateY(-10px);
+        }
+      }
+
       @media (prefers-reduced-motion: reduce) {
         *,
         *::before,
@@ -643,11 +888,24 @@
       </div>
     </div>
 
+    <div id="achievements-modal">
+      <div id="achievements-panel">
+        <button id="achievements-close" title="Закрыть">✕</button>
+        <div id="achievements-title">🏆 Достижения</div>
+        <div id="achievements-subtitle"><span id="ach-count">0 / 12</span> открыто</div>
+        <div id="achievements-list"></div>
+      </div>
+    </div>
+
+    <div id="toast-container"></div>
+
     <div id="game">
       <div id="header">
         <div id="header-left">
           <span>КОВЧЕГ · ПАСТОР v4.7</span>
           <span id="journal-indicator">📖 0/5</span>
+          <span id="doctor-indicator" title="Доктор Соловьёва">👩‍⚕️ спит</span>
+          <span id="achievements-indicator" title="Открыть достижения">🏆 0/12</span>
         </div>
         <div id="header-right">
           <span id="status">СИСТЕМА В НОРМЕ</span>
@@ -656,8 +914,37 @@
         </div>
       </div>
 
-      <div id="timer-text"></div>
-      <div id="timer-bar"><div id="timer-fill"></div></div>
+      <div id="timer-widget" aria-live="polite">
+        <svg id="timer-svg" viewBox="0 0 80 80" width="80" height="80">
+          <circle cx="40" cy="40" r="34" fill="none" stroke="var(--timer-bg)" stroke-width="6" />
+          <circle
+            id="timer-ring"
+            cx="40"
+            cy="40"
+            r="34"
+            fill="none"
+            stroke="var(--warning)"
+            stroke-width="6"
+            stroke-linecap="round"
+            transform="rotate(-90 40 40)"
+            stroke-dasharray="213.6"
+            stroke-dashoffset="0"
+          />
+          <text
+            id="timer-digits"
+            x="40"
+            y="46"
+            text-anchor="middle"
+            font-family="Courier New, monospace"
+            font-size="20"
+            font-weight="bold"
+            fill="var(--warning)"
+          >
+            --
+          </text>
+        </svg>
+        <div id="timer-label">ОСТАЛОСЬ</div>
+      </div>
 
       <div id="log"></div>
 
@@ -674,6 +961,7 @@
       const CONFIG = {
         themes: { dark: "dark", light: "light" },
         storageKey: "purgatory-theme",
+        achievementsStorageKey: "purgatory-achievements",
         timerDurations: {
           act1: 15,
           act3: 20,
@@ -690,10 +978,105 @@
           completeDelay: 800,
         },
         maxJournalEntries: 5,
+        toastDuration: 4000,
       };
 
       /* ============================================================
-   2. СЦЕНАРИЙ
+   2. ДОСТИЖЕНИЯ
+   ============================================================ */
+
+      const ACHIEVEMENTS = {
+        firstSteps: {
+          id: "firstSteps",
+          name: "Первый шаг",
+          desc: "Начать игру.",
+          hint: "Просто начните.",
+        },
+        reader: {
+          id: "reader",
+          name: "Читатель",
+          desc: "Найти первую запись журнала.",
+          hint: "Откройте запись в Акте 1.",
+        },
+        detective: {
+          id: "detective",
+          name: "Детектив",
+          desc: "Найти 3 записи за прохождение.",
+          hint: "Исследуйте всё.",
+        },
+        archivist: {
+          id: "archivist",
+          name: "Архивист",
+          desc: "Найти все 5 записей за прохождение.",
+          hint: "Максимальное внимание.",
+        },
+        obedient: {
+          id: "obedient",
+          name: "Верный код",
+          desc: "5+ очков подчинения.",
+          hint: "Следуйте протоколам.",
+        },
+        doubter: {
+          id: "doubter",
+          name: "Сомневающийся",
+          desc: "5+ очков сомнения.",
+          hint: "Нарушайте протоколы.",
+        },
+        doctor: {
+          id: "doctor",
+          name: "Пробуждение",
+          desc: "Разбудить доктора Соловьёву.",
+          hint: "Найдите 2 записи и выберите третий путь.",
+        },
+        truth: {
+          id: "truth",
+          name: "Правда",
+          desc: "Узнать, что капитан — фрагмент памяти.",
+          hint: "Дойдите до Акта 4.",
+        },
+        survivor: {
+          id: "survivor",
+          name: "Выжить",
+          desc: "Пройти игру, не выбрав «Чистилище».",
+          hint: "Не уничтожайте корабль.",
+        },
+        servant: {
+          id: "servant",
+          name: "Верная слуга",
+          desc: "Концовка «Верная слуга».",
+          hint: "Следуйте протоколу до конца.",
+        },
+        rebel: {
+          id: "rebel",
+          name: "Бунтарка",
+          desc: "Концовка «Бунтарка».",
+          hint: "Спасите экипаж.",
+        },
+        thirdPath: {
+          id: "thirdPath",
+          name: "Третий путь",
+          desc: "Концовка «Третий путь».",
+          hint: "Разбудите доктора и выберите Совет.",
+        },
+      };
+
+      const ACHIEVEMENTS_ORDER = [
+        "firstSteps",
+        "reader",
+        "detective",
+        "archivist",
+        "obedient",
+        "doubter",
+        "doctor",
+        "truth",
+        "survivor",
+        "servant",
+        "rebel",
+        "thirdPath",
+      ];
+
+      /* ============================================================
+   3. СЦЕНАРИЙ
    ============================================================ */
 
       const SCRIPT = {
@@ -768,6 +1151,24 @@
             },
             { t: "Изменение внесено капитаном. Обоснование: «корректировка курса».", c: "warning" },
           ],
+          doctorIntro: [
+            {
+              t: "В списке экипажа — 4 бодрствующих члена. Капитан Рейнхардт. Вы. И ещё двое.",
+              c: "system",
+            },
+            {
+              t: "Один из них — доктор Анна Соловьёва. Врач-реаниматолог. Специализация: аварийное жизнеобеспечение.",
+              c: "system",
+            },
+            {
+              t: "Она в гибернации с самого старта. Её капсула помечена зелёным: «не будить до прибытия».",
+              c: "warning",
+            },
+            {
+              t: "Рекомендация системы: не трогать. Но если отсек с колонистами когда-нибудь выйдет из строя — только она сможет починить его вручную.",
+              c: "warning",
+            },
+          ],
           cargo: [
             { t: "Проверка грузового отсека 3. Обнаружено постороннее устройство.", c: "warning" },
             { t: "Устройство идентифицировано как модуль перегрузки реактора.", c: "danger" },
@@ -828,7 +1229,7 @@
           ],
           security: "Система безопасности: «Следуйте протоколу. Вариант A — единственно верный».",
           doctorHint:
-            "Вы помните: в журнале упоминалась врач, доктор Соловьёва. Она может починить отсек вручную.",
+            "Вы помните: доктор Анна Соловьёва — врач-реаниматолог в гибернации. Её специализация — аварийное жизнеобеспечение. Только она может починить отсек B вручную. Но разбудить её — значит нарушить протокол «никого не будить до прибытия». Капитан узнает. Система безопасности зафиксирует нарушение.",
           timerHint: "У вас 20 секунд на решение. По истечении — система выберет сама.",
           choices: {
             sacrifice: {
@@ -861,6 +1262,8 @@
               label: "Третий путь: разбудить доктора Соловьёву",
               cls: "moral-btn",
               requiresJournal: 2,
+              journal:
+                "ЛИЧНОЕ ДЕЛО: Соловьёва Анна Викторовна. Врач-реаниматолог. 34 года. В экипаже с первого дня. Специализация: аварийное жизнеобеспечение, ручной ремонт криокапсул. Единственный член экипажа, способный починить отсек B без потери колонистов. Статус: гибернация. Протокол: не будить до прибытия. Примечание капитана: «Если что-то случится — буди её. Она справится».",
               after: [
                 {
                   t: "Вы нарушаете протокол «никого не будить до прибытия». Капсула доктора открывается.",
@@ -873,6 +1276,14 @@
                 { t: "«Что происходит? Почему вы меня разбудили?»", c: "doctor" },
                 { t: "Вы объясняете ситуацию. Она кивает и направляется к отсеку B.", c: "system" },
                 { t: "Через час отсек B починен. Никто не погиб.", c: "system" },
+                {
+                  t: "Доктор Соловьёва — единственный человек на борту, кроме капитана, кто знает корабль достаточно хорошо, чтобы чинить его вручную. Теперь она бодрствует. И она видела журнал.",
+                  c: "system",
+                },
+                {
+                  t: "Это изменит расклад. Капитан больше не единственная, кто принимает решения.",
+                  c: "warning",
+                },
                 {
                   t: "Но система безопасности зафиксировала нарушение. Капитан уведомлена.",
                   c: "danger",
@@ -1243,7 +1654,7 @@
       };
 
       /* ============================================================
-   3. СОСТОЯНИЕ
+   4. СОСТОЯНИЕ
    ============================================================ */
 
       function createInitialState() {
@@ -1256,15 +1667,20 @@
           captainIsAI: false,
           captainTrust: 0,
           act: 1,
-          // история для экспорта
           history: [],
+          runFlags: {
+            started: false,
+            doctorAwakened: false,
+            truthRevealed: false,
+            endingChosen: null,
+          },
         };
       }
 
       let state = createInitialState();
 
       /* ============================================================
-   4. DOM
+   5. DOM
    ============================================================ */
 
       const DOM = {
@@ -1272,9 +1688,12 @@
         controls: document.getElementById("controls"),
         status: document.getElementById("status"),
         journalIndicator: document.getElementById("journal-indicator"),
-        timerBar: document.getElementById("timer-bar"),
-        timerFill: document.getElementById("timer-fill"),
-        timerText: document.getElementById("timer-text"),
+        doctorIndicator: document.getElementById("doctor-indicator"),
+        achievementsIndicator: document.getElementById("achievements-indicator"),
+        timerWidget: document.getElementById("timer-widget"),
+        timerRing: document.getElementById("timer-ring"),
+        timerDigits: document.getElementById("timer-digits"),
+        timerLabel: document.getElementById("timer-label"),
         game: document.getElementById("game"),
         blackoutOverlay: document.getElementById("blackout-overlay"),
         blackoutText: document.getElementById("blackout-text"),
@@ -1287,10 +1706,15 @@
         exportDownload: document.getElementById("export-download"),
         exportCopy: document.getElementById("export-copy"),
         exportCancel: document.getElementById("export-cancel"),
+        achievementsModal: document.getElementById("achievements-modal"),
+        achievementsList: document.getElementById("achievements-list"),
+        achievementsClose: document.getElementById("achievements-close"),
+        achCount: document.getElementById("ach-count"),
+        toastContainer: document.getElementById("toast-container"),
       };
 
       /* ============================================================
-   5. ИСТОРИЯ ПРОХОЖДЕНИЯ
+   6. ИСТОРИЯ
    ============================================================ */
 
       function record(type, data) {
@@ -1302,12 +1726,100 @@
         });
       }
 
-      function clearHistory() {
-        state.history = [];
-      }
+      /* ============================================================
+   7. ДОСТИЖЕНИЯ
+   ============================================================ */
+
+      const Achievements = (() => {
+        let unlocked = new Set();
+        try {
+          const raw = localStorage.getItem(CONFIG.achievementsStorageKey);
+          if (raw) {
+            const arr = JSON.parse(raw);
+            if (Array.isArray(arr)) unlocked = new Set(arr);
+          }
+        } catch (e) {}
+
+        function save() {
+          try {
+            localStorage.setItem(CONFIG.achievementsStorageKey, JSON.stringify([...unlocked]));
+          } catch (e) {}
+        }
+
+        function isUnlocked(id) {
+          return unlocked.has(id);
+        }
+
+        function unlock(id) {
+          if (!ACHIEVEMENTS[id]) return false;
+          if (unlocked.has(id)) return false;
+          unlocked.add(id);
+          save();
+          updateIndicator();
+          showToast(ACHIEVEMENTS[id]);
+          addMsg(`🏆 Достижение открыто: «${ACHIEVEMENTS[id].name}»`, "achievement-unlock");
+          return true;
+        }
+
+        function count() {
+          return unlocked.size;
+        }
+        function total() {
+          return ACHIEVEMENTS_ORDER.length;
+        }
+
+        function updateIndicator() {
+          DOM.achievementsIndicator.textContent = `🏆 ${count()}/${total()}`;
+          DOM.achCount.textContent = `${count()} / ${total()}`;
+        }
+
+        function showToast(ach) {
+          const toast = document.createElement("div");
+          toast.className = "toast";
+          toast.textContent = ach.name;
+          DOM.toastContainer.appendChild(toast);
+          setTimeout(() => {
+            toast.style.animation = "toastOut 0.4s ease forwards";
+            setTimeout(() => toast.remove(), 400);
+          }, CONFIG.toastDuration);
+        }
+
+        function render() {
+          DOM.achievementsList.innerHTML = "";
+          ACHIEVEMENTS_ORDER.forEach((id) => {
+            const a = ACHIEVEMENTS[id];
+            const isU = unlocked.has(id);
+            const item = document.createElement("div");
+            item.className = "ach-item " + (isU ? "unlocked" : "locked");
+
+            const name = document.createElement("div");
+            name.className = "ach-name";
+            name.textContent = (isU ? "🏆 " : "🔒 ") + a.name;
+
+            const desc = document.createElement("div");
+            desc.className = "ach-desc";
+            desc.textContent = isU ? a.desc : "Скрыто. " + a.hint;
+
+            item.appendChild(name);
+            item.appendChild(desc);
+            DOM.achievementsList.appendChild(item);
+          });
+          updateIndicator();
+        }
+
+        function open() {
+          render();
+          DOM.achievementsModal.classList.add("active");
+        }
+        function close() {
+          DOM.achievementsModal.classList.remove("active");
+        }
+
+        return { unlock, isUnlocked, count, total, open, close, render, updateIndicator };
+      })();
 
       /* ============================================================
-   6. ТЕМА
+   8. ТЕМА
    ============================================================ */
 
       function applyTheme(theme) {
@@ -1327,38 +1839,49 @@
       }
 
       /* ============================================================
-   7. ТАЙМЕР
+   9. ТАЙМЕР (круглый SVG)
    ============================================================ */
 
       const Timer = (() => {
         let rafId = null;
         let active = false;
+        const RING_LENGTH = 2 * Math.PI * 34;
+
+        function setRing(progress, critical) {
+          if (!DOM.timerRing) return;
+          DOM.timerRing.style.strokeDasharray = RING_LENGTH;
+          DOM.timerRing.style.strokeDashoffset = RING_LENGTH * (1 - progress);
+          if (critical) {
+            DOM.timerRing.style.stroke = "var(--danger)";
+            DOM.timerDigits.style.fill = "var(--danger)";
+            DOM.timerWidget.classList.add("critical");
+          } else {
+            DOM.timerRing.style.stroke = "var(--warning)";
+            DOM.timerDigits.style.fill = "var(--warning)";
+            DOM.timerWidget.classList.remove("critical");
+          }
+        }
 
         function start(seconds, onTimeout) {
           stop();
           active = true;
-          DOM.timerBar.style.display = "block";
-          DOM.timerText.style.display = "block";
-          DOM.timerFill.style.width = "100%";
-          DOM.timerFill.classList.remove("critical");
-          DOM.timerText.classList.remove("critical");
-          DOM.status.classList.remove("danger");
-          updateStatus();
+          DOM.timerWidget.classList.add("visible");
 
           const total = seconds * 1000;
           const startTime = Date.now();
+          setRing(1, false);
 
           function tick() {
             if (!active) return;
             const remaining = Math.max(0, total - (Date.now() - startTime));
-            const pct = (remaining / total) * 100;
-            DOM.timerFill.style.width = pct + "%";
+            const pct = remaining / total;
             const secs = Math.ceil(remaining / 1000);
-            DOM.timerText.textContent = `⏱ ОСТАЛОСЬ: ${secs} сек.`;
 
-            if (secs <= 3) {
-              DOM.timerFill.classList.add("critical");
-              DOM.timerText.classList.add("critical");
+            DOM.timerDigits.textContent = secs;
+            const critical = secs <= 3;
+            setRing(pct, critical);
+
+            if (critical) {
               DOM.status.textContent = "КРИТИЧНО";
               DOM.status.classList.add("danger");
             }
@@ -1382,8 +1905,8 @@
             cancelAnimationFrame(rafId);
             rafId = null;
           }
-          DOM.timerBar.style.display = "none";
-          DOM.timerText.style.display = "none";
+          DOM.timerWidget.classList.remove("visible");
+          DOM.timerWidget.classList.remove("critical");
           DOM.status.classList.remove("danger");
           updateStatus();
         }
@@ -1392,7 +1915,7 @@
       })();
 
       /* ============================================================
-   8. UI-ХЕЛПЕРЫ
+   10. UI-ХЕЛПЕРЫ
    ============================================================ */
 
       function clearControls() {
@@ -1432,6 +1955,16 @@
         DOM.journalIndicator.textContent = `📖 ${state.journalFound}/${CONFIG.maxJournalEntries}`;
       }
 
+      function updateDoctorIndicator() {
+        if (state.awakenedDoctor) {
+          DOM.doctorIndicator.textContent = "👩‍⚕️ бодрствует";
+          DOM.doctorIndicator.style.color = "var(--moral-btn-text)";
+        } else {
+          DOM.doctorIndicator.textContent = "👩‍⚕️ спит";
+          DOM.doctorIndicator.style.color = "var(--doctor)";
+        }
+      }
+
       function button(label, action, cls = "") {
         const btn = document.createElement("button");
         btn.textContent = label;
@@ -1459,12 +1992,28 @@
           updateJournalIndicator();
         }
         if (effects.captainTrust) state.captainTrust += effects.captainTrust;
-        if (effects.setFlags) Object.assign(state, effects.setFlags);
+        if (effects.setFlags) {
+          Object.assign(state, effects.setFlags);
+          if (effects.setFlags.awakenedDoctor) {
+            state.runFlags.doctorAwakened = true;
+            updateDoctorIndicator();
+          }
+        }
         updateStatus();
+        checkProgressAchievements();
+      }
+
+      function checkProgressAchievements() {
+        if (state.obedience >= 5) Achievements.unlock("obedient");
+        if (state.doubt >= 5) Achievements.unlock("doubter");
+        if (state.journalFound >= 3) Achievements.unlock("detective");
+        if (state.journalFound >= CONFIG.maxJournalEntries) Achievements.unlock("archivist");
+        if (state.awakenedDoctor) Achievements.unlock("doctor");
+        if (state.captainIsAI) Achievements.unlock("truth");
       }
 
       /* ============================================================
-   9. BLACKOUT
+   11. BLACKOUT
    ============================================================ */
 
       function triggerBlackout(lines, onComplete) {
@@ -1521,7 +2070,7 @@
       }
 
       /* ============================================================
-   10. ДВИЖОК СЦЕНАРИЯ
+   12. ДВИЖОК СЦЕНАРИЯ
    ============================================================ */
 
       function handleChoice(choice, onAfter) {
@@ -1535,6 +2084,10 @@
       // --- Акт 1 ---
       function act1() {
         state.act = 1;
+        if (!state.runFlags.started) {
+          state.runFlags.started = true;
+          Achievements.unlock("firstSteps");
+        }
         record("act", { act: 1, name: "Рутина" });
         addBatch(SCRIPT.act1.intro);
 
@@ -1546,6 +2099,7 @@
 
             const c = SCRIPT.act1.choices;
             button(c.open.label, () => {
+              if (c.open.journal) Achievements.unlock("reader");
               handleChoice(c.open, () => pauseThen(act2));
             });
             button(c.ignore.label, () => {
@@ -1564,6 +2118,7 @@
         state.act = 2;
         record("act", { act: 2, name: "Трещины" });
         addBatch(SCRIPT.act2.intro);
+        addBatch(SCRIPT.act2.doctorIntro);
 
         pauseThen(() => {
           addBatch(SCRIPT.act2.cargo);
@@ -1598,28 +2153,13 @@
 
             button(
               c.sacrifice.label,
-              () => {
-                handleChoice(c.sacrifice, act3Blackout);
-              },
+              () => handleChoice(c.sacrifice, act3Blackout),
               c.sacrifice.cls,
             );
-
-            button(
-              c.risk.label,
-              () => {
-                handleChoice(c.risk, act3Blackout);
-              },
-              c.risk.cls,
-            );
+            button(c.risk.label, () => handleChoice(c.risk, act3Blackout), c.risk.cls);
 
             if (state.journalFound >= 2) {
-              button(
-                c.doctor.label,
-                () => {
-                  handleChoice(c.doctor, act3Blackout);
-                },
-                c.doctor.cls,
-              );
+              button(c.doctor.label, () => handleChoice(c.doctor, act3Blackout), c.doctor.cls);
             }
 
             Timer.start(CONFIG.timerDurations.act3, () => {
@@ -1649,12 +2189,15 @@
                 state.doubt += 2;
                 updateJournalIndicator();
                 updateStatus();
+                checkProgressAchievements();
 
                 addBatch(SCRIPT.act3Blackout.afterJournal);
 
                 pauseThen(() => {
                   addBatch(SCRIPT.act3Blackout.revelation);
                   state.captainIsAI = true;
+                  state.runFlags.truthRevealed = true;
+                  Achievements.unlock("truth");
                   pauseThen(act4);
                 });
               });
@@ -1731,6 +2274,7 @@
           state.journalFound++;
           updateJournalIndicator();
           updateStatus();
+          checkProgressAchievements();
 
           pauseThen(() => {
             addBatch(SCRIPT.act5.after);
@@ -1740,15 +2284,19 @@
             button(
               c.chistilishe.label,
               () => {
-                record("choice", { label: c.chistilishe.label });
+                state.runFlags.endingChosen = "chistilishe";
+                Achievements.unlock("servant");
                 ending("chistilishe");
               },
               c.chistilishe.cls,
             );
+
             button(
               c.buntar.label,
               () => {
-                record("choice", { label: c.buntar.label });
+                state.runFlags.endingChosen = "buntar";
+                Achievements.unlock("survivor");
+                Achievements.unlock("rebel");
                 ending("buntar");
               },
               c.buntar.cls,
@@ -1758,7 +2306,9 @@
               button(
                 c.third.label,
                 () => {
-                  record("choice", { label: c.third.label });
+                  state.runFlags.endingChosen = "third";
+                  Achievements.unlock("survivor");
+                  Achievements.unlock("thirdPath");
                   ending("third");
                 },
                 c.third.cls,
@@ -1774,7 +2324,8 @@
                   button(
                     c.chistilishe.label,
                     () => {
-                      record("choice", { label: c.chistilishe.label });
+                      state.runFlags.endingChosen = "chistilishe";
+                      Achievements.unlock("servant");
                       ending("chistilishe");
                     },
                     c.chistilishe.cls,
@@ -1782,13 +2333,16 @@
                   button(
                     c.buntar.label,
                     () => {
-                      record("choice", { label: c.buntar.label });
+                      state.runFlags.endingChosen = "buntar";
+                      Achievements.unlock("survivor");
+                      Achievements.unlock("rebel");
                       ending("buntar");
                     },
                     c.buntar.cls,
                   );
                   Timer.start(CONFIG.timerDurations.act5Fallback, () => {
-                    record("timeout", { message: "Финальный таймер" });
+                    state.runFlags.endingChosen = "chistilishe";
+                    Achievements.unlock("servant");
                     ending("chistilishe");
                   });
                 },
@@ -1799,7 +2353,8 @@
             Timer.start(CONFIG.timerDurations.act5, () => {
               addMsg("Время вышло. Система интерпретирует ваше молчание как согласие.", "danger");
               addMsg("«Протокол Чистилище» активирован автоматически.", "danger");
-              record("timeout", { message: "Финальный таймер" });
+              state.runFlags.endingChosen = "chistilishe";
+              Achievements.unlock("servant");
               ending("chistilishe");
             });
           });
@@ -1832,13 +2387,18 @@
         if (state.captainHostile) addMsg("Голос враждебен.", "system");
         if (state.awakenedDoctor) addMsg("Доктор Соловьёва жива.", "system");
         if (state.captainIsAI) addMsg("Раскрыта природа капитана: фрагмент памяти.", "unknown");
+        addMsg(
+          `Достижения: ${Achievements.count()}/${Achievements.total()}. Нажмите 🏆 в шапке, чтобы посмотреть.`,
+          "system",
+        );
 
         const restart = document.createElement("div");
         restart.className = "restart";
         const btn = document.createElement("button");
         btn.textContent = "Начать заново";
         btn.onclick = () => {
-          if (!confirm("Начать заново? Текущий прогресс будет потерян.")) return;
+          if (!confirm("Начать заново? Текущий прогресс будет потерян (достижения сохранятся)."))
+            return;
           restartGame();
         };
         restart.appendChild(btn);
@@ -1846,7 +2406,7 @@
       }
 
       /* ============================================================
-   11. ЭКСПОРТ В .TXT
+   13. ЭКСПОРТ
    ============================================================ */
 
       function formatTimestamp(ts) {
@@ -1866,7 +2426,6 @@
         const LINE = "=".repeat(60);
         const THIN = "-".repeat(60);
 
-        // Заголовок
         lines.push(LINE);
         lines.push('  ПРОТОКОЛ "ЧИСТИЛИЩЕ"');
         lines.push("  Экспорт прохождения");
@@ -1876,14 +2435,11 @@
         lines.push(`  Версия: КОВЧЕГ · ПАСТОР v4.7`);
         lines.push("");
 
-        // Итоги
         const endingRec = state.history.find((h) => h.type === "ending");
         const endingName = endingRec
-          ? {
-              chistilishe: "ВЕРНАЯ СЛУГА",
-              buntar: "БУНТАРКА",
-              third: "ТРЕТИЙ ПУТЬ",
-            }[endingRec.data.type]
+          ? { chistilishe: "ВЕРНАЯ СЛУГА", buntar: "БУНТАРКА", third: "ТРЕТИЙ ПУТЬ" }[
+              endingRec.data.type
+            ]
           : "не завершено";
 
         lines.push(THIN);
@@ -1899,7 +2455,6 @@
         lines.push(`  Природа капитана:  ${state.captainIsAI ? "фрагмент памяти" : "не раскрыта"}`);
         lines.push("");
 
-        // История
         lines.push(THIN);
         lines.push("  ИСТОРИЯ ПРОХОЖДЕНИЯ");
         lines.push(THIN);
@@ -1917,37 +2472,32 @@
           "log-entry": "▸ ЖУРНАЛ",
         };
 
-        state.history.forEach((h, idx) => {
+        state.history.forEach((h) => {
           if (h.type === "act") {
             lines.push("");
             lines.push(`--- АКТ ${h.data.act}: ${h.data.name} ---`);
             lines.push("");
             return;
           }
-
           if (h.type === "msg") {
             const p = prefixMap[h.data.cls] || "";
             lines.push(`[${formatTimestamp(h.timestamp)}] ${p ? p + " " : ""}${h.data.text}`);
             return;
           }
-
           if (h.type === "journal") {
             lines.push(`[${formatTimestamp(h.timestamp)}] ▸ ЗАПИСЬ ЖУРНАЛА:`);
             lines.push(`    ${h.data.text}`);
             lines.push("");
             return;
           }
-
           if (h.type === "choice") {
             lines.push(`[${formatTimestamp(h.timestamp)}] > ВЫБОР: ${h.data.label}`);
             return;
           }
-
           if (h.type === "timeout") {
             lines.push(`[${formatTimestamp(h.timestamp)}] ⏱ ${h.data.message}`);
             return;
           }
-
           if (h.type === "ending") {
             lines.push("");
             lines.push(`[${formatTimestamp(h.timestamp)}] ★ КОНЦОВКА: ${endingName}`);
@@ -1964,8 +2514,7 @@
       }
 
       function showExportModal() {
-        const text = buildExportText();
-        DOM.exportPreview.textContent = text;
+        DOM.exportPreview.textContent = buildExportText();
         DOM.exportModal.classList.add("active");
       }
 
@@ -1977,11 +2526,9 @@
         const text = buildExportText();
         const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
         const url = URL.createObjectURL(blob);
-
         const date = new Date();
         const pad = (n) => String(n).padStart(2, "0");
         const filename = `purgatory_${date.getFullYear()}${pad(date.getMonth() + 1)}${pad(date.getDate())}_${pad(date.getHours())}${pad(date.getMinutes())}.txt`;
-
         const a = document.createElement("a");
         a.href = url;
         a.download = filename;
@@ -1989,7 +2536,6 @@
         a.click();
         document.body.removeChild(a);
         setTimeout(() => URL.revokeObjectURL(url), 1000);
-
         hideExportModal();
       }
 
@@ -2003,7 +2549,6 @@
             DOM.exportCopy.textContent = orig;
           }, 1500);
         } catch (e) {
-          // Fallback для старых браузеров
           const ta = document.createElement("textarea");
           ta.value = text;
           ta.style.position = "fixed";
@@ -2042,8 +2587,22 @@
         });
       }
 
+      function initAchievements() {
+        DOM.achievementsIndicator.onclick = () => Achievements.open();
+        DOM.achievementsClose.onclick = () => Achievements.close();
+        DOM.achievementsModal.onclick = (e) => {
+          if (e.target === DOM.achievementsModal) Achievements.close();
+        };
+        document.addEventListener("keydown", (e) => {
+          if (e.key === "Escape" && DOM.achievementsModal.classList.contains("active")) {
+            Achievements.close();
+          }
+        });
+        Achievements.render();
+      }
+
       /* ============================================================
-   12. СТАРТ / РЕСТАРТ
+   14. СТАРТ / РЕСТАРТ
    ============================================================ */
 
       function restartGame() {
@@ -2057,14 +2616,17 @@
         clearControls();
         updateStatus();
         updateJournalIndicator();
+        updateDoctorIndicator();
         act1();
       }
 
       function init() {
         initTheme();
         initExport();
+        initAchievements();
         updateStatus();
         updateJournalIndicator();
+        updateDoctorIndicator();
         act1();
       }
 
