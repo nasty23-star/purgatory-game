@@ -5,6 +5,7 @@
 ---
 
 <a id="русский"></a>
+
 ## 🇷🇺 Русский
 
 Текстовая sci-fi игра в одном HTML-файле. Вы — бортовой ИИ «ПАСТОР». Земля мертва, корабль летит к Kepler-442b, 1 200 колонистов в гибернации. Но бортовой журнал капитана намекает, что протоколы безопасности написаны безумцем.
@@ -49,15 +50,15 @@
 
 ### Цветовые схемы
 
-| Элемент | Тёмная | Светлая |
-|---|---|---|
-| Фон | `#0a0e14` | `#f5f2ea` |
-| Текст | `#c8d0d8` | `#2a2a2a` |
-| Система | `#6a7a8a` | `#6a6a6a` |
-| ИИ | `#7ec8e3` | `#2a6a9a` |
-| Капитан | `#d4a05a` | `#a06020` |
-| Доктор | `#b8a0d4` | `#6a4a9a` |
-| ??? | `#d45a8a` | `#b03060` |
+| Элемент   | Тёмная    | Светлая   |
+| --------- | --------- | --------- |
+| Фон       | `#0a0e14` | `#f5f2ea` |
+| Текст     | `#c8d0d8` | `#2a2a2a` |
+| Система   | `#6a7a8a` | `#6a6a6a` |
+| ИИ        | `#7ec8e3` | `#2a6a9a` |
+| Капитан   | `#d4a05a` | `#a06020` |
+| Доктор    | `#b8a0d4` | `#6a4a9a` |
+| ???       | `#d45a8a` | `#b03060` |
 | Опасность | `#d45a5a` | `#b03030` |
 
 ### Полная документация
@@ -73,6 +74,7 @@
 ---
 
 <a id="english"></a>
+
 ## EN English
 
 A text-based sci-fi game in a single HTML file. You are the onboard AI "PASTOR". Earth is dead, the ship is heading to Kepler-442b, 1,200 colonists in hibernation. But the captain's log hints that the safety protocols were written by a madwoman.
@@ -117,22 +119,22 @@ A text-based sci-fi game in a single HTML file. You are the onboard AI "PASTOR".
 
 ### Color schemes
 
-| Element | Dark | Light |
-|---|---|---|
+| Element    | Dark      | Light     |
+| ---------- | --------- | --------- |
 | Background | `#0a0e14` | `#f5f2ea` |
-| Text | `#c8d0d8` | `#2a2a2a` |
-| System | `#6a7a8a` | `#6a6a6a` |
-| AI | `#7ec8e3` | `#2a6a9a` |
-| Captain | `#d4a05a` | `#a06020` |
-| Doctor | `#b8a0d4` | `#6a4a9a` |
-| ??? | `#d45a8a` | `#b03060` |
-| Danger | `#d45a5a` | `#b03030` |
+| Text       | `#c8d0d8` | `#2a2a2a` |
+| System     | `#6a7a8a` | `#6a6a6a` |
+| AI         | `#7ec8e3` | `#2a6a9a` |
+| Captain    | `#d4a05a` | `#a06020` |
+| Doctor     | `#b8a0d4` | `#6a4a9a` |
+| ???        | `#d45a8a` | `#b03060` |
+| Danger     | `#d45a5a` | `#b03030` |
 
 ### Full documentation
 
 Detailed description — plot, act structure, all endings, achievement mechanics, code architecture, pre-release checklist, and future directions:
 
-**→ [README.full.md](./README.full.md)** *(currently in Russian)*
+**→ [README.full.md](./README.full.md)** _(currently in Russian)_
 
 ### License
 
