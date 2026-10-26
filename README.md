@@ -1,6 +1,6 @@
 # Протокол «Чистилище» · Purgatory Protocol
 
-[🇷🇺 Русский](#русский) · [🇬🇧 English](#english)
+[🇷🇺 Русский](#русский) · [EN English](#english)
 
 ---
 
@@ -73,7 +73,7 @@
 ---
 
 <a id="english"></a>
-## 🇬🇧 English
+## EN English
 
 A text-based sci-fi game in a single HTML file. You are the onboard AI "PASTOR". Earth is dead, the ship is heading to Kepler-442b, 1,200 colonists in hibernation. But the captain's log hints that the safety protocols were written by a madwoman.
 
