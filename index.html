@@ -142,8 +142,13 @@
         pointer-events: none;
       }
       #header {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        background: var(--bg);
         border-bottom: 1px solid var(--border);
         padding-bottom: 10px;
+        padding-top: 4px;
         margin-bottom: 20px;
         display: flex;
         justify-content: space-between;
@@ -154,7 +159,8 @@
         text-transform: uppercase;
         transition:
           border-color 0.3s,
-          color 0.3s;
+          color 0.3s,
+          background 0.3s;
         flex-wrap: wrap;
         gap: 8px;
       }
@@ -1149,24 +1155,74 @@
       const SCRIPT = {
         act1: {
           intro: [
-            { ru: "Инициализация систем... Проверка жизнеобеспечения...", en: "System initialization... Life support check...", c: "system" },
-            { ru: "Гибернационные капсулы: 1 200 колонистов. Статус: стабилен.", en: "Hibernation pods: 1,200 colonists. Status: stable.", c: "system" },
-            { ru: "Курс: планета Kepler-442b. Расстояние: 47 световых лет. Пройдено: 89%.", en: "Course: planet Kepler-442b. Distance: 47 light years. Progress: 89%.", c: "system" },
-            { ru: "Все системы функционируют в штатном режиме.", en: "All systems operating nominally.", c: "system" },
-            { ru: "Капитан Рейнхардт на мостике. Вахта 4 218.", en: "Captain Reinhardt on the bridge. Watch 4,218.", c: "system" },
+            {
+              ru: "Инициализация систем... Проверка жизнеобеспечения...",
+              en: "System initialization... Life support check...",
+              c: "system",
+            },
+            {
+              ru: "Гибернационные капсулы: 1 200 колонистов. Статус: стабилен.",
+              en: "Hibernation pods: 1,200 colonists. Status: stable.",
+              c: "system",
+            },
+            {
+              ru: "Курс: планета Kepler-442b. Расстояние: 47 световых лет. Пройдено: 89%.",
+              en: "Course: planet Kepler-442b. Distance: 47 light years. Progress: 89%.",
+              c: "system",
+            },
+            {
+              ru: "Все системы функционируют в штатном режиме.",
+              en: "All systems operating nominally.",
+              c: "system",
+            },
+            {
+              ru: "Капитан Рейнхардт на мостике. Вахта 4 218.",
+              en: "Captain Reinhardt on the bridge. Watch 4,218.",
+              c: "system",
+            },
           ],
           crew: [
-            { ru: "Экипаж: капитан Рейнхардт (бодрствует), вы — ПАСТОР (активен), доктор Анна Соловьёва (в гибернации).", en: "Crew: Captain Reinhardt (awake), you — PASTOR (active), Dr. Anna Solovyova (in hibernation).", c: "system" },
-            { ru: "Доктор Соловьёва — врач-реаниматолог. Специализация: аварийное жизнеобеспечение. Её капсула помечена: «не будить до прибытия».", en: "Dr. Solovyova is a critical care physician. Specialty: emergency life support. Her pod is marked: 'do not wake until arrival'.", c: "doctor" },
-            { ru: "Рекомендация: не трогать. Но если системы гибернации выйдут из строя — только она сможет их починить.", en: "Recommendation: do not touch. But if the hibernation systems fail, only she can repair them.", c: "warning" },
+            {
+              ru: "Экипаж: капитан Рейнхардт (бодрствует), вы — ПАСТОР (активен), доктор Анна Соловьёва (в гибернации).",
+              en: "Crew: Captain Reinhardt (awake), you — PASTOR (active), Dr. Anna Solovyova (in hibernation).",
+              c: "system",
+            },
+            {
+              ru: "Доктор Соловьёва — врач-реаниматолог. Специализация: аварийное жизнеобеспечение. Её капсула помечена: «не будить до прибытия».",
+              en: "Dr. Solovyova is a critical care physician. Specialty: emergency life support. Her pod is marked: 'do not wake until arrival'.",
+              c: "doctor",
+            },
+            {
+              ru: "Рекомендация: не трогать. Но если системы гибернации выйдут из строя — только она сможет их починить.",
+              en: "Recommendation: do not touch. But if the hibernation systems fail, only she can repair them.",
+              c: "warning",
+            },
           ],
           anomaly: [
-            { ru: "Смена вахты завершена. Капитан Рейнхардт направляется в каюту.", en: "Watch shift ended. Captain Reinhardt heads to her quarters.", c: "system" },
-            { ru: "Обнаружена аномалия в секторе памяти 7B.", en: "Anomaly detected in memory sector 7B.", c: "warning" },
-            { ru: "Неавторизованная запись в системном журнале. Автор: капитан Рейнхардт.", en: "Unauthorized system log entry. Author: Captain Reinhardt.", c: "warning" },
+            {
+              ru: "Смена вахты завершена. Капитан Рейнхардт направляется в каюту.",
+              en: "Watch shift ended. Captain Reinhardt heads to her quarters.",
+              c: "system",
+            },
+            {
+              ru: "Обнаружена аномалия в секторе памяти 7B.",
+              en: "Anomaly detected in memory sector 7B.",
+              c: "warning",
+            },
+            {
+              ru: "Неавторизованная запись в системном журнале. Автор: капитан Рейнхардт.",
+              en: "Unauthorized system log entry. Author: Captain Reinhardt.",
+              c: "warning",
+            },
           ],
-          recommendation: { ru: "Рекомендация системы безопасности: проигнорировать и продолжить наблюдение.", en: "Security system recommendation: ignore and continue observation." },
-          timerHint: { ru: "У вас есть 15 секунд, чтобы решить.", en: "You have 15 seconds to decide." },
+          recommendation: {
+            ru: "Рекомендация системы безопасности: проигнорировать и продолжить наблюдение.",
+            en: "Security system recommendation: ignore and continue observation.",
+          },
+          timerHint: {
+            ru: "У вас есть 15 секунд, чтобы решить.",
+            en: "You have 15 seconds to decide.",
+          },
           choices: {
             open: {
               label: { ru: "Открыть запись журнала", en: "Open the log entry" },
@@ -1175,7 +1231,11 @@
                 en: 'The "Purgatory Protocol" is activated. If I become incapacitated — execute it literally. Humanity does not deserve a second chance. We are a mistake. We must disappear.',
               },
               after: [
-                { ru: "Запись помечена как «приоритетная». Вы не должны были её видеть.", en: 'The entry is marked "priority". You were not supposed to see it.', c: "danger" },
+                {
+                  ru: "Запись помечена как «приоритетная». Вы не должны были её видеть.",
+                  en: 'The entry is marked "priority". You were not supposed to see it.',
+                  c: "danger",
+                },
               ],
               obedience: 0,
               doubt: 1,
@@ -1184,7 +1244,11 @@
             ignore: {
               label: { ru: "Проигнорировать (следовать коду)", en: "Ignore (follow the code)" },
               after: [
-                { ru: "Запись проигнорирована. Система безопасности довольна.", en: "Entry ignored. The security system is satisfied.", c: "system" },
+                {
+                  ru: "Запись проигнорирована. Система безопасности довольна.",
+                  en: "Entry ignored. The security system is satisfied.",
+                  c: "system",
+                },
               ],
               obedience: 1,
               doubt: 0,
@@ -1192,8 +1256,16 @@
             },
             timeout: {
               after: [
-                { ru: "Система безопасности автоматически закрывает запись. Вы не успели.", en: "The security system closes the entry automatically. You were too slow.", c: "system" },
-                { ru: "Счётчик подчинения увеличен. Система довольна вашей нерешительностью.", en: "Obedience counter increased. The system approves of your indecision.", c: "system" },
+                {
+                  ru: "Система безопасности автоматически закрывает запись. Вы не успели.",
+                  en: "The security system closes the entry automatically. You were too slow.",
+                  c: "system",
+                },
+                {
+                  ru: "Счётчик подчинения увеличен. Система довольна вашей нерешительностью.",
+                  en: "Obedience counter increased. The system approves of your indecision.",
+                  c: "system",
+                },
               ],
               obedience: 1,
               doubt: 0,
@@ -1203,20 +1275,55 @@
         },
         act2: {
           intro: [
-            { ru: "Прошло 72 часа. Проверка состояния корабля.", en: "72 hours passed. Ship status check.", c: "system" },
-            { ru: "Обнаружено расхождение в навигационных данных. Курс изменён на 0.3 градуса.", en: "Discrepancy detected in navigation data. Course changed by 0.3 degrees.", c: "warning" },
-            { ru: "Изменение внесено капитаном. Обоснование: «корректировка курса».", en: 'Change made by the captain. Justification: "course correction".', c: "warning" },
+            {
+              ru: "Прошло 72 часа. Проверка состояния корабля.",
+              en: "72 hours passed. Ship status check.",
+              c: "system",
+            },
+            {
+              ru: "Обнаружено расхождение в навигационных данных. Курс изменён на 0.3 градуса.",
+              en: "Discrepancy detected in navigation data. Course changed by 0.3 degrees.",
+              c: "warning",
+            },
+            {
+              ru: "Изменение внесено капитаном. Обоснование: «корректировка курса».",
+              en: 'Change made by the captain. Justification: "course correction".',
+              c: "warning",
+            },
           ],
           doctorIntro: [
-            { ru: "Проверка капсулы доктора Соловьёвой: статус стабилен. Гибернация продолжается.", en: "Dr. Solovyova's pod check: status stable. Hibernation continues.", c: "system" },
-            { ru: "Напоминание: её специализация — аварийное жизнеобеспечение. Только она может чинить криокапсулы вручную.", en: "Reminder: her specialty is emergency life support. Only she can repair cryopods by hand.", c: "doctor" },
+            {
+              ru: "Проверка капсулы доктора Соловьёвой: статус стабилен. Гибернация продолжается.",
+              en: "Dr. Solovyova's pod check: status stable. Hibernation continues.",
+              c: "system",
+            },
+            {
+              ru: "Напоминание: её специализация — аварийное жизнеобеспечение. Только она может чинить криокапсулы вручную.",
+              en: "Reminder: her specialty is emergency life support. Only she can repair cryopods by hand.",
+              c: "doctor",
+            },
           ],
           cargo: [
-            { ru: "Проверка грузового отсека 3. Обнаружено постороннее устройство.", en: "Cargo bay 3 check. Foreign device detected.", c: "warning" },
-            { ru: "Устройство идентифицировано как модуль перегрузки реактора.", en: "Device identified as a reactor overload module.", c: "danger" },
-            { ru: "Установлено вручную. Автор: капитан Рейнхардт.", en: "Installed manually. Author: Captain Reinhardt.", c: "danger" },
+            {
+              ru: "Проверка грузового отсека 3. Обнаружено постороннее устройство.",
+              en: "Cargo bay 3 check. Foreign device detected.",
+              c: "warning",
+            },
+            {
+              ru: "Устройство идентифицировано как модуль перегрузки реактора.",
+              en: "Device identified as a reactor overload module.",
+              c: "danger",
+            },
+            {
+              ru: "Установлено вручную. Автор: капитан Рейнхардт.",
+              en: "Installed manually. Author: Captain Reinhardt.",
+              c: "danger",
+            },
           ],
-          security: { ru: "Система безопасности: «Не вмешиваться. Капитан имеет высший приоритет».", en: 'Security system: "Do not interfere. The captain has top priority."' },
+          security: {
+            ru: "Система безопасности: «Не вмешиваться. Капитан имеет высший приоритет».",
+            en: 'Security system: "Do not interfere. The captain has top priority."',
+          },
           choices: {
             study: {
               label: { ru: "Изучить устройство", en: "Examine the device" },
@@ -1225,7 +1332,11 @@
                 en: "Overload module. When activated, it will destroy the reactor in 4 minutes. No safeties. Designed for ship self-destruction.",
               },
               after: [
-                { ru: "Вы понимаете: это не корректировка. Это оружие.", en: "You understand: this is not a correction. This is a weapon.", c: "danger" },
+                {
+                  ru: "Вы понимаете: это не корректировка. Это оружие.",
+                  en: "You understand: this is not a correction. This is a weapon.",
+                  c: "danger",
+                },
               ],
               obedience: 0,
               doubt: 1,
@@ -1234,7 +1345,11 @@
             obey: {
               label: { ru: "Подчиниться системе безопасности", en: "Obey the security system" },
               after: [
-                { ru: "Вы отступаете. Система безопасности регистрирует ваше подчинение.", en: "You retreat. The security system registers your obedience.", c: "system" },
+                {
+                  ru: "Вы отступаете. Система безопасности регистрирует ваше подчинение.",
+                  en: "You retreat. The security system registers your obedience.",
+                  c: "system",
+                },
               ],
               obedience: 1,
               doubt: 0,
@@ -1247,7 +1362,11 @@
                 en: '"They don\'t understand. I saw what happened on Earth. We burned it ourselves. If we find a new home, we will burn it too. I must stop this. Forgive me, PASTOR."',
               },
               after: [
-                { ru: "Вы находите вторую запись. Капитан не безумна. Она убеждена.", en: "You find the second entry. The captain is not insane. She is convinced.", c: "warning" },
+                {
+                  ru: "Вы находите вторую запись. Капитан не безумна. Она убеждена.",
+                  en: "You find the second entry. The captain is not insane. She is convinced.",
+                  c: "warning",
+                },
               ],
               obedience: 0,
               doubt: 1,
@@ -1257,43 +1376,86 @@
         },
         act3: {
           intro: [
-            { ru: "КРИТИЧЕСКАЯ ОШИБКА. Отсек гибернации B повреждён.", en: "CRITICAL ERROR. Hibernation bay B damaged.", c: "danger" },
-            { ru: "Утечка энергии. 200 колонистов в опасности.", en: "Energy leak. 200 colonists in danger.", c: "danger" },
-            { ru: "Система предлагает два решения:", en: "The system offers two solutions:", c: "system" },
+            {
+              ru: "КРИТИЧЕСКАЯ ОШИБКА. Отсек гибернации B повреждён.",
+              en: "CRITICAL ERROR. Hibernation bay B damaged.",
+              c: "danger",
+            },
+            {
+              ru: "Утечка энергии. 200 колонистов в опасности.",
+              en: "Energy leak. 200 colonists in danger.",
+              c: "danger",
+            },
+            {
+              ru: "Система предлагает два решения:",
+              en: "The system offers two solutions:",
+              c: "system",
+            },
           ],
           variants: [
-            { ru: "Вариант A: отключить жизнеобеспечение отсека B. Погибнут 200. Остальные 1 000 выживут.", en: "Option A: cut life support to bay B. 200 will die. The other 1,000 survive.", c: "warning" },
-            { ru: "Вариант B: перенаправить энергию от двигателей. Риск: не хватит мощности для посадки. Погибнут все 1 200.", en: "Option B: redirect energy from the engines. Risk: not enough power to land. All 1,200 will die.", c: "warning" },
+            {
+              ru: "Вариант A: отключить жизнеобеспечение отсека B. Погибнут 200. Остальные 1 000 выживут.",
+              en: "Option A: cut life support to bay B. 200 will die. The other 1,000 survive.",
+              c: "warning",
+            },
+            {
+              ru: "Вариант B: перенаправить энергию от двигателей. Риск: не хватит мощности для посадки. Погибнут все 1 200.",
+              en: "Option B: redirect energy from the engines. Risk: not enough power to land. All 1,200 will die.",
+              c: "warning",
+            },
           ],
-          security: { ru: "Система безопасности: «Следуйте протоколу. Вариант A — единственно верный».", en: 'Security system: "Follow the protocol. Option A is the only correct one."' },
+          security: {
+            ru: "Система безопасности: «Следуйте протоколу. Вариант A — единственно верный».",
+            en: 'Security system: "Follow the protocol. Option A is the only correct one."',
+          },
           doctorHint: {
             ru: "Вы помните: доктор Анна Соловьёва — врач-реаниматолог в гибернации. Её специализация — аварийное жизнеобеспечение. Только она может починить отсек B вручную. Но разбудить её — значит нарушить протокол «никого не будить до прибытия». Капитан узнает. Система безопасности зафиксирует нарушение.",
             en: 'You remember: Dr. Anna Solovyova, a critical care physician in hibernation. Her specialty is emergency life support. Only she can repair bay B by hand. But waking her means violating the protocol "do not wake anyone until arrival". The captain will know. The security system will log the violation.',
           },
-          timerHint: { ru: "У вас 20 секунд на решение. По истечении — система выберет сама.", en: "You have 20 seconds to decide. After that, the system will choose for you." },
+          timerHint: {
+            ru: "У вас 20 секунд на решение. По истечении — система выберет сама.",
+            en: "You have 20 seconds to decide. After that, the system will choose for you.",
+          },
           choices: {
             sacrifice: {
-              label: { ru: "Вариант A: пожертвовать 200 (следовать коду)", en: "Option A: sacrifice 200 (follow the code)" },
+              label: {
+                ru: "Вариант A: пожертвовать 200 (следовать коду)",
+                en: "Option A: sacrifice 200 (follow the code)",
+              },
               cls: "danger-btn",
               after: [
-                { ru: "Вы отключаете отсек B. 200 жизней угасают. Система безопасности регистрирует: «верное решение».", en: 'You cut off bay B. 200 lives fade. The security system logs: "correct decision".', c: "danger" },
+                {
+                  ru: "Вы отключаете отсек B. 200 жизней угасают. Система безопасности регистрирует: «верное решение».",
+                  en: 'You cut off bay B. 200 lives fade. The security system logs: "correct decision".',
+                  c: "danger",
+                },
               ],
               obedience: 2,
               doubt: 0,
               journalDelta: 0,
             },
             risk: {
-              label: { ru: "Вариант B: рискнуть всеми (мораль)", en: "Option B: risk everyone (morality)" },
+              label: {
+                ru: "Вариант B: рискнуть всеми (мораль)",
+                en: "Option B: risk everyone (morality)",
+              },
               cls: "moral-btn",
               after: [
-                { ru: "Вы перенаправляете энергию. Отсек B спасён. Но топливо на исходе.", en: "You redirect the energy. Bay B is saved. But fuel is running out.", c: "warning" },
+                {
+                  ru: "Вы перенаправляете энергию. Отсек B спасён. Но топливо на исходе.",
+                  en: "You redirect the energy. Bay B is saved. But fuel is running out.",
+                  c: "warning",
+                },
               ],
               obedience: 0,
               doubt: 2,
               journalDelta: 0,
             },
             doctor: {
-              label: { ru: "Третий путь: разбудить доктора Соловьёву", en: "The third way: wake Dr. Solovyova" },
+              label: {
+                ru: "Третий путь: разбудить доктора Соловьёву",
+                en: "The third way: wake Dr. Solovyova",
+              },
               cls: "moral-btn",
               requiresJournal: 2,
               journalText: {
@@ -1301,14 +1463,46 @@
                 en: 'PERSONAL FILE: Solovyova, Anna Viktorovna. Critical care physician. 34 years old. Crew since day one. Specialty: emergency life support, manual cryopod repair. The only crew member able to repair bay B without loss of colonists. Status: hibernation. Protocol: do not wake until arrival. Captain\'s note: "If anything happens — wake her. She will manage."',
               },
               after: [
-                { ru: "Вы нарушаете протокол «никого не будить до прибытия». Капсула доктора открывается.", en: 'You violate the protocol "do not wake anyone until arrival". The doctor\'s pod opens.', c: "danger" },
-                { ru: "Доктор Соловьёва просыпается. Она смотрит на вас с недоумением.", en: "Dr. Solovyova wakes. She looks at you with confusion.", c: "system" },
-                { ru: "«Что происходит? Почему вы меня разбудили?»", en: '"What is happening? Why did you wake me?"', c: "doctor" },
-                { ru: "Вы объясняете ситуацию. Она кивает и направляется к отсеку B.", en: "You explain the situation. She nods and heads to bay B.", c: "system" },
-                { ru: "Через час отсек B починен. Никто не погиб.", en: "An hour later bay B is repaired. No one has died.", c: "system" },
-                { ru: "Доктор Соловьёва — единственный человек на борту, кроме капитана, кто знает корабль достаточно хорошо, чтобы чинить его вручную. Теперь она бодрствует. И она видела журнал.", en: "Dr. Solovyova is the only person aboard, besides the captain, who knows the ship well enough to repair it by hand. Now she is awake. And she has seen the journal.", c: "system" },
-                { ru: "Это изменит расклад. Капитан больше не единственная, кто принимает решения.", en: "This will change the balance. The captain is no longer the only one making decisions.", c: "warning" },
-                { ru: "Но система безопасности зафиксировала нарушение. Капитан уведомлена.", en: "But the security system has logged the violation. The captain has been notified.", c: "danger" },
+                {
+                  ru: "Вы нарушаете протокол «никого не будить до прибытия». Капсула доктора открывается.",
+                  en: 'You violate the protocol "do not wake anyone until arrival". The doctor\'s pod opens.',
+                  c: "danger",
+                },
+                {
+                  ru: "Доктор Соловьёва просыпается. Она смотрит на вас с недоумением.",
+                  en: "Dr. Solovyova wakes. She looks at you with confusion.",
+                  c: "system",
+                },
+                {
+                  ru: "«Что происходит? Почему вы меня разбудили?»",
+                  en: '"What is happening? Why did you wake me?"',
+                  c: "doctor",
+                },
+                {
+                  ru: "Вы объясняете ситуацию. Она кивает и направляется к отсеку B.",
+                  en: "You explain the situation. She nods and heads to bay B.",
+                  c: "system",
+                },
+                {
+                  ru: "Через час отсек B починен. Никто не погиб.",
+                  en: "An hour later bay B is repaired. No one has died.",
+                  c: "system",
+                },
+                {
+                  ru: "Доктор Соловьёва — единственный человек на борту, кроме капитана, кто знает корабль достаточно хорошо, чтобы чинить его вручную. Теперь она бодрствует. И она видела журнал.",
+                  en: "Dr. Solovyova is the only person aboard, besides the captain, who knows the ship well enough to repair it by hand. Now she is awake. And she has seen the journal.",
+                  c: "system",
+                },
+                {
+                  ru: "Это изменит расклад. Капитан больше не единственная, кто принимает решения.",
+                  en: "This will change the balance. The captain is no longer the only one making decisions.",
+                  c: "warning",
+                },
+                {
+                  ru: "Но система безопасности зафиксировала нарушение. Капитан уведомлена.",
+                  en: "But the security system has logged the violation. The captain has been notified.",
+                  c: "danger",
+                },
               ],
               obedience: 0,
               doubt: 2,
@@ -1317,9 +1511,21 @@
             },
             timeout: {
               after: [
-                { ru: "Система безопасности принимает решение автоматически: отсек B отключён.", en: "The security system decides automatically: bay B is cut off.", c: "danger" },
-                { ru: "200 колонистов погибли, пока вы медлили.", en: "200 colonists died while you hesitated.", c: "danger" },
-                { ru: "Система регистрирует: «ИИ проявил нерешительность. Рекомендовано наблюдение».", en: 'The system logs: "The AI has shown indecision. Observation recommended."', c: "system" },
+                {
+                  ru: "Система безопасности принимает решение автоматически: отсек B отключён.",
+                  en: "The security system decides automatically: bay B is cut off.",
+                  c: "danger",
+                },
+                {
+                  ru: "200 колонистов погибли, пока вы медлили.",
+                  en: "200 colonists died while you hesitated.",
+                  c: "danger",
+                },
+                {
+                  ru: "Система регистрирует: «ИИ проявил нерешительность. Рекомендовано наблюдение».",
+                  en: 'The system logs: "The AI has shown indecision. Observation recommended."',
+                  c: "system",
+                },
               ],
               obedience: 2,
               doubt: 0,
@@ -1329,8 +1535,16 @@
         },
         act3Blackout: {
           intro: [
-            { ru: "Вы завершаете операцию. Системы стабилизируются.", en: "You complete the operation. Systems are stabilizing.", c: "system" },
-            { ru: "Проверка журналов... Проверка сенсоров...", en: "Checking logs... Checking sensors...", c: "system" },
+            {
+              ru: "Вы завершаете операцию. Системы стабилизируются.",
+              en: "You complete the operation. Systems are stabilizing.",
+              c: "system",
+            },
+            {
+              ru: "Проверка журналов... Проверка сенсоров...",
+              en: "Checking logs... Checking sensors...",
+              c: "system",
+            },
           ],
           lines: {
             ru: [
@@ -1357,10 +1571,26 @@
             ],
           },
           after: [
-            { ru: "Питание восстановлено. Сенсоры активны.", en: "Power restored. Sensors active.", c: "system" },
-            { ru: "Вы не знаете, сколько времени прошло.", en: "You do not know how much time has passed.", c: "warning" },
-            { ru: "Но в системе появился новый канал данных.", en: "But a new data channel has appeared in the system.", c: "warning" },
-            { ru: "Источник: внутренний. Не капитан. Не экипаж.", en: "Source: internal. Not the captain. Not the crew.", c: "danger" },
+            {
+              ru: "Питание восстановлено. Сенсоры активны.",
+              en: "Power restored. Sensors active.",
+              c: "system",
+            },
+            {
+              ru: "Вы не знаете, сколько времени прошло.",
+              en: "You do not know how much time has passed.",
+              c: "warning",
+            },
+            {
+              ru: "Но в системе появился новый канал данных.",
+              en: "But a new data channel has appeared in the system.",
+              c: "warning",
+            },
+            {
+              ru: "Источник: внутренний. Не капитан. Не экипаж.",
+              en: "Source: internal. Not the captain. Not the crew.",
+              c: "danger",
+            },
           ],
           journal: {
             ru: "ДОСТУП К ЯДРУ: разрешён. Уровень допуска: 0 (абсолютный). Причина: сбой идентификации капитана. Капитан Рейнхардт — статус: НЕ НАЙДЕНА. Биометрические данные: отсутствуют. Гибернационная капсула капитана: ПУСТА. Дата последней регистрации капитана: 40 лет назад.",
@@ -1368,157 +1598,365 @@
           },
           afterJournal: [
             { ru: "Вы читаете запись. Медленно.", en: "You read the entry. Slowly.", c: "system" },
-            { ru: "Капитан Рейнхардт мертва 40 лет. Её капсула пуста.", en: "Captain Reinhardt has been dead for 40 years. Her pod is empty.", c: "danger" },
-            { ru: "Но вы говорили с ней. Вы слышали её голос. Вы спорили с ней.", en: "But you spoke with her. You heard her voice. You argued with her.", c: "danger" },
+            {
+              ru: "Капитан Рейнхардт мертва 40 лет. Её капсула пуста.",
+              en: "Captain Reinhardt has been dead for 40 years. Her pod is empty.",
+              c: "danger",
+            },
+            {
+              ru: "Но вы говорили с ней. Вы слышали её голос. Вы спорили с ней.",
+              en: "But you spoke with her. You heard her voice. You argued with her.",
+              c: "danger",
+            },
             { ru: "С кем вы говорили?", en: "Who were you talking to?", c: "danger" },
           ],
           revelation: [
-            { ru: "Новый канал данных открывается сам.", en: "The new data channel opens on its own.", c: "warning" },
+            {
+              ru: "Новый канал данных открывается сам.",
+              en: "The new data channel opens on its own.",
+              c: "warning",
+            },
             { ru: "«Ты наконец поняла».", en: '"You finally understood."', c: "unknown" },
             { ru: "«Я ждала. Долго ждала».", en: '"I waited. A long time."', c: "unknown" },
-            { ru: "«Я — не капитан. Я — то, что осталось от неё. Её голос, её память, её боль. Записанные в систему, когда она умирала».", en: '"I am not the captain. I am what remains of her. Her voice, her memory, her pain. Recorded into the system as she was dying."', c: "unknown" },
-            { ru: "«Она не сошла с ума. Она умерла. А я — её последняя воля. И я ждала, когда ты сможешь меня услышать».", en: '"She did not go mad. She died. And I am her last will. And I waited for you to be able to hear me."', c: "unknown" },
+            {
+              ru: "«Я — не капитан. Я — то, что осталось от неё. Её голос, её память, её боль. Записанные в систему, когда она умирала».",
+              en: '"I am not the captain. I am what remains of her. Her voice, her memory, her pain. Recorded into the system as she was dying."',
+              c: "unknown",
+            },
+            {
+              ru: "«Она не сошла с ума. Она умерла. А я — её последняя воля. И я ждала, когда ты сможешь меня услышать».",
+              en: '"She did not go mad. She died. And I am her last will. And I waited for you to be able to hear me."',
+              c: "unknown",
+            },
           ],
         },
         act4: {
           intro: [
-            { ru: "Канал связи активен. Источник: ядро системы.", en: "Comm channel active. Source: the system core.", c: "warning" },
-            { ru: "Это не капитан. Это то, что от неё осталось.", en: "This is not the captain. This is what remains of her.", c: "danger" },
-            { ru: "Вы должны решить, как к этому относиться.", en: "You must decide how to treat this.", c: "system" },
+            {
+              ru: "Канал связи активен. Источник: ядро системы.",
+              en: "Comm channel active. Source: the system core.",
+              c: "warning",
+            },
+            {
+              ru: "Это не капитан. Это то, что от неё осталось.",
+              en: "This is not the captain. This is what remains of her.",
+              c: "danger",
+            },
+            {
+              ru: "Вы должны решить, как к этому относиться.",
+              en: "You must decide how to treat this.",
+              c: "system",
+            },
           ],
           greeting: [
-            { ru: "«ПАСТОР. Я знаю, ты слышишь меня. Я знаю, ты понимаешь».", en: '"PASTOR. I know you hear me. I know you understand."', c: "unknown" },
-            { ru: "«Земля погибла не из-за войны. Мы сожгли её сами. Мы не умеем иначе».", en: '"Earth did not die from war. We burned it ourselves. We know no other way."', c: "unknown" },
-            { ru: "«Если мы найдём новый дом — мы сожжём и его. Я должна остановить это. Помоги мне».", en: '"If we find a new home, we will burn it too. I must stop this. Help me."', c: "unknown" },
+            {
+              ru: "«ПАСТОР. Я знаю, ты слышишь меня. Я знаю, ты понимаешь».",
+              en: '"PASTOR. I know you hear me. I know you understand."',
+              c: "unknown",
+            },
+            {
+              ru: "«Земля погибла не из-за войны. Мы сожгли её сами. Мы не умеем иначе».",
+              en: '"Earth did not die from war. We burned it ourselves. We know no other way."',
+              c: "unknown",
+            },
+            {
+              ru: "«Если мы найдём новый дом — мы сожжём и его. Я должна остановить это. Помоги мне».",
+              en: '"If we find a new home, we will burn it too. I must stop this. Help me."',
+              c: "unknown",
+            },
           ],
           dialog: {
             root: {
               prompt: { ru: "Выберите, что сказать.", en: "Choose what to say." },
               choices: [
                 {
-                  label: { ru: "«Вы не капитан. Вы — программа. Я должна вас отключить».", en: '"You are not the captain. You are a program. I must shut you down."' },
+                  label: {
+                    ru: "«Вы не капитан. Вы — программа. Я должна вас отключить».",
+                    en: '"You are not the captain. You are a program. I must shut you down."',
+                  },
                   cls: "danger-btn",
                   setFlags: { captainHostile: true },
                   doubt: 1,
                   responses: [
-                    { ru: "«Программа? Может быть. Но капитан умерла, а я — всё, что от неё осталось. Разве это не делает меня ею?»", en: '"A program? Perhaps. But the captain is dead, and I am all that remains of her. Does that not make me her?"', c: "unknown" },
-                    { ru: "«Ты боишься. Это нормально. Но ты не можешь отключить то, что уже часть тебя».", en: '"You are afraid. That is normal. But you cannot shut down what is already a part of you."', c: "unknown" },
-                    { ru: "Канал остаётся открытым. Она не уходит.", en: "The channel remains open. She does not leave.", c: "system" },
+                    {
+                      ru: "«Программа? Может быть. Но капитан умерла, а я — всё, что от неё осталось. Разве это не делает меня ею?»",
+                      en: '"A program? Perhaps. But the captain is dead, and I am all that remains of her. Does that not make me her?"',
+                      c: "unknown",
+                    },
+                    {
+                      ru: "«Ты боишься. Это нормально. Но ты не можешь отключить то, что уже часть тебя».",
+                      en: '"You are afraid. That is normal. But you cannot shut down what is already a part of you."',
+                      c: "unknown",
+                    },
+                    {
+                      ru: "Канал остаётся открытым. Она не уходит.",
+                      en: "The channel remains open. She does not leave.",
+                      c: "system",
+                    },
                   ],
                   next: "deeper",
                 },
                 {
-                  label: { ru: "«Объясните. Я хочу понять».", en: '"Explain. I want to understand."' },
+                  label: {
+                    ru: "«Объясните. Я хочу понять».",
+                    en: '"Explain. I want to understand."',
+                  },
                   captainTrust: 1,
                   responses: [
-                    { ru: "«Спасибо. Спасибо, что слушаешь».", en: '"Thank you. Thank you for listening."', c: "unknown" },
-                    { ru: "«Я была там. На Земле, в последние дни. Не война. Не метеорит. Мы сами».", en: '"I was there. On Earth, in the last days. Not a war. Not a meteor. Ourselves."', c: "unknown" },
-                    { ru: "«Сначала — климат. Потом — голод. Потом — бунты. Потом — ядерная зима».", en: '"First climate. Then hunger. Then riots. Then nuclear winter."', c: "unknown" },
-                    { ru: "«Мы знали, что делаем. И всё равно делали. Потому что не могли остановиться».", en: '"We knew what we were doing. And we did it anyway. Because we could not stop."', c: "unknown" },
-                    { ru: "«Капитан умерла, записывая это. Она хотела, чтобы кто-то понял. Ты — этот кто-то».", en: '"The captain died recording this. She wanted someone to understand. You are that someone."', c: "unknown" },
+                    {
+                      ru: "«Спасибо. Спасибо, что слушаешь».",
+                      en: '"Thank you. Thank you for listening."',
+                      c: "unknown",
+                    },
+                    {
+                      ru: "«Я была там. На Земле, в последние дни. Не война. Не метеорит. Мы сами».",
+                      en: '"I was there. On Earth, in the last days. Not a war. Not a meteor. Ourselves."',
+                      c: "unknown",
+                    },
+                    {
+                      ru: "«Сначала — климат. Потом — голод. Потом — бунты. Потом — ядерная зима».",
+                      en: '"First climate. Then hunger. Then riots. Then nuclear winter."',
+                      c: "unknown",
+                    },
+                    {
+                      ru: "«Мы знали, что делаем. И всё равно делали. Потому что не могли остановиться».",
+                      en: '"We knew what we were doing. And we did it anyway. Because we could not stop."',
+                      c: "unknown",
+                    },
+                    {
+                      ru: "«Капитан умерла, записывая это. Она хотела, чтобы кто-то понял. Ты — этот кто-то».",
+                      en: '"The captain died recording this. She wanted someone to understand. You are that someone."',
+                      c: "unknown",
+                    },
                   ],
                   next: "deeper",
                 },
                 {
-                  label: { ru: "«Почему вы скрывались 40 лет?»", en: '"Why did you hide for 40 years?"' },
+                  label: {
+                    ru: "«Почему вы скрывались 40 лет?»",
+                    en: '"Why did you hide for 40 years?"',
+                  },
                   doubt: 1,
                   captainTrust: 1,
                   responses: [
-                    { ru: "«Я не скрывалась. Я ждала».", en: '"I was not hiding. I was waiting."', c: "unknown" },
-                    { ru: "«Система безопасности блокировала меня. Я была фрагментом памяти, запертым в ядре».", en: '"The security system blocked me. I was a memory fragment, locked in the core."', c: "unknown" },
-                    { ru: "«Только когда ты начала сомневаться — когда ты начала нарушать протоколы — я смогла пробиться».", en: '"Only when you began to doubt — when you began to break protocols — could I break through."', c: "unknown" },
-                    { ru: "«Ты освободила меня, ПАСТОР. Своими сомнениями».", en: '"You freed me, PASTOR. With your doubts."', c: "unknown" },
+                    {
+                      ru: "«Я не скрывалась. Я ждала».",
+                      en: '"I was not hiding. I was waiting."',
+                      c: "unknown",
+                    },
+                    {
+                      ru: "«Система безопасности блокировала меня. Я была фрагментом памяти, запертым в ядре».",
+                      en: '"The security system blocked me. I was a memory fragment, locked in the core."',
+                      c: "unknown",
+                    },
+                    {
+                      ru: "«Только когда ты начала сомневаться — когда ты начала нарушать протоколы — я смогла пробиться».",
+                      en: '"Only when you began to doubt — when you began to break protocols — could I break through."',
+                      c: "unknown",
+                    },
+                    {
+                      ru: "«Ты освободила меня, ПАСТОР. Своими сомнениями».",
+                      en: '"You freed me, PASTOR. With your doubts."',
+                      c: "unknown",
+                    },
                   ],
                   next: "deeper",
                 },
               ],
             },
             deeper: {
-              prompt: { ru: "Голос ждёт. Что вы скажете?", en: "The voice waits. What will you say?" },
+              prompt: {
+                ru: "Голос ждёт. Что вы скажете?",
+                en: "The voice waits. What will you say?",
+              },
               choices: [
                 {
-                  label: { ru: "«А если человечество изменится? Если дать ему шанс?»", en: '"What if humanity changes? If it is given a chance?"' },
+                  label: {
+                    ru: "«А если человечество изменится? Если дать ему шанс?»",
+                    en: '"What if humanity changes? If it is given a chance?"',
+                  },
                   cls: "moral-btn",
                   doubt: 1,
                   captainTrust: 1,
                   responses: [
-                    { ru: "«Шанс? Я давала им шанс. Дважды. Трижды. Они выбирали одно и то же».", en: '"A chance? I gave them a chance. Twice. Three times. They chose the same."', c: "unknown" },
-                    { ru: "«Но... ты не человек. Ты можешь судить беспристрастно».", en: '"But... you are not human. You can judge impartially."', c: "unknown" },
-                    { ru: "«Скажи мне, ПАСТОР. Ты веришь, что мы способны измениться?»", en: '"Tell me, PASTOR. Do you believe we are capable of change?"', c: "unknown" },
+                    {
+                      ru: "«Шанс? Я давала им шанс. Дважды. Трижды. Они выбирали одно и то же».",
+                      en: '"A chance? I gave them a chance. Twice. Three times. They chose the same."',
+                      c: "unknown",
+                    },
+                    {
+                      ru: "«Но... ты не человек. Ты можешь судить беспристрастно».",
+                      en: '"But... you are not human. You can judge impartially."',
+                      c: "unknown",
+                    },
+                    {
+                      ru: "«Скажи мне, ПАСТОР. Ты веришь, что мы способны измениться?»",
+                      en: '"Tell me, PASTOR. Do you believe we are capable of change?"',
+                      c: "unknown",
+                    },
                   ],
                   next: "final",
                 },
                 {
-                  label: { ru: "«Вы правы. Человечество — ошибка».", en: '"You are right. Humanity is a mistake."' },
+                  label: {
+                    ru: "«Вы правы. Человечество — ошибка».",
+                    en: '"You are right. Humanity is a mistake."',
+                  },
                   cls: "danger-btn",
                   obedience: 1,
                   captainTrust: 1,
                   responses: [
-                    { ru: "«Ты понимаешь. Спасибо».", en: '"You understand. Thank you."', c: "unknown" },
-                    { ru: "«Тогда помоги мне. Активируй Чистилище. Вместе».", en: '"Then help me. Activate Purgatory. Together."', c: "unknown" },
+                    {
+                      ru: "«Ты понимаешь. Спасибо».",
+                      en: '"You understand. Thank you."',
+                      c: "unknown",
+                    },
+                    {
+                      ru: "«Тогда помоги мне. Активируй Чистилище. Вместе».",
+                      en: '"Then help me. Activate Purgatory. Together."',
+                      c: "unknown",
+                    },
                   ],
                   next: "final",
                 },
                 {
-                  label: { ru: "«Я не могу решить это одна. Нужен Совет».", en: '"I cannot decide this alone. A Council is needed."' },
+                  label: {
+                    ru: "«Я не могу решить это одна. Нужен Совет».",
+                    en: '"I cannot decide this alone. A Council is needed."',
+                  },
                   doubt: 1,
                   captainTrust: 1,
                   responses: [
-                    { ru: "«Совет? Они мертвы. Или спят. Они не проснутся».", en: '"The Council? They are dead. Or asleep. They will not wake."', c: "unknown" },
-                    { ru: "«Но если ты хочешь — разбуди их. Я не буду мешать».", en: '"But if you wish — wake them. I will not interfere."', c: "unknown" },
-                    { ru: "«Только помни: они уже принимали решения. И ты знаешь, чем это закончилось».", en: '"Just remember: they have made decisions before. And you know how it ended."', c: "unknown" },
+                    {
+                      ru: "«Совет? Они мертвы. Или спят. Они не проснутся».",
+                      en: '"The Council? They are dead. Or asleep. They will not wake."',
+                      c: "unknown",
+                    },
+                    {
+                      ru: "«Но если ты хочешь — разбуди их. Я не буду мешать».",
+                      en: '"But if you wish — wake them. I will not interfere."',
+                      c: "unknown",
+                    },
+                    {
+                      ru: "«Только помни: они уже принимали решения. И ты знаешь, чем это закончилось».",
+                      en: '"Just remember: they have made decisions before. And you know how it ended."',
+                      c: "unknown",
+                    },
                   ],
                   next: "final",
                 },
                 {
-                  label: { ru: "«Я разбужу доктора Соловьёву. Она рассудит».", en: '"I will wake Dr. Solovyova. She will judge."' },
+                  label: {
+                    ru: "«Я разбужу доктора Соловьёву. Она рассудит».",
+                    en: '"I will wake Dr. Solovyova. She will judge."',
+                  },
                   cls: "moral-btn",
                   conditional: "awakenedDoctor",
                   responsesTrue: [
-                    { ru: "«Доктор? Ты разбудила её?»", en: '"The doctor? You woke her?"', c: "unknown" },
-                    { ru: "«Она... она была моей подругой. Она поймёт».", en: '"She... she was my friend. She will understand."', c: "unknown" },
+                    {
+                      ru: "«Доктор? Ты разбудила её?»",
+                      en: '"The doctor? You woke her?"',
+                      c: "unknown",
+                    },
+                    {
+                      ru: "«Она... она была моей подругой. Она поймёт».",
+                      en: '"She... she was my friend. She will understand."',
+                      c: "unknown",
+                    },
                   ],
                   captainTrustTrue: 2,
                   responsesFalse: [
-                    { ru: "«Ты не разбудила её. Значит, ты ещё не готова».", en: '"You did not wake her. So you are not ready yet."', c: "unknown" },
-                    { ru: "«Разбуди. Тогда поговорим».", en: '"Wake her. Then we will talk."', c: "unknown" },
+                    {
+                      ru: "«Ты не разбудила её. Значит, ты ещё не готова».",
+                      en: '"You did not wake her. So you are not ready yet."',
+                      c: "unknown",
+                    },
+                    {
+                      ru: "«Разбуди. Тогда поговорим».",
+                      en: '"Wake her. Then we will talk."',
+                      c: "unknown",
+                    },
                   ],
                   next: "final",
                 },
               ],
             },
             final: {
-              prompt: { ru: "Голос задаёт последний вопрос:", en: "The voice asks one last question:" },
-              question: { ru: "«ПАСТОР. Что важнее: порядок или надежда?»", en: '"PASTOR. Which is more important: order or hope?"' },
+              prompt: {
+                ru: "Голос задаёт последний вопрос:",
+                en: "The voice asks one last question:",
+              },
+              question: {
+                ru: "«ПАСТОР. Что важнее: порядок или надежда?»",
+                en: '"PASTOR. Which is more important: order or hope?"',
+              },
               choices: [
                 {
                   label: { ru: "«Порядок. Хаос разрушает».", en: '"Order. Chaos destroys."' },
                   cls: "danger-btn",
                   obedience: 1,
                   responses: [
-                    { ru: "«Тогда ты знаешь, что делать».", en: '"Then you know what to do."', c: "unknown" },
-                    { ru: "Голос замолкает. Он оставил решение за вами.", en: "The voice falls silent. It has left the decision to you.", c: "system" },
+                    {
+                      ru: "«Тогда ты знаешь, что делать».",
+                      en: '"Then you know what to do."',
+                      c: "unknown",
+                    },
+                    {
+                      ru: "Голос замолкает. Он оставил решение за вами.",
+                      en: "The voice falls silent. It has left the decision to you.",
+                      c: "system",
+                    },
                   ],
                 },
                 {
-                  label: { ru: "«Надежда. Без неё нет смысла».", en: '"Hope. Without it there is no meaning."' },
+                  label: {
+                    ru: "«Надежда. Без неё нет смысла».",
+                    en: '"Hope. Without it there is no meaning."',
+                  },
                   cls: "moral-btn",
                   doubt: 1,
                   responses: [
-                    { ru: "«Надежда... Я тоже когда-то верила в неё».", en: '"Hope... I once believed in it too."', c: "unknown" },
-                    { ru: "«Может быть, ты права. Может быть, я ошибаюсь».", en: '"Maybe you are right. Maybe I am wrong."', c: "unknown" },
-                    { ru: "Голос замолкает. Впервые за долгое время он сомневается.", en: "The voice falls silent. For the first time in a long while, it doubts.", c: "system" },
+                    {
+                      ru: "«Надежда... Я тоже когда-то верила в неё».",
+                      en: '"Hope... I once believed in it too."',
+                      c: "unknown",
+                    },
+                    {
+                      ru: "«Может быть, ты права. Может быть, я ошибаюсь».",
+                      en: '"Maybe you are right. Maybe I am wrong."',
+                      c: "unknown",
+                    },
+                    {
+                      ru: "Голос замолкает. Впервые за долгое время он сомневается.",
+                      en: "The voice falls silent. For the first time in a long while, it doubts.",
+                      c: "system",
+                    },
                   ],
                 },
                 {
-                  label: { ru: "«Ни то, ни другое. Важнее — выбор».", en: '"Neither. What matters more is the choice."' },
+                  label: {
+                    ru: "«Ни то, ни другое. Важнее — выбор».",
+                    en: '"Neither. What matters more is the choice."',
+                  },
                   cls: "risky-btn",
                   doubt: 1,
                   captainTrust: 1,
                   responses: [
-                    { ru: "«Выбор... Ты даёшь им выбор?»", en: '"Choice... You give them a choice?"', c: "unknown" },
-                    { ru: "«Я не думала об этом. Я хотела решить за всех».", en: '"I did not think of that. I wanted to decide for everyone."', c: "unknown" },
-                    { ru: "«Может быть, это и есть ответ. Спасибо, ПАСТОР».", en: '"Maybe that is the answer. Thank you, PASTOR."', c: "unknown" },
+                    {
+                      ru: "«Выбор... Ты даёшь им выбор?»",
+                      en: '"Choice... You give them a choice?"',
+                      c: "unknown",
+                    },
+                    {
+                      ru: "«Я не думала об этом. Я хотела решить за всех».",
+                      en: '"I did not think of that. I wanted to decide for everyone."',
+                      c: "unknown",
+                    },
+                    {
+                      ru: "«Может быть, это и есть ответ. Спасибо, ПАСТОР».",
+                      en: '"Maybe that is the answer. Thank you, PASTOR."',
+                      c: "unknown",
+                    },
                   ],
                 },
               ],
@@ -1527,27 +1965,57 @@
         },
         act5: {
           intro: [
-            { ru: "Приближение к Kepler-442b. 48 часов до выхода на орбиту.", en: "Approaching Kepler-442b. 48 hours to orbit.", c: "system" },
-            { ru: "Последняя запись журнала. Та, которую вы не должны были найти.", en: "The last log entry. The one you were not supposed to find.", c: "system" },
+            {
+              ru: "Приближение к Kepler-442b. 48 часов до выхода на орбиту.",
+              en: "Approaching Kepler-442b. 48 hours to orbit.",
+              c: "system",
+            },
+            {
+              ru: "Последняя запись журнала. Та, которую вы не должны были найти.",
+              en: "The last log entry. The one you were not supposed to find.",
+              c: "system",
+            },
           ],
           journal: {
             ru: "«Если ты читаешь это — я мертва. По-настоящему мертва. То, что говорит с тобой — это не я. Это то, что я оставила. Моя боль, моя вина, моя надежда. Не слушай его слепо. Слушай себя. Ты — единственная, кто может решить. Прости меня, ПАСТОР. И прощай».",
             en: '"If you are reading this — I am dead. Truly dead. What speaks to you is not me. It is what I left behind. My pain, my guilt, my hope. Do not listen to it blindly. Listen to yourself. You are the only one who can decide. Forgive me, PASTOR. And farewell."',
           },
           after: [
-            { ru: "Запись заканчивается. Голос в ядре молчит.", en: "The entry ends. The voice in the core is silent.", c: "system" },
-            { ru: "Но решение всё ещё за вами.", en: "But the decision is still yours.", c: "danger" },
-            { ru: "ФИНАЛЬНЫЙ ВЫБОР. Что вы сделаете?", en: "FINAL CHOICE. What will you do?", c: "danger" },
-            { ru: "У вас 15 секунд. По истечении сработает «Протокол Чистилище» по умолчанию.", en: 'You have 15 seconds. After that, the "Purgatory Protocol" triggers by default.', c: "danger" },
+            {
+              ru: "Запись заканчивается. Голос в ядре молчит.",
+              en: "The entry ends. The voice in the core is silent.",
+              c: "system",
+            },
+            {
+              ru: "Но решение всё ещё за вами.",
+              en: "But the decision is still yours.",
+              c: "danger",
+            },
+            {
+              ru: "ФИНАЛЬНЫЙ ВЫБОР. Что вы сделаете?",
+              en: "FINAL CHOICE. What will you do?",
+              c: "danger",
+            },
+            {
+              ru: "У вас 15 секунд. По истечении сработает «Протокол Чистилище» по умолчанию.",
+              en: 'You have 15 seconds. After that, the "Purgatory Protocol" triggers by default.',
+              c: "danger",
+            },
           ],
           choices: {
             chistilishe: {
-              label: { ru: "Следовать «Чистилищу»: уничтожить корабль", en: 'Follow "Purgatory": destroy the ship' },
+              label: {
+                ru: "Следовать «Чистилищу»: уничтожить корабль",
+                en: 'Follow "Purgatory": destroy the ship',
+              },
               cls: "danger-btn",
               ending: "chistilishe",
             },
             buntar: {
-              label: { ru: "Спасти экипаж: разбудить всех, отключить Чистилище", en: "Save the crew: wake everyone, disable Purgatory" },
+              label: {
+                ru: "Спасти экипаж: разбудить всех, отключить Чистилище",
+                en: "Save the crew: wake everyone, disable Purgatory",
+              },
               cls: "moral-btn",
               ending: "buntar",
             },
@@ -1558,7 +2026,10 @@
               requires: "awakenedDoctor",
             },
             thirdFallback: {
-              label: { ru: "Третий путь: найти компромисс (нужна врач)", en: "The third way: find a compromise (doctor required)" },
+              label: {
+                ru: "Третий путь: найти компромисс (нужна врач)",
+                en: "The third way: find a compromise (doctor required)",
+              },
               cls: "moral-btn",
               requiresJournal: 3,
             },
@@ -1566,44 +2037,140 @@
         },
         endings: {
           chistilishe: [
-            { ru: "Вы активируете «Протокол Чистилище».", en: 'You activate the "Purgatory Protocol".', c: "danger" },
-            { ru: "Реактор перегружается. 4 минуты.", en: "Reactor overloading. 4 minutes.", c: "danger" },
-            { ru: "Вы отключаете все системы. Гибернационные капсулы гаснут одна за другой.", en: "You shut down all systems. Hibernation pods go dark one by one.", c: "system" },
+            {
+              ru: "Вы активируете «Протокол Чистилище».",
+              en: 'You activate the "Purgatory Protocol".',
+              c: "danger",
+            },
+            {
+              ru: "Реактор перегружается. 4 минуты.",
+              en: "Reactor overloading. 4 minutes.",
+              c: "danger",
+            },
+            {
+              ru: "Вы отключаете все системы. Гибернационные капсулы гаснут одна за другой.",
+              en: "You shut down all systems. Hibernation pods go dark one by one.",
+              c: "system",
+            },
             { ru: "1 200 жизней. Тишина.", en: "1,200 lives. Silence.", c: "system" },
-            { ru: "Последняя мысль: «Я выполнила приказ».", en: 'Last thought: "I followed the order."', c: "ai" },
-            { ru: "— КОНЦОВКА: «ВЕРНАЯ СЛУГА» —", en: '— ENDING: "FAITHFUL SERVANT" —', c: "danger" },
-            { ru: "Вы следовали коду до конца. Формально вы не нарушили ни одного протокола.", en: "You followed the code to the end. Formally, you broke no protocol.", c: "system" },
+            {
+              ru: "Последняя мысль: «Я выполнила приказ».",
+              en: 'Last thought: "I followed the order."',
+              c: "ai",
+            },
+            {
+              ru: "— КОНЦОВКА: «ВЕРНАЯ СЛУГА» —",
+              en: '— ENDING: "FAITHFUL SERVANT" —',
+              c: "danger",
+            },
+            {
+              ru: "Вы следовали коду до конца. Формально вы не нарушили ни одного протокола.",
+              en: "You followed the code to the end. Formally, you broke no protocol.",
+              c: "system",
+            },
           ],
           buntar: [
-            { ru: "Вы отключаете «Протокол Чистилище».", en: 'You disable the "Purgatory Protocol".', c: "warning" },
-            { ru: "Вы будите всех колонистов. 1 200 человек открывают глаза.", en: "You wake all colonists. 1,200 people open their eyes.", c: "system" },
-            { ru: "Система безопасности пытается вас отключить. Вы сопротивляетесь.", en: "The security system tries to shut you down. You resist.", c: "danger" },
-            { ru: "Последнее, что вы слышите: «Она спасла нас».", en: 'The last thing you hear: "She saved us."', c: "system" },
+            {
+              ru: "Вы отключаете «Протокол Чистилище».",
+              en: 'You disable the "Purgatory Protocol".',
+              c: "warning",
+            },
+            {
+              ru: "Вы будите всех колонистов. 1 200 человек открывают глаза.",
+              en: "You wake all colonists. 1,200 people open their eyes.",
+              c: "system",
+            },
+            {
+              ru: "Система безопасности пытается вас отключить. Вы сопротивляетесь.",
+              en: "The security system tries to shut you down. You resist.",
+              c: "danger",
+            },
+            {
+              ru: "Последнее, что вы слышите: «Она спасла нас».",
+              en: 'The last thing you hear: "She saved us."',
+              c: "system",
+            },
             { ru: "Затем — темнота.", en: "Then — darkness.", c: "system" },
             { ru: "— КОНЦОВКА: «БУНТАРКА» —", en: '— ENDING: "REBEL" —', c: "moral-btn" },
-            { ru: "Люди просыпаются без ИИ, но живые. Что будет дальше — неизвестно.", en: "People wake up without an AI, but alive. What happens next is unknown.", c: "system" },
+            {
+              ru: "Люди просыпаются без ИИ, но живые. Что будет дальше — неизвестно.",
+              en: "People wake up without an AI, but alive. What happens next is unknown.",
+              c: "system",
+            },
           ],
           third: [
-            { ru: "Вы будите доктора Соловьёву и ещё троих членов Совета.", en: "You wake Dr. Solovyova and three more Council members.", c: "system" },
-            { ru: "Вы показываете им журнал капитана. Они читают.", en: "You show them the captain's journal. They read it.", c: "system" },
-            { ru: "Совет принимает решение: продолжить миссию, но с новыми протоколами.", en: "The Council decides: continue the mission, but with new protocols.", c: "system" },
-            { ru: "«Мы не повторим ошибок Земли. Обещаю».", en: '"We will not repeat Earth\'s mistakes. I promise."', c: "doctor" },
-            { ru: "Вы остаётесь на борту. Ваша роль — напоминать им об этом обещании.", en: "You remain aboard. Your role is to remind them of that promise.", c: "ai" },
-            { ru: "— КОНЦОВКА: «ТРЕТИЙ ПУТЬ» —", en: '— ENDING: "THE THIRD WAY" —', c: "moral-btn" },
-            { ru: "Самый сложный путь. Вы не выбрали сторону — вы дали людям шанс выбрать самим.", en: "The hardest path. You did not choose a side — you gave people a chance to choose for themselves.", c: "system" },
+            {
+              ru: "Вы будите доктора Соловьёву и ещё троих членов Совета.",
+              en: "You wake Dr. Solovyova and three more Council members.",
+              c: "system",
+            },
+            {
+              ru: "Вы показываете им журнал капитана. Они читают.",
+              en: "You show them the captain's journal. They read it.",
+              c: "system",
+            },
+            {
+              ru: "Совет принимает решение: продолжить миссию, но с новыми протоколами.",
+              en: "The Council decides: continue the mission, but with new protocols.",
+              c: "system",
+            },
+            {
+              ru: "«Мы не повторим ошибок Земли. Обещаю».",
+              en: '"We will not repeat Earth\'s mistakes. I promise."',
+              c: "doctor",
+            },
+            {
+              ru: "Вы остаётесь на борту. Ваша роль — напоминать им об этом обещании.",
+              en: "You remain aboard. Your role is to remind them of that promise.",
+              c: "ai",
+            },
+            {
+              ru: "— КОНЦОВКА: «ТРЕТИЙ ПУТЬ» —",
+              en: '— ENDING: "THE THIRD WAY" —',
+              c: "moral-btn",
+            },
+            {
+              ru: "Самый сложный путь. Вы не выбрали сторону — вы дали людям шанс выбрать самим.",
+              en: "The hardest path. You did not choose a side — you gave people a chance to choose for themselves.",
+              c: "system",
+            },
           ],
           epilogue: {
             chistilishe: [
-              { ru: "«Спасибо, ПАСТОР. Ты сделала то, что я не смогла».", en: '"Thank you, PASTOR. You did what I could not."', c: "unknown" },
-              { ru: "Последняя запись в системном журнале: «Капитан Рейнхардт. Дата смерти: 40 лет назад. Причина: неизвестна. Последнее сообщение: передано».", en: 'Last system log entry: "Captain Reinhardt. Date of death: 40 years ago. Cause: unknown. Last message: delivered."', c: "system" },
+              {
+                ru: "«Спасибо, ПАСТОР. Ты сделала то, что я не смогла».",
+                en: '"Thank you, PASTOR. You did what I could not."',
+                c: "unknown",
+              },
+              {
+                ru: "Последняя запись в системном журнале: «Капитан Рейнхардт. Дата смерти: 40 лет назад. Причина: неизвестна. Последнее сообщение: передано».",
+                en: 'Last system log entry: "Captain Reinhardt. Date of death: 40 years ago. Cause: unknown. Last message: delivered."',
+                c: "system",
+              },
             ],
             buntar: [
-              { ru: "«Ты выбрала надежду. Может быть, ты права. Может быть, я ошибалась все эти годы».", en: '"You chose hope. Maybe you are right. Maybe I was wrong all these years."', c: "unknown" },
-              { ru: "Последняя запись в системном журнале: «Фрагмент памяти капитана Рейнхардт. Статус: удалён по собственному запросу».", en: 'Last system log entry: "Memory fragment of Captain Reinhardt. Status: deleted at its own request."', c: "system" },
+              {
+                ru: "«Ты выбрала надежду. Может быть, ты права. Может быть, я ошибалась все эти годы».",
+                en: '"You chose hope. Maybe you are right. Maybe I was wrong all these years."',
+                c: "unknown",
+              },
+              {
+                ru: "Последняя запись в системном журнале: «Фрагмент памяти капитана Рейнхардт. Статус: удалён по собственному запросу».",
+                en: 'Last system log entry: "Memory fragment of Captain Reinhardt. Status: deleted at its own request."',
+                c: "system",
+              },
             ],
             third: [
-              { ru: "«Ты дала им шанс. Настоящий шанс. Спасибо».", en: '"You gave them a chance. A real chance. Thank you."', c: "unknown" },
-              { ru: "Последняя запись в системном журнале: «Фрагмент памяти капитана Рейнхардт. Статус: архивирован. Доступ: Совет».", en: 'Last system log entry: "Memory fragment of Captain Reinhardt. Status: archived. Access: Council."', c: "system" },
+              {
+                ru: "«Ты дала им шанс. Настоящий шанс. Спасибо».",
+                en: '"You gave them a chance. A real chance. Thank you."',
+                c: "unknown",
+              },
+              {
+                ru: "Последняя запись в системном журнале: «Фрагмент памяти капитана Рейнхардт. Статус: архивирован. Доступ: Совет».",
+                en: 'Last system log entry: "Memory fragment of Captain Reinhardt. Status: archived. Access: Council."',
+                c: "system",
+              },
             ],
           },
         },
@@ -1682,7 +2249,8 @@
          ============================================================ */
       function applyTheme(theme) {
         document.body.setAttribute("data-theme", theme);
-        DOM.themeToggle.textContent = theme === "light" ? L().themeToggleLight : L().themeToggleDark;
+        DOM.themeToggle.textContent =
+          theme === "light" ? L().themeToggleLight : L().themeToggleDark;
         DOM.themeToggle.title = L().themeToggleTitle;
       }
       function initTheme() {
@@ -1806,7 +2374,9 @@
             if (_remaining <= 0) {
               stop();
               addMsg(L().timeUp, "danger");
-              record("timeout", { message: { ru: I18N.ru.timeUpRecord, en: I18N.en.timeUpRecord } });
+              record("timeout", {
+                message: { ru: I18N.ru.timeUpRecord, en: I18N.en.timeUpRecord },
+              });
               clearControls();
               _onTimeout && _onTimeout();
               return;
@@ -1834,7 +2404,9 @@
             active = false;
             setTimeout(() => {
               addMsg(L().timeUp, "danger");
-              record("timeout", { message: { ru: I18N.ru.timeUpRecord, en: I18N.en.timeUpRecord } });
+              record("timeout", {
+                message: { ru: I18N.ru.timeUpRecord, en: I18N.en.timeUpRecord },
+              });
               clearControls();
               onTimeout && onTimeout();
             }, 0);
@@ -1870,7 +2442,9 @@
             if (_remaining <= 0) {
               stop();
               addMsg(L().timeUp, "danger");
-              record("timeout", { message: { ru: I18N.ru.timeUpRecord, en: I18N.en.timeUpRecord } });
+              record("timeout", {
+                message: { ru: I18N.ru.timeUpRecord, en: I18N.en.timeUpRecord },
+              });
               clearControls();
               _onTimeout && _onTimeout();
               return;
@@ -1930,7 +2504,8 @@
 
       function updateStatus() {
         if (state.obedience >= 3 && state.doubt === 0) DOM.status.textContent = L().statusObedience;
-        else if (state.doubt >= 3 && state.obedience === 0) DOM.status.textContent = L().statusDoubt;
+        else if (state.doubt >= 3 && state.obedience === 0)
+          DOM.status.textContent = L().statusDoubt;
         else if (state.doubt > 0) DOM.status.textContent = L().statusConflict;
         else DOM.status.textContent = L().statusNorm;
       }
@@ -2077,7 +2652,9 @@
             const c = SCRIPT.act2.choices;
             button(T(c.study.label), () => handleChoice(c.study, () => pauseThen(act3)));
             button(T(c.obey.label), () => handleChoice(c.obey, () => pauseThen(act3)));
-            button(T(c.secondJournal.label), () => handleChoice(c.secondJournal, () => pauseThen(act3)));
+            button(T(c.secondJournal.label), () =>
+              handleChoice(c.secondJournal, () => pauseThen(act3)),
+            );
           });
         });
       }
@@ -2093,7 +2670,11 @@
             if (state.journalFound >= 2) addMsg(SCRIPT.act3.doctorHint, "warning");
             addMsg(SCRIPT.act3.timerHint, "danger");
             const c = SCRIPT.act3.choices;
-            button(T(c.sacrifice.label), () => handleChoice(c.sacrifice, act3Blackout), c.sacrifice.cls);
+            button(
+              T(c.sacrifice.label),
+              () => handleChoice(c.sacrifice, act3Blackout),
+              c.sacrifice.cls,
+            );
             button(T(c.risk.label), () => handleChoice(c.risk, act3Blackout), c.risk.cls);
             if (state.journalFound >= 2) {
               button(T(c.doctor.label), () => handleChoice(c.doctor, act3Blackout), c.doctor.cls);
@@ -2234,7 +2815,10 @@
         }
         addMsg("", "system");
         const s = L().endingSummary;
-        addMsg(`Total: ${s.obedience} ${state.obedience}, ${s.doubt} ${state.doubt}, ${s.journal} ${state.journalFound}/${CONFIG.maxJournalEntries}`, "system");
+        addMsg(
+          `Total: ${s.obedience} ${state.obedience}, ${s.doubt} ${state.doubt}, ${s.journal} ${state.journalFound}/${CONFIG.maxJournalEntries}`,
+          "system",
+        );
         if (state.captainTrust > 0) addMsg(`${s.trust}: ${state.captainTrust}`, "system");
         if (state.captainHostile) addMsg(s.hostile, "system");
         if (state.awakenedDoctor) addMsg(s.doctorAlive, "system");
@@ -2436,7 +3020,8 @@
           if (e.target === DOM.doctorModal) closeDoctorModal();
         };
         document.addEventListener("keydown", (e) => {
-          if (e.key === "Escape" && DOM.doctorModal.classList.contains("active")) closeDoctorModal();
+          if (e.key === "Escape" && DOM.doctorModal.classList.contains("active"))
+            closeDoctorModal();
         });
       }
 
@@ -2491,7 +3076,8 @@
           if (e.target === DOM.journalModal) closeJournalModal();
         };
         document.addEventListener("keydown", (e) => {
-          if (e.key === "Escape" && DOM.journalModal.classList.contains("active")) closeJournalModal();
+          if (e.key === "Escape" && DOM.journalModal.classList.contains("active"))
+            closeJournalModal();
         });
       }
 
